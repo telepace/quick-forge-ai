@@ -1,13 +1,13 @@
 # MVP
 
-1. 产品目标：
+1. Product Goals:
 
-2. 核心功能：
+2. Core Features:
 
-3. 用户流程：
+3. User Flow:
 
-4. 验收标准：
+4. Acceptance Criteria:
 
-5. 非做不可：
-✅ 邮箱 + 密码登录
-❌ Google OAuth（可推迟）
+5. Must-Have Features:
+✅ Email + Password Login
+❌ Google OAuth (Can be postponed)

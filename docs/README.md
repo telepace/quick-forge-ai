@@ -1,8 +1,8 @@
-# 项目文档说明
+# Project Documentation Guide
 
-本项目文档目录 `docs` 中存放了与项目相关的各种工具文档说明。这些文档主要分为两类：
+The `docs` directory in this project contains various documentation related to the project tools. These documents are mainly divided into two categories:
 
-1. **协同文档**：这些文档用于团队成员之间的协作，包括项目规范、开发流程、会议记录等。它们帮助团队成员更好地理解项目进展和任务分配。
+1. **Collaboration Documents**: These documents are used for collaboration between team members, including project specifications, development processes, meeting records, etc. They help team members better understand project progress and task allocation.
 
-2. **AI 文档**：这些文档专门为 AI 合作伙伴设计，包含 AI 在项目中使用的指南、配置说明、以及如何与 AI 协作的最佳实践。AI 也是项目的重要合作伙伴，这些文档确保 AI 能够高效地参与到项目开发中。
+2. **AI Documents**: These documents are specifically designed for AI partners, including guidelines for AI use in the project, configuration instructions, and best practices for collaborating with AI. AI is also an important partner in the project, and these documents ensure that AI can efficiently participate in project development.
 
