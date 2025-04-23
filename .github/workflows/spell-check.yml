@@ -1,0 +1,32 @@
+name: Spell Check with Typos
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  spellcheck:
+    name: Spell Check
+    runs-on: ubuntu-latest
+    concurrency:
+      group: spellcheck-${{ github.ref }}
+      cancel-in-progress: true
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Spell Check
+        uses: crate-ci/typos@v1
+        with:
+          files: |
+            **/*.md
+            docs/**/*.md
+            README.md
+          config: .typos.toml
+          write_changes: false
