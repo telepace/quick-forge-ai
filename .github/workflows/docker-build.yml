@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-voiceflow:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,14 +44,14 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get Docker metadata
-        id: metadata
+      - name: Get Docker metadata for backend
+        id: metadata-backend
         uses: docker/metadata-action@v5.5.1
         with:
           images: |
-            docker.io/telepace/voiceflow
-            registry.cn-hangzhou.aliyuncs.com/telepace/voiceflow
-            ghcr.io/telepace/voiceflow
+            docker.io/${{ github.repository_owner }}/quick-forge-ai-backend
+            registry.cn-hangzhou.aliyuncs.com/${{ github.repository_owner }}/quick-forge-ai-backend
+            ghcr.io/${{ github.repository_owner }}/quick-forge-ai-backend
           tags: |
             type=ref,event=tag
             type=schedule
@@ -63,31 +63,50 @@ jobs:
             type=semver,pattern={{major}}
             type=sha
 
-      - name: Build and push Docker image for voiceflow
+      - name: Build backend
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./build/images/voiceflow/Dockerfile
+          context: ./backend
+          file: ./backend/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.metadata.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
-          build-args: |
-            VERSION=${{ steps.metadata.outputs.version }}
+          tags: ${{ steps.metadata-backend.outputs.tags }}
+          labels: ${{ steps.metadata-backend.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: true
 
-      - name: Scan Docker image for vulnerabilities
-        uses: aquasecurity/trivy-action@0.30.0
+      - name: Get Docker metadata for frontend
+        id: metadata-frontend
+        uses: docker/metadata-action@v5.5.1
         with:
-          image-ref: docker.io/telepace/voiceflow:${{ steps.metadata.outputs.version }}
-          format: 'github'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-          cache: 'true'
+          images: |
+            docker.io/${{ github.repository_owner }}/quick-forge-ai-frontend
+            registry.cn-hangzhou.aliyuncs.com/${{ github.repository_owner }}/quick-forge-ai-frontend
+            ghcr.io/${{ github.repository_owner }}/quick-forge-ai-frontend
+          tags: |
+            type=ref,event=tag
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Build frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.metadata-frontend.outputs.tags }}
+          labels: ${{ steps.metadata-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
 
       - name: Clean up Docker
         if: always()
