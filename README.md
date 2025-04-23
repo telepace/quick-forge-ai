@@ -2,10 +2,10 @@
 
 <div align="center">
   
-![QuickForge AI](https://img.shields.io/badge/QuickForge-AI-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104.0-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.2.2-blue)
-![License](https://img.shields.io/badge/license-MIT-brightgreen)
+![QuickForge AI](https://images.shields.io/badge/QuickForge-AI-blue)
+![FastAPI](https://images.shields.io/badge/FastAPI-0.104.0-green)
+![TypeScript](https://images.shields.io/badge/TypeScript-5.2.2-blue)
+![License](https://images.shields.io/badge/license-MIT-brightgreen)
 
 </div>
 
@@ -222,13 +222,13 @@ QuickForge AI makes it simple to integrate various AI services:
 ## 📱 UI Preview
 
 ### Dashboard Login
-![Login Screen](./docs/img/login.png)
+![Login Screen](./docs/images/login.png)
 
 ### Main Dashboard
-![Dashboard](./docs/img/dashboard.png)
+![Dashboard](./docs/images/dashboard.png)
 
 ### Dark Mode Support
-![Dark Mode](./docs/img/dark-mode.png)
+![Dark Mode](./docs/images/dark-mode.png)
 
 ## 📄 License
 
