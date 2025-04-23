@@ -41,6 +41,7 @@ QuickForge AI是一个生产级全栈模板，结合了FastAPI (Python)和TypeSc
   <img src="./images/technical-war.svg" alt="技术栈比较图" />
 </p>
 
+
 ### 后端
 - FastAPI用于高性能API端点
 - SQLModel用于SQL数据库交互(ORM)
@@ -240,6 +241,12 @@ QuickForge AI使集成各种AI服务变得简单：
 
 ### 深色模式支持
 ![深色模式](./images/dashboard-dark.png)
+
+
+## 独立开发使用的工具推荐
+
++ https://github.com/weijunext/indie-hacker-tools
+
 
 ## 📄 许可证
 
