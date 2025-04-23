@@ -1,0 +1,47 @@
+# 忽略 node_modules 和依赖相关目录
+node_modules/
+vendor/
+dist/
+build/
+target/
+
+# 忽略环境变量配置
+.env
+.env.*
+
+# 忽略 IDE 和编辑器的缓存文件
+.vscode/
+.idea/
+*.swp
+
+# 忽略日志和临时文件
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# 忽略测试输出、缓存
+coverage/
+*.pyc
+__pycache__/
+.cache/
+.nyc_output/
+
+# 忽略数据库和大型数据文件
+*.sqlite
+*.db
+*.csv
+*.tsv
+*.parquet
+*.h5
+
+# 忽略特定 AI 辅助或构建输出
+.cursordb/
+.cursor-tmp/
+out/
+output/
+docs/generated/
+
+# 如有需要，可以取消忽略某些重要文件
+!important.config.js
