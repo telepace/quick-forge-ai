@@ -1,0 +1,16 @@
+# All text files use LF line endings
+# All text files use LF line endings
+* text=auto eol=lf
+
+# Specify certain platform-specific files to use CRLF
+*.bat text eol=crlf
+
+# No diff for images
+*.png binary
+*.jpg binary
+
+# Lock files are not counted in language statistics
+package-lock.json linguist-generated
+
+# Merge strategy: keep current branch's files
+*.lock merge=ours
