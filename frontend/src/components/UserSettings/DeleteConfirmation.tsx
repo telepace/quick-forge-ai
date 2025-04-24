@@ -19,6 +19,11 @@ import useAuth from "@/hooks/useAuth"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
+/**
+ * A React component that renders a dialog for confirming user account deletion.
+ *
+ * @returns {JSX.Element} - The rendered DeleteConfirmation component.
+ */
 const DeleteConfirmation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -44,6 +49,19 @@ const DeleteConfirmation = () => {
     },
   })
 
+  /**
+   * Handles the submission of a form or action by invoking a mutation function.
+   *
+   * @async
+   * @function onSubmit
+   * @description This function is designed to handle the submission process for forms or actions. It invokes a mutation function which is expected to perform some side-effect, such as sending data to a server or updating application state.
+   * @throws {Error} - If the mutation fails, an error will be thrown.
+   * @returns {Promise<void>} - A promise that resolves when the mutation has been successfully invoked.
+   *
+   * @example
+   * onSubmit();
+   * // This will trigger the mutation function and handle its completion or failure.
+   */
   const onSubmit = async () => {
     mutation.mutate()
   }
