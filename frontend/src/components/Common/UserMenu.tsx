@@ -6,9 +6,22 @@ import { FiLogOut, FiUser } from "react-icons/fi"
 import useAuth from "@/hooks/useAuth"
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "../ui/menu"
 
+/**
+ * Renders the user menu component with options to access settings and log out.
+ *
+ * @returns {JSX.Element} - The rendered user menu component.
+ */
 const UserMenu = () => {
   const { user, logout } = useAuth()
 
+  /**
+   * Handles the user logout process.
+   *
+   * @async
+   * @function handleLogout
+   * @description This function is responsible for initiating the user logout process. It calls the `logout()` function to perform the actual logout action.
+   * @throws {Error} - If an error occurs during the logout process, it will be thrown.
+   */
   const handleLogout = async () => {
     logout()
   }
