@@ -20,6 +20,22 @@ const usersSearchSchema = z.object({
 
 const PER_PAGE = 5
 
+/**
+ * Generates query options to fetch users from the server.
+ *
+ * @param {Object} options - The options object containing pagination details.
+ * @param {number} options.page - The current page number for which to fetch users. Page numbering starts at 1.
+ * @returns {QueryOptions} An object containing a query function and a unique query key.
+ *
+ * @example
+ * const queryOptions = getUsersQueryOptions({ page: 2 });
+ * console.log(queryOptions);
+ * // Output:
+ * // {
+ * //   queryFn: [Function],
+ * //   queryKey: ['users', { page: 2 }]
+ * // }
+ */
 function getUsersQueryOptions({ page }: { page: number }) {
   return {
     queryFn: () =>
@@ -44,6 +60,11 @@ function UsersTable() {
     placeholderData: (prevData) => prevData,
   })
 
+  /**
+   * Sets the page number in the URL search parameters.
+   *
+   * @param {number} page - The new page number to set.
+   */
   const setPage = (page: number) =>
     navigate({
       search: (prev: { [key: string]: string }) => ({ ...prev, page }),
@@ -113,6 +134,11 @@ function UsersTable() {
   )
 }
 
+/**
+ * Displays the main component for managing users. This includes rendering a heading, an "Add User" form, and a table to display existing users.
+ *
+ * @returns {React.ReactNode} - The JSX markup representing the Admin component.
+ */
 function Admin() {
   return (
     <Container maxW="full">
