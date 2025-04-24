@@ -11,3 +11,11 @@
 2. PRD/Tech Design Doc/NOTES.md 生成：最强大的模型 & 强大的推理模型
 3. 用于代码生成/细化：IDE 的集成 AI 代理（Copilot Chat、Cursor 等）
 
+
+
+目标： 生成一个结构化的 NOTES.md 文件，该文件总结了关键信息，并根据提供的产品需求文档 (PRD) 和技术设计文档 (Tech Design Doc) 提供了一份高阶的实施计划。此 NOTES.md 文件将在初始代码生成阶段作为 AI IDE 代理（例如 GitHub Copilot Chat 或 Cursor）的主要指南。
+
+你需要更具当前的模版目录结合起来解决问题。
+
+AI 角色： 扮演一位一丝不苟的技术项目经理。你的任务是彻底分析参考的 PRD 文件和技术设计文档，并将它们合成为一个清晰、可操作、适合 AI 代理的 NOTES.md 格式的文件。
+

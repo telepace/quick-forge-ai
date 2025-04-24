@@ -1,7 +1,7 @@
 project_name:
   type: str
   help: The name of the project, shown to API users (in .env)
-  default: FastAPI Project
+  default: Quick Forge AI
 
 stack_name:
   type: str
