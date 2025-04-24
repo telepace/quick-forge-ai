@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  docs:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME:-user}/quick-forge-ai-docs:latest
+    container_name: quick-forge-ai-docs
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - quick-forge-network
+
+networks:
+  quick-forge-network:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-quick-forge}_default 

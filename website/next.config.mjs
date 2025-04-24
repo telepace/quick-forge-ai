@@ -1,11 +1,14 @@
 import nextra from 'nextra'
- 
-// Set up Nextra with its configuration
+
+// 为Nextra配置
 const withNextra = nextra({
-  // ... Add Nextra-specific options here
+  defaultShowCopyCode: true,
 })
- 
-// Export the final Next.js config with Nextra included
+
+// 导出最终的Next.js配置
 export default withNextra({
-  // ... Add regular Next.js options here
+  output: 'standalone',
+  images: {
+    unoptimized: true
+  }
 })
