@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/dialog"
 import useCustomToast from "@/hooks/useCustomToast"
 
+/**
+ * A React component that renders a dialog for deleting a user.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.id - The ID of the user to be deleted.
+ */
 const DeleteUser = ({ id }: { id: string }) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -26,6 +32,13 @@ const DeleteUser = ({ id }: { id: string }) => {
     formState: { isSubmitting },
   } = useForm()
 
+  /**
+   * Deletes a user by their unique identifier.
+   *
+   * @param {string} id - The ID of the user to delete.
+   * @returns {Promise<void>} A Promise that resolves when the user has been successfully deleted.
+   * @throws {Error} If an error occurs during the deletion process, an Error is thrown with details.
+   */
   const deleteUser = async (id: string) => {
     await UsersService.deleteUser({ userId: id })
   }
@@ -44,6 +57,13 @@ const DeleteUser = ({ id }: { id: string }) => {
     },
   })
 
+  /**
+   * Handles the submission of an action by invoking a mutation with a specific ID.
+   *
+   * @async
+   * @function onSubmit
+   * @throws {Error} If there is an issue during the mutation process.
+   */
   const onSubmit = async () => {
     mutation.mutate(id)
   }
