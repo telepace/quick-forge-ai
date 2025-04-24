@@ -1,6 +1,11 @@
 import { Button, Center, Flex, Text } from "@chakra-ui/react"
 import { Link } from "@tanstack/react-router"
 
+/**
+ * A React component that displays a "404 Not Found" page.
+ *
+ * @returns {JSX.Element} - The JSX element representing the "404 Not Found" page.
+ */
 const NotFound = () => {
   return (
     <>
