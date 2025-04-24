@@ -12,6 +12,11 @@ interface UpdatePasswordForm extends UpdatePassword {
   confirm_password: string
 }
 
+/**
+ * React functional component that renders a form to change user password.
+ *
+ * @returns {JSX.Element} - The rendered component.
+ */
 const ChangePassword = () => {
   const { showSuccessToast } = useCustomToast()
   const {
@@ -37,6 +42,13 @@ const ChangePassword = () => {
     },
   })
 
+  /**
+   * Handles form submission for updating a password.
+   *
+   * @param {UpdatePasswordForm} data - The form data containing the new password information.
+   * @returns {Promise<void>} A promise that resolves when the mutation has been initiated.
+   * @throws {Error} Throws an error if the mutation fails or encounters any issues.
+   */
   const onSubmit: SubmitHandler<UpdatePasswordForm> = async (data) => {
     mutation.mutate(data)
   }
