@@ -7,5 +7,9 @@ export default {
   docs: {
     title: '文档',
     type: 'page'
+  },
+  blog: {
+    title: '博客',
+    type: 'page'
   }
 } 

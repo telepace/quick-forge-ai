@@ -1,5 +1,7 @@
 # Ignore node_modules and dependency-related directories
 node_modules/
+website/node_modules/
+frontend/node_modules/
 vendor/
 dist/
 build/

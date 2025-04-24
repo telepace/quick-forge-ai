@@ -1,0 +1,91 @@
+---
+title: 快速入门 Quick Forge AI
+date: 2024-07-01
+description: 本文将指导您如何使用 Quick Forge AI 构建您的第一个 AI 应用程序
+---
+
+# 快速入门 Quick Forge AI
+
+欢迎使用 Quick Forge AI，这是一个强大的 AI 应用构建平台。本文将指导您完成设置过程并创建您的第一个 AI 应用程序。
+
+## 安装和配置
+
+首先，您需要安装 Quick Forge AI CLI：
+
+```bash
+npm install -g quick-forge-ai-cli
+```
+
+安装完成后，初始化一个新项目：
+
+```bash
+quick-forge init my-ai-app
+cd my-ai-app
+```
+
+## 创建您的第一个 AI 组件
+
+Quick Forge AI 使用组件化方法构建 AI 应用。以下是创建简单聊天机器人组件的步骤：
+
+```javascript
+// 创建聊天机器人组件
+import { AIComponent } from 'quick-forge-ai';
+
+export const ChatBot = () => {
+  return (
+    <AIComponent
+      type="chat"
+      model="gpt-4"
+      prompt="你是一个有用的助手，回答用户的问题。"
+    />
+  );
+};
+```
+
+## 集成到您的应用程序
+
+将组件集成到应用程序中：
+
+```javascript
+import { ChatBot } from './components/ChatBot';
+
+function App() {
+  return (
+    <div className="app">
+      <header>
+        <h1>我的 AI 应用</h1>
+      </header>
+      <main>
+        <ChatBot />
+      </main>
+    </div>
+  );
+}
+
+export default App;
+```
+
+## 运行应用程序
+
+运行以下命令启动应用程序：
+
+```bash
+npm run dev
+```
+
+您的应用程序现在应该在 `http://localhost:3000` 上运行。
+
+## 下一步
+
+恭喜！您已成功创建了第一个 Quick Forge AI 应用程序。接下来，您可以探索更多高级功能：
+
+- 定制 AI 模型设置
+- 添加多模态支持
+- 实现用户认证
+- 部署到生产环境
+
+请查阅我们的 [详细文档](/docs) 获取更多信息。
+
+---
+
+如有任何问题，请随时在 [GitHub 仓库](https://github.com/telepace/quick-forge-ai) 上提交 issue。 

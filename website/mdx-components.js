@@ -1,12 +1,12 @@
-import { useMDXComponents as getThemeComponents } from 'nextra-theme-docs'
+import { useMDXComponents as getDocsMDXComponents } from 'nextra-theme-docs'
 
 // 获取默认的MDX组件
-const themeComponents = getThemeComponents()
+const docsComponents = getDocsMDXComponents()
 
 // 合并组件
 export function useMDXComponents(components) {
   return {
-    ...themeComponents,
+    ...docsComponents,
     ...components,
   }
 } 
