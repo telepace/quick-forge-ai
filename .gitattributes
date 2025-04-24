@@ -14,3 +14,5 @@ package-lock.json linguist-generated
 
 # Merge strategy: keep current branch's files
 *.lock merge=ours
+
+*.sh text eol=lf

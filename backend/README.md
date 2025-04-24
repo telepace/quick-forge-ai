@@ -1,4 +1,4 @@
-# FastAPI Project - Backend
+# Quick Forge AI - Backend
 
 ## Requirements
 

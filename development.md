@@ -1,4 +1,4 @@
-# FastAPI Project - Development
+# Quick Forge AI - Development
 
 ## Docker Compose
 
