@@ -22,6 +22,12 @@ interface Item {
   path: string
 }
 
+/**
+ * A React component that renders a sidebar menu with items based on the user's permissions.
+ *
+ * @param {SidebarItemsProps} props - The props for the SidebarItems component.
+ * @returns {JSX.Element} The rendered sidebar component.
+ */
 const SidebarItems = ({ onClose }: SidebarItemsProps) => {
   const queryClient = useQueryClient()
   const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
