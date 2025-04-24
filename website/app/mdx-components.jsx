@@ -14,6 +14,19 @@ const mdxComponents = {
 }
 
 // Next.js需要这个导出格式
+/**
+ * Combines custom MDX components with default MDX components.
+ *
+ * @param {Object} components - An object containing custom MDX components to be merged with the default ones.
+ * @returns {Object} An object that merges both the default and custom MDX components, with custom components taking precedence.
+ *
+ * @example
+ * const myComponents = {
+ *   Heading: (props) => <h1 style={{ color: 'red' }}>{props.children}</h1>
+ * };
+ * const combinedComponents = useMDXComponents(myComponents);
+ * // combinedComponents now includes both default and custom MDX components with custom ones taking precedence.
+ */
 export function useMDXComponents(components) {
   return { ...mdxComponents, ...components }
 } 
