@@ -49,12 +49,26 @@ import type {
 export class ItemsService {
   /**
    * Read Items
-   * Retrieve items.
-   * @param data The data for the request.
-   * @param data.skip
-   * @param data.limit
-   * @returns ItemsPublic Successful Response
-   * @throws ApiError
+   * Retrieve items from the API.
+   *
+   * @param {Object} [data={}] The data for the request.
+   * @param {number} [data.skip] The number of items to skip in the result set.
+   * @param {number} [data.limit] The maximum number of items to return.
+   * @returns {CancelablePromise<ItemsReadItemsResponse>} Successful response containing the retrieved items.
+   * @throws {ApiError} If an API error occurs during the request.
+   *
+   * Example:
+   * ```typescript
+   * const data = {
+   *   skip: 0,
+   *   limit: 10
+   * };
+   * readItems(data).then(response => {
+   *   console.log(response.data);
+   * }).catch(error => {
+   *   console.error(error);
+   * });
+   * ```
    */
   public static readItems(
     data: ItemsReadItemsData = {},
@@ -74,11 +88,24 @@ export class ItemsService {
 
   /**
    * Create Item
-   * Create new item.
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @returns ItemPublic Successful Response
-   * @throws ApiError
+   * Creates a new item using the provided data.
+   *
+   * @param {ItemsCreateItemData} data - The data for the request containing the item details.
+   * @returns {CancelablePromise<ItemsCreateItemResponse>} - A promise that resolves to the created item's public information or throws an error if creation fails.
+   * @throws {ApiError} - Throws an ApiError if the validation of the input data fails, as indicated by a 422 status code response.
+   *
+   * @example
+   * const createItemData = {
+   *   requestBody: {
+   *     name: "New Item",
+   *     description: "This is a new item",
+   *     price: 19.99,
+   *   },
+   * };
+   *
+   * createItem(createItemData)
+   *   .then((item) => console.log(item))
+   *   .catch((error) => console.error(error));
    */
   public static createItem(
     data: ItemsCreateItemData,
@@ -97,10 +124,15 @@ export class ItemsService {
   /**
    * Read Item
    * Get item by ID.
-   * @param data The data for the request.
-   * @param data.id
-   * @returns ItemPublic Successful Response
-   * @throws ApiError
+   *
+   * @param {Object} data - The data for the request.
+   * @param {string} data.id - The ID of the item to retrieve.
+   *
+   * @returns {Promise<ItemsReadItemResponse>}
+   * Successful Response with an `ItemPublic` object.
+   *
+   * @throws {ApiError}
+   * Throws an `ApiError` if the request fails, e.g., due to validation errors.
    */
   public static readItem(
     data: ItemsReadItemData,
@@ -118,13 +150,13 @@ export class ItemsService {
   }
 
   /**
-   * Update Item
    * Update an item.
-   * @param data The data for the request.
-   * @param data.id
-   * @param data.requestBody
-   * @returns ItemPublic Successful Response
-   * @throws ApiError
+   *
+   * @param {Object} data - The data for the request.
+   * @param {number|string} data.id - The ID of the item to be updated.
+   * @param {Object} data.requestBody - The body of the request containing the updated data.
+   * @returns {CancelablePromise<ItemsUpdateItemResponse>} Successful response with updated item details.
+   * @throws {ApiError} If an error occurs during the API call, such as validation errors (HTTP 422).
    */
   public static updateItem(
     data: ItemsUpdateItemData,
@@ -144,12 +176,17 @@ export class ItemsService {
   }
 
   /**
-   * Delete Item
-   * Delete an item.
-   * @param data The data for the request.
-   * @param data.id
-   * @returns Message Successful Response
-   * @throws ApiError
+   * Delete an item from the system.
+   *
+   * @param {ItemsDeleteItemData} data - The data for the request containing the item ID to be deleted.
+   * @param {string} data.id - The unique identifier of the item to be deleted.
+   * @returns {CancelablePromise<ItemsDeleteItemResponse>} A promise that resolves with a successful response or rejects with an ApiError if the operation fails.
+   * @throws {ApiError} If there is a validation error (HTTP 422).
+   *
+   * Example:
+   * deleteItem({ id: 'item123' })
+   *   .then(response => console.log('Item deleted successfully:', response))
+   *   .catch(error => console.error('Failed to delete item:', error));
    */
   public static deleteItem(
     data: ItemsDeleteItemData,
@@ -169,12 +206,21 @@ export class ItemsService {
 
 export class LoginService {
   /**
-   * Login Access Token
    * OAuth2 compatible token login, get an access token for future requests
-   * @param data The data for the request.
-   * @param data.formData
-   * @returns Token Successful Response
-   * @throws ApiError
+   * @param {LoginLoginAccessTokenData} data - The data for the request.
+   * @param {FormData} data.formData - Form data containing necessary login credentials.
+   * @returns {CancelablePromise<LoginLoginAccessTokenResponse>} - Successful response containing the access token.
+   * @throws {ApiError} - Throws an ApiError if the request fails or validation errors occur.
+   * @example
+   * const loginData = {
+   *   formData: {
+   *     username: 'user',
+   *     password: 'pass'
+   *   }
+   * };
+   * loginAccessToken(loginData)
+   *   .then(response => console.log(response.data))
+   *   .catch(error => console.error(error));
    */
   public static loginAccessToken(
     data: LoginLoginAccessTokenData,
@@ -193,8 +239,8 @@ export class LoginService {
   /**
    * Test Token
    * Test access token
-   * @returns UserPublic Successful Response
-   * @throws ApiError
+   * @returns {LoginTestTokenResponse} Successful Response
+   * @throws {ApiError}
    */
   public static testToken(): CancelablePromise<LoginTestTokenResponse> {
     return __request(OpenAPI, {
@@ -205,11 +251,14 @@ export class LoginService {
 
   /**
    * Recover Password
-   * Password Recovery
-   * @param data The data for the request.
-   * @param data.email
-   * @returns Message Successful Response
-   * @throws ApiError
+   * Initiates the password recovery process for the user associated with the provided email.
+   *
+   * @param data - The data required for the password recovery request.
+   * @param data.email - The email address of the user requesting password recovery.
+   *
+   * @returns A Promise that resolves to a `LoginRecoverPasswordResponse` object on successful completion, or rejects with an `ApiError` if there is an error during the process.
+   *
+   * @throws {ApiError} If the server returns a 422 status code indicating a validation error.
    */
   public static recoverPassword(
     data: LoginRecoverPasswordData,
@@ -227,12 +276,24 @@ export class LoginService {
   }
 
   /**
-   * Reset Password
-   * Reset password
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @returns Message Successful Response
-   * @throws ApiError
+   * Reset user password.
+   *
+   * @param {Object} data - The data for the request.
+   * @param {Object} data.requestBody - The body of the request containing necessary information to reset the password.
+   * @returns {CancelablePromise<LoginResetPasswordResponse>} A promise that resolves to a message indicating successful response or rejects with an ApiError.
+   * @throws {ApiError} If there is a validation error (HTTP 422).
+   *
+   * Example:
+   * ```javascript
+   * resetPassword({
+   *   requestBody: {
+   *     email: 'user@example.com',
+   *     token: 'resetToken123'
+   *   }
+   * })
+   * .then(response => console.log(response))
+   * .catch(error => console.error(error));
+   * ```
    */
   public static resetPassword(
     data: LoginResetPasswordData,
@@ -249,12 +310,20 @@ export class LoginService {
   }
 
   /**
-   * Recover Password Html Content
-   * HTML Content for Password Recovery
-   * @param data The data for the request.
-   * @param data.email
-   * @returns string Successful Response
-   * @throws ApiError
+   * Generates HTML content for password recovery.
+   *
+   * @param {LoginRecoverPasswordHtmlContentData} data - The data required for the request.
+   * @param {string} data.email - The email address associated with the account.
+   * @returns {Promise<CancelablePromise<LoginRecoverPasswordHtmlContentResponse>>} A Promise that resolves to a CancelablePromise containing the response from the server.
+   * @throws {ApiError} If an API error occurs during the request, such as validation errors.
+   *
+   * Example:
+   *   const data = {
+   *     email: "user@example.com"
+   *   };
+   *   recoverPasswordHtmlContent(data)
+   *     .then(response => console.log(response))
+   *     .catch(error => console.error(error));
    */
   public static recoverPasswordHtmlContent(
     data: LoginRecoverPasswordHtmlContentData,
@@ -274,13 +343,25 @@ export class LoginService {
 
 export class UsersService {
   /**
-   * Read Users
-   * Retrieve users.
-   * @param data The data for the request.
-   * @param data.skip
-   * @param data.limit
-   * @returns UsersPublic Successful Response
-   * @throws ApiError
+   * Retrieve users from the system.
+   *
+   * @param {Object} [data] - The data for the request.
+   * @param {number} [data.skip] - The number of users to skip in the response.
+   * @param {number} [data.limit] - The maximum number of users to return in the response.
+   * @returns {CancelablePromise<UsersReadUsersResponse>} A promise that resolves with the users data.
+   * @throws {ApiError} If an error occurs during the request, e.g., validation errors.
+   *
+   * @example
+   * try {
+   *   const result = await readUsers({ skip: 0, limit: 10 });
+   *   console.log(result);
+   * } catch (error) {
+   *   if (error instanceof ApiError) {
+   *     console.error("API Error:", error.message);
+   *   } else {
+   *     console.error("Unexpected Error:", error);
+   *   }
+   * }
    */
   public static readUsers(
     data: UsersReadUsersData = {},
@@ -300,11 +381,14 @@ export class UsersService {
 
   /**
    * Create User
-   * Create new user.
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @returns UserPublic Successful Response
-   * @throws ApiError
+   *
+   * Creates a new user based on the provided data.
+   *
+   * @param {Object} data - The data for the request.
+   * @param {Object} data.requestBody - The body of the request containing the user data.
+   * @returns {CancelablePromise<UsersCreateUserResponse>} - Promise that resolves to a UserPublic object on success, or rejects with an ApiError if there is a validation error (HTTP 422).
+   *
+   * @throws {ApiError} If the server returns a 422 status code due to validation errors.
    */
   public static createUser(
     data: UsersCreateUserData,
@@ -321,10 +405,10 @@ export class UsersService {
   }
 
   /**
-   * Read User Me
    * Get current user.
-   * @returns UserPublic Successful Response
-   * @throws ApiError
+   *
+   * @returns {UsersReadUserMeResponse} Successful response with the current user's public information.
+   * @throws {ApiError} Throws an API error if the request fails or if there is a server-side issue.
    */
   public static readUserMe(): CancelablePromise<UsersReadUserMeResponse> {
     return __request(OpenAPI, {
@@ -334,10 +418,15 @@ export class UsersService {
   }
 
   /**
-   * Delete User Me
-   * Delete own user.
-   * @returns Message Successful Response
-   * @throws ApiError
+   * Deletes the currently authenticated user's account.
+   *
+   * This method sends a DELETE request to the "/api/v1/users/me" endpoint to remove the user associated with the current authentication context.
+   *
+   * @returns {CancelablePromise<UsersDeleteUserMeResponse>}
+   *   - A promise that resolves with a response containing information about the deletion of the user's account.
+   *
+   * @throws {ApiError}
+   *   - Throws an error if there is an API-related issue during the request, such as network errors or invalid responses.
    */
   public static deleteUserMe(): CancelablePromise<UsersDeleteUserMeResponse> {
     return __request(OpenAPI, {
@@ -349,10 +438,9 @@ export class UsersService {
   /**
    * Update User Me
    * Update own user.
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @returns UserPublic Successful Response
-   * @throws ApiError
+   * @param {UsersUpdateUserMeData} data - The data for the request.
+   * @returns {CancelablePromise<UsersUpdateUserMeResponse>} Successful response containing updated user details.
+   * @throws {ApiError} If the update fails, an ApiError will be thrown with a status code of 422 and the message "Validation Error".
    */
   public static updateUserMe(
     data: UsersUpdateUserMeData,
@@ -369,12 +457,20 @@ export class UsersService {
   }
 
   /**
-   * Update Password Me
    * Update own password.
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @returns Message Successful Response
-   * @throws ApiError
+   *
+   * @param {Object} data - The data for the request.
+   * @param {Object} data.requestBody - The new password details.
+   * @returns {CancelablePromise<UsersUpdatePasswordMeResponse>} Successful Response containing a message.
+   * @throws {ApiError} Throws an error if validation fails (HTTP 422).
+   *
+   * Example:
+   * const result = await updatePasswordMe({
+   *   requestBody: {
+   *     oldPassword: 'oldPass123',
+   *     newPassword: 'newPass456'
+   *   }
+   * });
    */
   public static updatePasswordMe(
     data: UsersUpdatePasswordMeData,
@@ -393,10 +489,10 @@ export class UsersService {
   /**
    * Register User
    * Create new user without the need to be logged in.
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @returns UserPublic Successful Response
-   * @throws ApiError
+   *
+   * @param {UsersRegisterUserData} data - The data for the request.
+   * @returns {CancelablePromise<UsersRegisterUserResponse>} Successful Response of type UsersRegisterUserResponse.
+   * @throws {ApiError} If an error occurs during the API call, such as validation errors (422).
    */
   public static registerUser(
     data: UsersRegisterUserData,
@@ -414,11 +510,13 @@ export class UsersService {
 
   /**
    * Read User By Id
+   *
    * Get a specific user by id.
-   * @param data The data for the request.
-   * @param data.userId
-   * @returns UserPublic Successful Response
-   * @throws ApiError
+   *
+   * @param {Object} data - The data for the request.
+   * @param {string} data.userId - The ID of the user to retrieve.
+   * @returns {Promise<UserPublic>} Successful Response
+   * @throws {ApiError}
    */
   public static readUserById(
     data: UsersReadUserByIdData,
@@ -438,11 +536,11 @@ export class UsersService {
   /**
    * Update User
    * Update a user.
-   * @param data The data for the request.
-   * @param data.userId
-   * @param data.requestBody
-   * @returns UserPublic Successful Response
-   * @throws ApiError
+   * @param {UsersUpdateUserData} data - The data for the request.
+   * @param {string} data.userId - The ID of the user to update.
+   * @param {object} data.requestBody - The request body containing user details.
+   * @returns {CancelablePromise<UsersUpdateUserResponse>} Successful Response
+   * @throws {ApiError}
    */
   public static updateUser(
     data: UsersUpdateUserData,
@@ -463,11 +561,12 @@ export class UsersService {
 
   /**
    * Delete User
-   * Delete a user.
-   * @param data The data for the request.
-   * @param data.userId
-   * @returns Message Successful Response
-   * @throws ApiError
+   * Deletes a user based on the provided user ID.
+   *
+   * @param {UsersDeleteUserData} data - The data for the request.
+   * @param {string} data.userId - The unique identifier of the user to be deleted.
+   * @returns {Promise<UsersDeleteUserResponse>} A promise that resolves with a message indicating successful deletion or rejects with an error if validation fails.
+   * @throws {ApiError} Throws an API error if the request encounters issues such as validation errors (HTTP status 422).
    */
   public static deleteUser(
     data: UsersDeleteUserData,
@@ -487,12 +586,22 @@ export class UsersService {
 
 export class UtilsService {
   /**
-   * Test Email
-   * Test emails.
-   * @param data The data for the request.
-   * @param data.emailTo
-   * @returns Message Successful Response
-   * @throws ApiError
+   * Sends a test email.
+   *
+   * @param data - The data for the request.
+   * @property {string} data.emailTo - The recipient's email address.
+   * @returns {CancelablePromise<UtilsTestEmailResponse>} A promise that resolves with the successful response message.
+   * @throws {ApiError} If an error occurs during the API call, including validation errors (HTTP 422).
+   *
+   * @example
+   * const data = {
+   *   emailTo: "recipient@example.com"
+   * };
+   * testEmail(data).then(response => {
+   *   console.log(response.message);
+   * }).catch(error => {
+   *   console.error("API Error:", error);
+   * });
    */
   public static testEmail(
     data: UtilsTestEmailData,
@@ -510,9 +619,10 @@ export class UtilsService {
   }
 
   /**
-   * Health Check
-   * @returns boolean Successful Response
-   * @throws ApiError
+   * Performs a health check to verify the service is running.
+   *
+   * @returns {boolean} True if the health check is successful, otherwise false.
+   * @throws {ApiError} If an error occurs during the health check.
    */
   public static healthCheck(): CancelablePromise<UtilsHealthCheckResponse> {
     return __request(OpenAPI, {
