@@ -7,6 +7,12 @@ export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
 })
 
+/**
+ * Represents the Dashboard component of the application.
+ * Displays user-specific information upon successful authentication.
+ *
+ * @returns {JSX.Element} - The rendered JSX element for the dashboard.
+ */
 function Dashboard() {
   const { user: currentUser } = useAuth()
 
