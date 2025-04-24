@@ -1,5 +1,9 @@
 'use client'
 
+/**
+ * React component for the getting started guide of Quick Forge AI.
+ * @returns {React.ReactNode} - The rendered JSX element.
+ */
 export default function GettingStartedPost() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
