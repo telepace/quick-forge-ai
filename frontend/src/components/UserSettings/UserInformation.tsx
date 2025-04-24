@@ -42,6 +42,11 @@ const UserInformation = () => {
     },
   })
 
+  /**
+   * Toggles the edit mode state.
+   *
+   * This function is responsible for switching between edit mode and non-edit mode. It toggles the `editMode` state by negating its current value.
+   */
   const toggleEditMode = () => {
     setEditMode(!editMode)
   }
@@ -60,10 +65,24 @@ const UserInformation = () => {
     },
   })
 
+  /**
+   * Handles form submission for user update.
+   *
+   * @async
+   * @function onSubmit
+   * @param {UserUpdateMe} data - The data to be submitted, which includes updated user details.
+   * @throws {Error} If the mutation fails or encounters an unexpected error.
+   */
   const onSubmit: SubmitHandler<UserUpdateMe> = async (data) => {
     mutation.mutate(data)
   }
 
+  /**
+   * Handles the cancellation of an operation or edit mode.
+   * This function resets any necessary data and toggles the edit mode off.
+   *
+   * @returns {void}
+   */
   const onCancel = () => {
     reset()
     toggleEditMode()
