@@ -27,6 +27,16 @@ export const Route = createFileRoute("/login")({
   },
 })
 
+/**
+ * Renders the login form component.
+ *
+ * This function utilizes React hooks to manage state and side effects for handling user authentication.
+ * It integrates with a custom authentication hook (`useAuth`) to perform login mutations and error management.
+ * The form includes fields for username (email) and password, with validation rules applied to each field.
+ * Upon successful submission, the provided credentials are sent for authentication.
+ *
+ * @returns {JSX.Element} - The rendered login form component.
+ */
 function Login() {
   const { loginMutation, error, resetError } = useAuth()
   const {
@@ -42,6 +52,22 @@ function Login() {
     },
   })
 
+  /**
+   * Handles form submission for user authentication.
+   *
+   * @async
+   * @function onSubmit
+   * @param {AccessToken} data - The data submitted from the form, expected to be of type AccessToken.
+   * @returns {Promise<void>}
+   * @throws {Error} If an error occurs during the login process, it is handled internally by useAuth hook.
+   *
+   * Example usage:
+   * ```
+   * const handleFormSubmit = (data) => {
+   *   onSubmit(data);
+   * };
+   * ```
+   */
   const onSubmit: SubmitHandler<AccessToken> = async (data) => {
     if (isSubmitting) return
 
