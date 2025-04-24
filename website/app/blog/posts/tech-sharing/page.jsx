@@ -1,5 +1,13 @@
 'use client'
 
+/**
+ * A React component that renders a technical sharing post about Quick Forge AI.
+ * This component includes sections on architecture overview, technology stack selection,
+ * model abstraction layer, traffic management strategies, scalability design, security design,
+ * and developer experience.
+ *
+ * @returns {React.ReactNode} - The rendered JSX of the technical sharing post.
+ */
 export default function TechSharingPost() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
