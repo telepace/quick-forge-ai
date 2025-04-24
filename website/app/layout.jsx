@@ -9,6 +9,13 @@ export const metadata = {
   description: 'Quick Forge AI Documentation'
 }
 
+/**
+ * Represents the root layout component of a Next.js application.
+ *
+ * @param {Object} props - The properties for the RootLayout component.
+ * @param {React.ReactNode} props.children - The children components to be rendered inside the layout.
+ * @returns {JSX.Element} - The JSX element representing the root layout.
+ */
 export default async function RootLayout({ children }) {
   const banner = <Banner storageKey="nextra-banner">欢迎使用 Quick Forge AI 文档</Banner>
   const navbar = <Navbar logo={<strong>Quick Forge AI</strong>} />
