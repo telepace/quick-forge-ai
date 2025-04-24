@@ -9,6 +9,12 @@ import { LuMoon, LuSun } from "react-icons/lu"
 
 export interface ColorModeProviderProps extends ThemeProviderProps {}
 
+/**
+ * Provides context for color mode using the ThemeProvider component.
+ *
+ * @param {Object} props - The properties to pass to the ColorModeProvider.
+ * @returns {React.ReactNode} - The rendered ColorModeProvider component.
+ */
 export function ColorModeProvider(props: ColorModeProviderProps) {
   return (
     <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
@@ -23,8 +29,37 @@ export interface UseColorModeReturn {
   toggleColorMode: () => void
 }
 
+/**
+ * Hook to toggle and manage the color mode of an application.
+ *
+ * @returns {Object} An object containing methods for managing the color mode.
+ * @property {ColorMode} colorMode - The current color mode of the application, either "light" or "dark".
+ * @property {Function} setColorMode - Function to set a specific color mode ("light" or "dark").
+ * @property {Function} toggleColorMode - Function to toggle between the current color mode and its opposite.
+ *
+ * @example
+ * import { useColorMode } from 'path-to-module';
+ *
+ * const App = () => {
+ *   const { colorMode, toggleColorMode } = useColorMode();
+ *
+ *   return (
+ *     <div>
+ *       <p>Current Color Mode: {colorMode}</p>
+ *       <button onClick={toggleColorMode}>Toggle Color Mode</button>
+ *     </div>
+ *   );
+ * };
+ */
 export function useColorMode(): UseColorModeReturn {
   const { resolvedTheme, setTheme } = useTheme()
+  /**
+   * Toggles between dark and light color modes.
+   *
+   * This function checks the current resolved theme. If it's "dark", it sets the theme to "light". Otherwise, it sets the theme to "dark".
+   *
+   * @returns {void} - This function does not return anything.
+   */
   const toggleColorMode = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark")
   }
@@ -35,11 +70,30 @@ export function useColorMode(): UseColorModeReturn {
   }
 }
 
+/**
+ * Returns the appropriate value based on the current color mode.
+ *
+ * @template T - The type of the values being returned.
+ * @param {T} light - The value to return when the color mode is "light".
+ * @param {T} dark - The value to return when the color mode is "dark".
+ * @returns {T} - The value corresponding to the current color mode.
+ *
+ * @example
+ * // Returns 'lightTheme' if the color mode is "light", otherwise returns 'darkTheme'
+ * const theme = useColorModeValue('lightTheme', 'darkTheme');
+ */
 export function useColorModeValue<T>(light: T, dark: T) {
   const { colorMode } = useColorMode()
   return colorMode === "dark" ? dark : light
 }
 
+/**
+ * Renders an icon representing the current color mode of the application.
+ * The icon changes based on whether the color mode is "dark" or "light".
+ *
+ * @function
+ * @returns {JSX.Element} - Returns a JSX element representing the icon.
+ */
 export function ColorModeIcon() {
   const { colorMode } = useColorMode()
   return colorMode === "dark" ? <LuMoon /> : <LuSun />
