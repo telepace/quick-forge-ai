@@ -5,7 +5,10 @@ WORKDIR /app
 
 COPY package*.json /app/
 
-RUN npm install -g pnpm && pnpm install
+RUN npm install -g pnpm && \
+    pnpm config set auto-install-peers true && \
+    pnpm config set unsafe-perm true && \
+    pnpm install
 
 COPY ./ /app/
 
@@ -16,9 +19,9 @@ ARG SKIP_TS_CHECK=false
 ENV SKIP_TS_CHECK=${SKIP_TS_CHECK}
 
 RUN if [ "$SKIP_TS_CHECK" = "true" ] ; then \
-        pnpm install && vite build; \
+        pnpm exec vite build; \
     else \
-        pnpm install && pnpm build; \
+        pnpm build; \
     fi
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
