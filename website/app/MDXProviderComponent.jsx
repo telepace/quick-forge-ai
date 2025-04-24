@@ -17,6 +17,13 @@ const components = {
 }
 
 // MDX提供器组件
+/**
+ * A component that provides an MDX context to its children.
+ *
+ * @param {Object} props - The properties of the component.
+ * @param {React.ReactNode} props.children - The child elements to render within the MDX provider.
+ * @returns {React.ReactNode} - The rendered component.
+ */
 export default function MDXProviderComponent({ children }) {
   return (
     <MDXProvider components={components}>
