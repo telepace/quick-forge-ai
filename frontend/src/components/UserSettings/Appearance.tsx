@@ -3,6 +3,11 @@ import { useTheme } from "next-themes"
 
 import { Radio, RadioGroup } from "@/components/ui/radio"
 
+/**
+ * A React component that provides a user interface for managing theme settings, allowing users to switch between system default, light mode, and dark mode.
+ *
+ * @returns {React.ReactNode} - The JSX element representing the appearance management interface.
+ */
 const Appearance = () => {
   const { theme, setTheme } = useTheme()
 
