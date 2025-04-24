@@ -262,3 +262,12 @@ git merge --continue
 ---
 
 Built with ❤️ for AI entrepreneurs and freelancers. Happy coding!
+
+## Development
+
+See the [development guide](development.md) for instructions on setting up the development environment.
+
+### Code Quality Tools
+
+- **Linting**: We use various linters to maintain code quality
+- **Spell Checking**: We use [typos](https://github.com/crate-ci/typos) for spell checking. The configuration is in `_typos.toml`

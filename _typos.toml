@@ -1,0 +1,88 @@
+# Typos configuration file
+# Reference: https://github.com/crate-ci/typos
+
+# File filtering settings
+[files]
+# Exclude specific files and directories
+extend-exclude = [
+  "*.lock",
+  "*.svg",
+  "*.min.js",
+  "*.map",
+  ".git/",
+  "node_modules/",
+  "dist/",
+  "build/",
+  ".venv/",
+  ".next/",
+  "website/.next/"
+]
+# Check hidden files
+ignore-hidden = false
+# Respect .gitignore and other ignore files
+ignore-files = true
+ignore-dot = true
+ignore-vcs = true
+ignore-global = true
+ignore-parent = true
+
+# Default settings
+[default]
+# Check filename spelling
+check-filename = true
+# Check file content spelling
+check-file = true
+# Allow Unicode characters
+unicode = true
+# Use English spelling check
+locale = "en"
+
+# Custom regular expression to ignore specific identifiers
+extend-ignore-identifiers-re = [
+  # Ignore md5/sha hash values
+  "\\b[0-9a-f]{32}\\b",
+  "\\b[0-9a-f]{40}\\b",
+  "\\b[0-9a-f]{64}\\b",
+  # Ignore common abbreviations
+  "\\bDNS\\b",
+  "\\bAPI\\b",
+  "\\bURL\\b",
+  "\\bUUID\\b",
+  "\\bJWT\\b",
+  # Ignore specific format URLs and paths
+  "\\bhttps?://[\\w\\.-]+(/[\\w\\.-]+)*\\b"
+]
+
+# Custom words to ignore
+[default.extend-words]
+# Technical terms and proper nouns
+datas = "datas"
+commited = "commited" 
+alembic = "alembic"
+pydantic = "pydantic"
+postgresql = "postgresql"
+cors = "cors"
+middlewares = "middlewares"
+nginx = "nginx"
+env = "env"
+jwt = "jwt"
+oauth = "oauth"
+cors = "cors"
+cron = "cron"
+webpack = "webpack"
+vite = "vite"
+swc = "swc"
+reactjs = "reactjs"
+backend = "backend"
+frontend = "frontend"
+
+# Use custom settings for Markdown files
+[type.markdown]
+extend-glob = ["*.md"]
+# Markdown files often have many code snippets, keep strict checking
+check-file = true
+
+# Use custom settings for code files
+[type.code]
+extend-glob = ["*.py", "*.js", "*.ts", "*.tsx", "*.jsx", "*.java", "*.go", "*.rs", "*.c", "*.cpp", "*.h"]
+check-file = true 
