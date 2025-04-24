@@ -2,41 +2,47 @@ FROM node:20.0.0-alpine AS builder
 
 WORKDIR /app
 
-# 设置环境变量
+# Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# 复制项目文件
+# Copy project files
 COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
 
-# 复制所有源代码
+# Copy all source code
 COPY . .
 
-# 构建应用
+# Ensure the public directory exists
+RUN mkdir -p public
+
+# Build the application
 RUN npm run build
 RUN npm run postbuild
 
-# 生产环境运行阶段
+# Production environment runtime stage
 FROM node:20.0.0-alpine AS runner
 
 WORKDIR /app
 
-# 设置环境变量
+# Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# 复制依赖和构建产物
+# Copy dependencies and build products
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/out ./out
-COPY --from=builder /app/public ./public
+# Create public directory in case it doesn't exist in the builder stage
+RUN mkdir -p ./public
+# In Docker 19.03+ we can use --ignore-missing flag, but for compatibility we use this approach
+COPY --from=builder /app/public/ ./public/ 
 
-# 暴露端口
+# Expose port
 EXPOSE 3000
 
-# 安装静态服务器
+# Install static server
 RUN npm install -g serve
 
-# 启动静态服务器
+# Start static server
 CMD ["serve", "-s", "out", "-p", "3000"] 
