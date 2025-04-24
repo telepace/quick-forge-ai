@@ -2,6 +2,12 @@
 
 import { Footer } from 'nextra-theme-blog'
 
+/**
+ * A React functional component that renders a custom blog footer.
+ *
+ * @function
+ * @returns {JSX.Element} - The rendered JSX for the blog footer.
+ */
 export default function CustomBlogFooter() {
   return (
     <Footer>
