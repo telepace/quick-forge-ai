@@ -2,6 +2,11 @@
 
 import { Footer } from 'nextra-theme-docs'
 
+/**
+ * A React component representing a custom footer with copyright information and links.
+ *
+ * @returns {JSX.Element} - The rendered JSX element of the custom footer.
+ */
 export default function CustomFooter() {
   return (
     <Footer>
