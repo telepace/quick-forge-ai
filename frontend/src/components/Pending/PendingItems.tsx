@@ -1,6 +1,11 @@
 import { Table } from "@chakra-ui/react"
 import { SkeletonText } from "../ui/skeleton"
 
+/**
+ * Returns a React component that displays a table with pending items.
+ *
+ * @returns {React.FC} - A React functional component rendering the table.
+ */
 const PendingItems = () => (
   <Table.Root size={{ base: "sm", md: "md" }}>
     <Table.Header>
