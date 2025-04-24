@@ -27,6 +27,22 @@ jobs:
           files: |
             **/*.md
             docs/**/*.md
+            **.py
+            **.js
+            **.ts
+            **.tsx
             README.md
-          config: .typos.toml
+          config: _typos.toml
           write_changes: false
+          
+      - name: Test Configuration
+        if: ${{ always() }}
+        run: |
+          echo "Testing typos configuration..."
+          if [ -f _typos.toml ]; then
+            echo "✅ Configuration file exists"
+            typos --dump-config - | grep -q "files.extend-exclude" && echo "✅ Configuration loaded correctly" || echo "❌ Configuration not loaded"
+          else
+            echo "❌ Configuration file not found"
+            exit 1
+          fi
