@@ -16,6 +16,11 @@ import {
 } from "../ui/drawer"
 import SidebarItems from "./SidebarItems"
 
+/**
+ * The `Sidebar` component renders a mobile and desktop sidebar with navigation items and logout functionality.
+ *
+ * @returns {JSX.Element} - The rendered sidebar.
+ */
 const Sidebar = () => {
   const queryClient = useQueryClient()
   const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
