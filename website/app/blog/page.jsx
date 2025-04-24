@@ -2,6 +2,11 @@
 
 import Link from 'next/link'
 
+/**
+ * A React functional component that renders the blog index page.
+ *
+ * @returns {JSX.Element} - The rendered blog index page.
+ */
 export default function BlogIndexPage() {
   const featuredPosts = [
     {
