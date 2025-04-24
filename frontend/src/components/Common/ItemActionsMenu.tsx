@@ -10,6 +10,12 @@ interface ItemActionsMenuProps {
   item: ItemPublic
 }
 
+/**
+ * Renders a menu of actions for an item, including editing and deleting options.
+ *
+ * @param {Object} item - The item object that the actions are associated with.
+ * @returns {JSX.Element} - The rendered menu component.
+ */
 export const ItemActionsMenu = ({ item }: ItemActionsMenuProps) => {
   return (
     <MenuRoot>
