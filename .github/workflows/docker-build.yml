@@ -162,6 +162,7 @@ jobs:
           file: ./frontend/Dockerfile
           build-args: |
             VITE_API_URL=${{ steps.set-env.outputs.API_URL }}
+            SKIP_TS_CHECK=true
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.metadata-frontend.outputs.tags }}

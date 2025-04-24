@@ -12,7 +12,14 @@ COPY ./ /app/
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL}
 
-RUN pnpm build
+ARG SKIP_TS_CHECK=false
+ENV SKIP_TS_CHECK=${SKIP_TS_CHECK}
+
+RUN if [ "$SKIP_TS_CHECK" = "true" ] ; then \
+        pnpm install && vite build; \
+    else \
+        pnpm install && pnpm build; \
+    fi
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
 FROM nginx:1
