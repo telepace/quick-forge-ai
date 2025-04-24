@@ -7,6 +7,15 @@ export const metadata = {
   title: 'Blog Example'
 }
  
+/**
+ * The main layout component for the website, rendering the entire page structure.
+ *
+ * @async
+ * @function RootLayout
+ * @param {Object} children - The child components to be rendered within the layout.
+ * @returns {JSX.Element} The JSX element representing the website's layout.
+ * @throws {Error} If there is an issue fetching the page map data.
+ */
 export default async function RootLayout({ children }) {
   const banner = (
     <Banner storageKey="4.0-release">
