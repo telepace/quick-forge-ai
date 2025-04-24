@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/dialog"
 import useCustomToast from "@/hooks/useCustomToast"
 
+/**
+ * A component that handles the deletion of an item with a confirmation dialog.
+ *
+ * @param {Object} props - The component's properties.
+ * @param {string} props.id - The ID of the item to be deleted.
+ */
 const DeleteItem = ({ id }: { id: string }) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -26,6 +32,14 @@ const DeleteItem = ({ id }: { id: string }) => {
     formState: { isSubmitting },
   } = useForm()
 
+  /**
+   * Deletes an item by its ID.
+   *
+   * @async
+   * @function deleteItem
+   * @param {string} id - The ID of the item to be deleted.
+   * @throws {Error} - If there is an error while deleting the item.
+   */
   const deleteItem = async (id: string) => {
     await ItemsService.deleteItem({ id: id })
   }
@@ -44,6 +58,14 @@ const DeleteItem = ({ id }: { id: string }) => {
     },
   })
 
+  /**
+   * Asynchronously submits data using a mutation.
+   *
+   * @async
+   * @function onSubmit
+   * @throws {Error} - Throws an error if the mutation fails.
+   * @returns {void}
+   */
   const onSubmit = async () => {
     mutation.mutate(id)
   }
