@@ -27,6 +27,12 @@ export const Route = createFileRoute("/recover-password")({
   },
 })
 
+/**
+ * Component for recovering a user's password. This component provides a form where users can enter their email to receive a password recovery email.
+ *
+ * @function
+ * @returns {JSX.Element} - The JSX element representing the password recovery form.
+ */
 function RecoverPassword() {
   const {
     register,
@@ -36,6 +42,12 @@ function RecoverPassword() {
   } = useForm<FormData>()
   const { showSuccessToast } = useCustomToast()
 
+  /**
+   * Asynchronously recovers user password by sending a recovery email.
+   *
+   * @param {FormData} data - The form data containing the email address.
+   * @throws {Error} - If there is an issue with the email format or service failure.
+   */
   const recoverPassword = async (data: FormData) => {
     await LoginService.recoverPassword({
       email: data.email,
@@ -53,6 +65,13 @@ function RecoverPassword() {
     },
   })
 
+  /**
+   * Handles form submission by invoking a mutation with the provided form data.
+   *
+   * @param {FormData} data - The form data to be submitted.
+   * @returns {Promise<void>} A promise that resolves when the mutation has completed.
+   * @throws Will throw an error if the mutation fails.
+   */
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     mutation.mutate(data)
   }
