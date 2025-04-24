@@ -18,6 +18,11 @@ export const Route = createFileRoute("/_layout/settings")({
   component: UserSettings,
 })
 
+/**
+ * Returns the user settings component based on whether the current user is a superuser or not.
+ *
+ * @returns {React.ReactNode} - The rendered user settings component.
+ */
 function UserSettings() {
   const { user: currentUser } = useAuth()
   const finalTabs = currentUser?.is_superuser
