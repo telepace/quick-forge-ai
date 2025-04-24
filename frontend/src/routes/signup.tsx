@@ -31,6 +31,14 @@ interface UserRegisterForm extends UserRegister {
   confirm_password: string
 }
 
+/**
+ * Renders a sign-up form component.
+ *
+ * This component handles user registration using the useAuth hook from the AuthContext. It includes validation for email, full name, password, and confirm password fields.
+ *
+ * @function
+ * @returns {JSX.Element} - The rendered sign-up form.
+ */
 function SignUp() {
   const { signUpMutation } = useAuth()
   const {
@@ -49,6 +57,25 @@ function SignUp() {
     },
   })
 
+  /** @function onSubmit - Handles form submission for user registration.
+   *
+   * This function is designed to process the data from a user registration form
+   * and initiate the signUp mutation with that data.
+   *
+   * @param {UserRegisterForm} data - The data object containing the form input values.
+   * @returns {void}
+   *
+   * @example
+   * // Example usage of onSubmit function
+   * const formData = {
+   *   username: 'user123',
+   *   email: 'user@example.com',
+   *   password: 'securePassword'
+   * };
+   * onSubmit(formData);
+   *
+   * This will trigger the signUpMutation with the provided form data.
+   */
   const onSubmit: SubmitHandler<UserRegisterForm> = (data) => {
     signUpMutation.mutate(data)
   }
