@@ -150,6 +150,20 @@ export const PasswordStrengthMeter = forwardRef<
   )
 })
 
+/**
+ * Returns an object containing a label and color palette based on a given percentage.
+ *
+ * @param {number} percent - The percentage value to determine the color palette. Must be between 0 and 100.
+ * @returns {{label: string, colorPalette: string}} An object with a label indicating the range (Low, Medium, High) and the corresponding color palette (red, orange, green).
+ *
+ * @example
+ * // Returns { label: "Medium", colorPalette: "orange" }
+ * getColorPalette(50);
+ *
+ * @example
+ * // Returns { label: "High", colorPalette: "green" }
+ * getColorPalette(90);
+ */
 function getColorPalette(percent: number) {
   switch (true) {
     case percent < 33:
