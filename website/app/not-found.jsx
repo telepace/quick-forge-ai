@@ -1,5 +1,23 @@
 'use client'
 
+/**
+ * Renders a 404 error page indicating that the requested page does not exist.
+ *
+ * @return {JSX.Element} - The JSX element representing the 404 error page.
+ *
+ * Example Usage:
+ * ```jsx
+ * import NotFound from './NotFound';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <NotFound />
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
 export default function NotFound() {
   return (
     <div className="container mx-auto py-16 px-4 text-center">
