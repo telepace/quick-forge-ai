@@ -11,6 +11,14 @@ interface UserActionsMenuProps {
   disabled?: boolean
 }
 
+/**
+ * Renders a menu with actions for a user.
+ *
+ * @param {Object} props - The component's props.
+ * @param {User} props.user - The user object to perform actions on.
+ * @param {boolean} [props.disabled=false] - Whether the menu is disabled.
+ * @returns {JSX.Element} The rendered UserActionsMenu component.
+ */
 export const UserActionsMenu = ({ user, disabled }: UserActionsMenuProps) => {
   return (
     <MenuRoot>
