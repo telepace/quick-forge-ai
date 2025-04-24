@@ -1,9 +1,9 @@
 export default {
   logo: <span style={{ fontWeight: 'bold' }}>Quick Forge AI</span>,
   project: {
-    link: 'https://github.com/user/quick-forge-ai',
+    link: 'https://github.com/telepace/quick-forge-ai',
   },
-  docsRepositoryBase: 'https://github.com/user/quick-forge-ai',
+  docsRepositoryBase: 'https://github.com/telepace/quick-forge-ai',
   useNextSeoProps() {
     return {
       titleTemplate: '%s – Quick Forge AI'
@@ -18,7 +18,7 @@ export default {
   footer: {
     text: (
       <span>
-        MIT {new Date().getFullYear()} © <a href="https://github.com/user/quick-forge-ai" target="_blank">Quick Forge AI</a>.
+        MIT {new Date().getFullYear()} © <a href="https://github.com/telepace/quick-forge-ai" target="_blank">Quick Forge AI</a>.
       </span>
     )
   },

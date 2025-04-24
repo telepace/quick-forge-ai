@@ -1,7 +1,7 @@
 import { Footer, Layout, Navbar } from 'nextra-theme-docs'
-import { Banner, Head } from 'nextra/components'
-import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
+import { getPageMap } from 'nextra/page-map'
+import { Banner } from 'nextra/components'
  
 export const metadata = {
   title: 'Quick Forge AI',
@@ -23,9 +23,9 @@ export default async function RootLayout({ children }) {
       dir="ltr"
       suppressHydrationWarning
     >
-      <Head>
+      <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
+      </head>
       <body>
         <Layout
           banner={banner}

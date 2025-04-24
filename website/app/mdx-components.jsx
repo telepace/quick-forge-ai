@@ -8,6 +8,6 @@ export function useMDXComponents(components) {
   return {
     ...themeComponents,
     ...components,
-    // 可以在这里添加自定义组件
+    // 可以在这里添加自定义组件，但确保客户端和服务器渲染一致
   }
 } 
