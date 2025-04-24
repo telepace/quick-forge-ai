@@ -1,5 +1,11 @@
 'use client'
 
+/**
+ * Generates content for a post discussing best practices for building high-quality AI applications.
+ * This function returns JSX to render the post in a styled container with headings and paragraphs.
+ *
+ * @return {JSX.Element} - The JSX element representing the rendered post.
+ */
 export default function BestPracticesPost() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
