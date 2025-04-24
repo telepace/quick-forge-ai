@@ -185,6 +185,38 @@ The deployment includes:
 
 See the [deployment documentation](./docs/deployment.md) for detailed instructions on deploying to various platforms.
 
+## 📚 Documentation
+
+### Building Documentation Locally
+
+You can build and run the documentation website locally using Docker:
+
+```bash
+# Build and run documentation
+docker-compose -f docker-compose.docs.yml up --build
+```
+
+The documentation will be available at http://localhost:3000.
+
+### Documentation Deployment
+
+The documentation is automatically built and deployed when changes are pushed to the main branch. The GitHub Actions workflow handles:
+
+1. Building a Docker image for the documentation
+2. Pushing the image to Docker Hub and GitHub Container Registry
+3. Deploying the documentation to GitHub Pages
+
+You can find the deployed documentation at: https://docs.your-domain.com
+
+### Contributing to Documentation
+
+Documentation source files are located in the `website/content` directory. To add or update documentation:
+
+1. Create or modify markdown files in the appropriate directory
+2. Test your changes locally using the Docker setup
+3. Push your changes to a feature branch and create a pull request
+4. Once merged, the documentation will be automatically deployed
+
 ## 🔄 Development Workflow
 
 ### Using with Cursor
