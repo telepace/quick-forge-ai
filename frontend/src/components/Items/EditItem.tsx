@@ -35,6 +35,12 @@ interface ItemUpdateForm {
   description?: string
 }
 
+/**
+ * A React component that renders a dialog for editing an item.
+ *
+ * @param {EditItemProps} props - The properties for the EditItem component.
+ * @returns {JSX.Element} The JSX element representing the EditItem dialog.
+ */
 const EditItem = ({ item }: EditItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -69,6 +75,13 @@ const EditItem = ({ item }: EditItemProps) => {
     },
   })
 
+  /**
+   * Handles form submission and submits data using mutation.
+   *
+   * @param {ItemUpdateForm} data - The data to be submitted from the form.
+   * @throws Will throw an error if mutation fails.
+   * @returns {void}
+   */
   const onSubmit: SubmitHandler<ItemUpdateForm> = async (data) => {
     mutation.mutate(data)
   }
