@@ -1,0 +1,100 @@
+# Optimized workflow for building and deploying a Next.js site from 'website/' subdirectory to GitHub Pages
+name: Deploy Next.js site (from website subdir) to Pages
+
+on:
+  push:
+    branches: ["main"]
+    paths: # Optional: Trigger only if files within website/ or the workflow change
+      - 'website/**'
+      - '.github/workflows/deploy-nextjs.yml' # Use the actual filename of your workflow
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Or use .nvmrc in ./website if preferred
+          cache: 'npm'
+          cache-dependency-path: ./website/package-lock.json # Point to the lock file inside website/
+
+      # Configure Pages for Next.js static export
+      # This automatically sets output: 'export' and basePath in next.config.js if needed.
+      - name: Setup Pages
+        id: pages # Give it an ID to reference outputs if needed later
+        uses: actions/configure-pages@v5
+        with:
+          static_site_generator: next
+          # Point to the Next.js project directory relative to the repo root
+          generator_config_file: ./website/next.config.mjs # Ensure this path is correct
+          # Optional: Set base_path explicitly if needed, e.g., /your-repo-name
+          # base_path: /${{ github.event.repository.name }}
+
+      # Restore Next.js cache if available
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          # Path is relative to the repository root
+          path: ./website/.next/cache
+          # Generate key based on lock file and source files *within* website/
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/website/package-lock.json') }}-${{ hashFiles('**/website/**.[jt]s', '**/website/**.[jt]sx') }}
+          # Fallback restore key
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/website/package-lock.json') }}-
+
+      - name: Install dependencies
+        working-directory: ./website # Specify working directory for this step
+        run: npm ci # Use ci for speed and reliability with lock file
+
+      - name: Build with Next.js
+        working-directory: ./website # Specify working directory for this step
+        # Pass basePath environment variable if your components need it during build time
+        # The configure-pages action modifies next.config.js for the export itself.
+        # env:
+        #  NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }} # Use output from configure-pages
+        run: npm run build # Runs 'next build' and the original 'postbuild' from package.json
+
+      # === IMPORTANT: Rerun pagefind correctly for static export ===
+      # The original postbuild script in package.json might target the wrong directory or fail
+      # because configure-pages forces static export to 'out/'.
+      # This step explicitly runs pagefind on the final static 'out' directory produced by 'next build'.
+      - name: Run Pagefind on static output
+        working-directory: ./website # Specify working directory for this step
+        # Ensure pagefind is available (it's a devDependency, so npx should work)
+        # Note: The arch check from the original postbuild script is removed for CI simplicity.
+        run: npx pagefind --site out --output-path out/_pagefind # Target the 'out' dir relative to 'website/'
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Path is relative to the repository root, pointing to the build output folder
+          path: ./website/out
+
+  # Deployment job remains the same
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        # No 'with' needed, it automatically uses the artifact from the 'build' job
