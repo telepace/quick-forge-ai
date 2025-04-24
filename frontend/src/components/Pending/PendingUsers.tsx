@@ -1,6 +1,11 @@
 import { Table } from "@chakra-ui/react"
 import { SkeletonText } from "../ui/skeleton"
 
+/**
+ * A React component that displays a table of pending users with placeholders for data.
+ *
+ * @returns {JSX.Element} - A JSX element representing the table.
+ */
 const PendingUsers = () => (
   <Table.Root size={{ base: "sm", md: "md" }}>
     <Table.Header>
