@@ -14,6 +14,11 @@ export const toaster = createToaster({
   pauseOnPageIdle: true,
 })
 
+/**
+ * A component that renders a toast notification using Chakra UI components.
+ *
+ * @returns {JSX.Element} - The rendered Toast component wrapped in a Portal.
+ */
 export const Toaster = () => {
   return (
     <Portal>
