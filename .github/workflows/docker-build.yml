@@ -87,7 +87,7 @@ jobs:
             type=sha
 
       - name: Build backend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Dockerfile
@@ -161,7 +161,7 @@ jobs:
             type=sha
 
       - name: Build frontend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
@@ -236,7 +236,7 @@ jobs:
             type=sha
 
       - name: 构建并推送文档镜像
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./website
           file: ./website/Dockerfile
