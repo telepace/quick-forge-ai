@@ -26,6 +26,14 @@ export const Route = createFileRoute("/reset-password")({
   },
 })
 
+/**
+ * Component responsible for resetting a user's password.
+ *
+ * This component utilizes Formik and React Hook Form to handle form validation and submission.
+ * It also uses a custom hook for showing success toast notifications and React Router for navigation.
+ *
+ * @returns {JSX.Element} - The rendered ResetPassword component.
+ */
 function ResetPassword() {
   const {
     register,
@@ -43,6 +51,18 @@ function ResetPassword() {
   const { showSuccessToast } = useCustomToast()
   const navigate = useNavigate()
 
+  /**
+   * Asynchronously resets a user's password using a provided token.
+   *
+   * @async
+   * @function resetPassword
+   * @param {NewPassword} data - An object containing the new password and the token for resetting.
+   * @returns {void}
+   * @throws {Error} If no token is found in the URL query parameters.
+   * @example
+   * const newPasswordData = { new_password: "newSecurePass123" };
+   * resetPassword(newPasswordData);
+   */
   const resetPassword = async (data: NewPassword) => {
     const token = new URLSearchParams(window.location.search).get("token")
     if (!token) return
@@ -63,6 +83,12 @@ function ResetPassword() {
     },
   })
 
+  /**
+   * Handles form submission by calling the mutation function with the provided data.
+   *
+   * @param {NewPasswordForm} data - The data submitted through the form.
+   * @returns {void}
+   */
   const onSubmit: SubmitHandler<NewPasswordForm> = async (data) => {
     mutation.mutate(data)
   }
