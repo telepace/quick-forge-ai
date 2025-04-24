@@ -27,6 +27,11 @@ import {
 } from "../ui/dialog"
 import { Field } from "../ui/field"
 
+/**
+ * A React component for adding items to a list. It provides a dialog form for entering item details such as title and description.
+ *
+ * @returns {JSX.Element} - The rendered JSX element of the AddItem component.
+ */
 const AddItem = () => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -61,6 +66,11 @@ const AddItem = () => {
     },
   })
 
+  /**
+   * Handles form submission.
+   *
+   * @param {ItemCreate} data - The form data to be submitted.
+   */
   const onSubmit: SubmitHandler<ItemCreate> = (data) => {
     mutation.mutate(data)
   }
