@@ -12,6 +12,19 @@ export class Interceptors<T> {
     this._fns = []
   }
 
+  /**
+   * Removes a middleware function from the internal list of middleware functions.
+   *
+   * @param {Middleware<T>} fn - The middleware function to remove.
+   * @returns {void}
+   *
+   * @example
+   * const myMiddleware = (ctx, next) => {
+   *   // Middleware logic here
+   * };
+   * app.use(myMiddleware);
+   * app.eject(myMiddleware); // Removes the middleware from the application
+   */
   eject(fn: Middleware<T>): void {
     const index = this._fns.indexOf(fn)
     if (index !== -1) {
@@ -19,6 +32,12 @@ export class Interceptors<T> {
     }
   }
 
+  /**
+   * Adds a middleware function to the list of middlewares.
+   *
+   * @param {Middleware<T>} fn - The middleware function to add.
+   * @returns {void}
+   */
   use(fn: Middleware<T>): void {
     this._fns = [...this._fns, fn]
   }
