@@ -32,6 +32,11 @@ interface UserCreateForm extends UserCreate {
   confirm_password: string
 }
 
+/**
+ * A React component that renders a dialog for adding a new user to the system.
+ *
+ * @returns {React.ReactElement} The rendered dialog component.
+ */
 const AddUser = () => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -72,6 +77,21 @@ const AddUser = () => {
     },
   })
 
+  /**
+   * Handles form submission for user creation.
+   * @function onSubmit
+   * @param {UserCreateForm} data - The form data containing user information to be submitted.
+   * @returns {void}
+   * @throws {Error} - If the submission process encounters an error, an exception will be thrown.
+   * @example
+   * // Example usage:
+   * const userData = {
+   *   name: 'John Doe',
+   *   email: 'john.doe@example.com',
+   *   password: 'securepassword123'
+   * };
+   * onSubmit(userData);
+   */
   const onSubmit: SubmitHandler<UserCreateForm> = (data) => {
     mutation.mutate(data)
   }
