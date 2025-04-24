@@ -12,10 +12,19 @@ import {
 } from "@/client"
 import { handleError } from "@/utils"
 
+/**
+ * Checks if the user is currently logged in by verifying the presence of an access token in localStorage.
+ *
+ * @returns {boolean} - Returns true if the user is logged in, false otherwise.
+ */
 const isLoggedIn = () => {
   return localStorage.getItem("access_token") !== null
 }
 
+/**
+ * Custom hook that manages user authentication processes.
+ * @returns {object} An object containing authentication-related data and functions.
+ */
 const useAuth = () => {
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
@@ -41,6 +50,14 @@ const useAuth = () => {
     },
   })
 
+  /**
+   * Logs in a user using an access token.
+   *
+   * @async
+   * @function login
+   * @param {AccessToken} data - The access token data to be used for logging in.
+   * @throws {Error} - If the login process fails or encounters an error.
+   */
   const login = async (data: AccessToken) => {
     const response = await LoginService.loginAccessToken({
       formData: data,
@@ -58,6 +75,15 @@ const useAuth = () => {
     },
   })
 
+  /**
+   * Logs out the user by removing the access token from local storage and navigating to the login page.
+   *
+   * @function logout
+   * @returns {void} This function does not return any value.
+   *
+   * Example usage:
+   * logout();
+   */
   const logout = () => {
     localStorage.removeItem("access_token")
     navigate({ to: "/login" })
