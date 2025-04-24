@@ -2,6 +2,11 @@
 
 import { useState } from 'react'
 
+/**
+ * Renders a page displaying a list of blog posts with search functionality.
+ *
+ * @returns {JSX.Element} - The JSX element representing the Blog Posts Page.
+ */
 export default function BlogPostsPage() {
   const [searchTerm, setSearchTerm] = useState('')
 
