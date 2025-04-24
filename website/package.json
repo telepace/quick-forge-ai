@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
+    "postbuild": "node -e \"if (process.arch !== 'arm64') require('child_process').execSync('npx pagefind --site .next/server/app --output-path public/_pagefind')\"",
     "start": "next start"
   },
   "devDependencies": {

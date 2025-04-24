@@ -1,0 +1,59 @@
+global:
+  env: development
+  domain: localhost.localdomain
+  stackName: qforge-dev
+  apiUrl: "http://api.localhost.localdomain"
+  frontendHost: "http://dashboard.localhost.localdomain"
+  imageTag: latest
+  imageRepository: telepace
+  
+  environment:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_DB: app
+    POSTGRES_PORT: 5432
+    POSTGRES_SERVER: postgresql
+    
+    SECRET_KEY: "changeme"
+    
+    BACKEND_CORS_ORIGINS: '["http://localhost", "https://localhost", "http://localhost:8080", "https://localhost:8080", "http://dashboard.localhost.localdomain", "https://dashboard.localhost.localdomain"]'
+    
+    FIRST_SUPERUSER: admin@example.com
+    FIRST_SUPERUSER_PASSWORD: admin
+
+backend:
+  ingress:
+    hosts:
+      - host: api.localhost.localdomain
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+frontend:
+  ingress:
+    hosts:
+      - host: dashboard.localhost.localdomain
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+  
+  buildArgs:
+    VITE_API_URL: "http://api.localhost.localdomain"
+    NODE_ENV: development
+
+website:
+  ingress:
+    hosts:
+      - host: docs.localhost.localdomain
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+postgresql:
+  auth:
+    username: postgres
+    password: postgres
+    database: app 
