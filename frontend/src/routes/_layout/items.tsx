@@ -28,6 +28,22 @@ const itemsSearchSchema = z.object({
 
 const PER_PAGE = 5
 
+/**
+ * Constructs query options to fetch items from the ItemsService.
+ *
+ * @param {Object} options - The options object containing pagination parameters.
+ * @param {number} options.page - The current page number for pagination, starting from 1.
+ * @returns {Object} An object containing a `queryFn` and `queryKey`.
+ * @throws {Error} If the provided `page` is less than 1, an error will be thrown.
+ *
+ * @example
+ * const queryOptions = getItemsQueryOptions({ page: 1 });
+ * // Returns:
+ * // {
+ * //   queryFn: () => ItemsService.readItems({ skip: 0, limit: PER_PAGE }),
+ * //   queryKey: ["items", { page: 1 }]
+ * // }
+ */
 function getItemsQueryOptions({ page }: { page: number }) {
   return {
     queryFn: () =>
@@ -41,6 +57,11 @@ export const Route = createFileRoute("/_layout/items")({
   validateSearch: (search) => itemsSearchSchema.parse(search),
 })
 
+/**
+ * A component that renders an items table with pagination.
+ *
+ * @returns {JSX.Element} The rendered ItemsTable component.
+ */
 function ItemsTable() {
   const navigate = useNavigate({ from: Route.fullPath })
   const { page } = Route.useSearch()
@@ -131,6 +152,12 @@ function ItemsTable() {
   )
 }
 
+/**
+ * React functional component that renders the main container for items management.
+ * It includes a heading, an addItem component, and an ItemsTable component.
+ *
+ * @returns {React.ReactNode} - The rendered JSX element.
+ */
 function Items() {
   return (
     <Container maxW="full">
