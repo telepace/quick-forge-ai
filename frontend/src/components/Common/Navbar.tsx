@@ -4,6 +4,11 @@ import { Link } from "@tanstack/react-router"
 import Logo from "/assets/images/fastapi-logo.svg"
 import UserMenu from "./UserMenu"
 
+/**
+ * Renders a navigation bar component that adapts its display based on the current breakpoint.
+ *
+ * @returns {JSX.Element} - The rendered navbar element.
+ */
 function Navbar() {
   const display = useBreakpointValue({ base: "none", md: "flex" })
 
