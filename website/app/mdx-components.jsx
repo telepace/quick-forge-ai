@@ -1,8 +1,8 @@
 import React from 'react'
 
-// 创建静态的MDX组件配置
+// Create static MDX component configurations
 const mdxComponents = {
-  // 为不同元素定义基础样式
+  // Define basic styles for different elements
   h1: props => <h1 className="text-4xl font-bold mt-8 mb-4" {...props} />,
   h2: props => <h2 className="text-3xl font-bold mt-6 mb-3" {...props} />,
   h3: props => <h3 className="text-2xl font-bold mt-5 mb-2" {...props} />,
@@ -13,7 +13,7 @@ const mdxComponents = {
   p: props => <p className="my-4" {...props} />
 }
 
-// Next.js需要这个导出格式
+// Next.js requires this export format
 export function useMDXComponents(components) {
   return { ...mdxComponents, ...components }
 } 

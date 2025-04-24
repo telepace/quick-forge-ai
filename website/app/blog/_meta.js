@@ -1,12 +1,12 @@
 export default {
   index: {
-    title: '博客',
+    title: 'Blog',
     display: 'hidden',
     theme: {
       layout: 'full'
     }
   },
   posts: {
-    title: '所有文章'
+    title: 'All Posts'
   }
 } 

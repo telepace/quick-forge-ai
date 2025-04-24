@@ -7,18 +7,18 @@ export default function BlogPostsPage() {
 
   const posts = [
     {
-      title: '快速入门 Quick Forge AI',
-      description: '如何使用 Quick Forge AI 构建你的第一个 AI 应用',
+      title: 'Getting Started with Quick Forge AI',
+      description: 'How to build your first AI application with Quick Forge AI',
       href: '/blog/posts/getting-started'
     },
     {
-      title: '最佳实践',
-      description: '提高应用性能和用户体验的最佳实践',
+      title: 'Best Practices',
+      description: 'Best practices for improving application performance and user experience',
       href: '/blog/posts/best-practices'
     },
     {
-      title: '技术分享',
-      description: '我们的技术架构和开发心得',
+      title: 'Tech Sharing',
+      description: 'Our technical architecture and development insights',
       href: '/blog/posts/tech-sharing'
     }
   ]
@@ -30,12 +30,12 @@ export default function BlogPostsPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-4xl font-bold mb-8">所有文章</h1>
+      <h1 className="text-4xl font-bold mb-8">All Articles</h1>
       
       <div className="mb-8">
         <input
           type="text"
-          placeholder="搜索文章..."
+          placeholder="Search articles..."
           className="w-full p-2 border border-gray-300 rounded"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -48,12 +48,12 @@ export default function BlogPostsPage() {
             <div key={index} className="border rounded-lg p-6 hover:shadow-lg transition-shadow">
               <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
               <p className="mb-4">{post.description}</p>
-              <a href={post.href} className="text-blue-600 hover:underline">阅读更多 →</a>
+              <a href={post.href} className="text-blue-600 hover:underline">Read More →</a>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-500">没有找到匹配的文章</p>
+        <p className="text-center text-gray-500">No matching articles found</p>
       )}
     </div>
   )

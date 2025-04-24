@@ -331,7 +331,7 @@ export default function LandingPageStyles() {
         background: rgba(255, 255, 255, 0.2);
       }
 
-      /* 响应式设计 */
+      /* Responsive design */
       @media (max-width: 768px) {
         .hero-title {
           font-size: 2.5rem;
@@ -362,7 +362,7 @@ export default function LandingPageStyles() {
         }
       }
       
-      /* 自定义MDX p组件样式 */
+      /* Custom MDX p component style */
       .mdx-p {
         display: block;
         margin-bottom: 1rem;
@@ -371,7 +371,7 @@ export default function LandingPageStyles() {
         color: inherit;
       }
       
-      /* 按钮内的span样式 */
+      /* Span style within buttons */
       .primary-button span,
       .secondary-button span,
       .github-button span {

@@ -2,8 +2,8 @@
 
 import React from 'react'
 
-// 客户端MDX包装组件
-// 用于包装需要使用MDX组件的内容，确保它们在客户端渲染
+// Client MDX wrapper component
+// Used to wrap content that needs to use MDX components, ensuring they are rendered on the client side
 export default function ClientMDX({ children }) {
   return <>{children}</>
 } 

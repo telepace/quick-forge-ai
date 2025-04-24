@@ -1,7 +1,7 @@
 import { Footer, Layout, Navbar } from 'nextra-theme-docs'
 import { Banner, Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
-// 引入主题样式
+// Import theme styles
 import 'nextra-theme-docs/style.css'
 
 export const metadata = {
@@ -10,7 +10,7 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
-  const banner = <Banner storageKey="nextra-banner">欢迎使用 Quick Forge AI 文档</Banner>
+  const banner = <Banner storageKey="nextra-banner">Welcome to Quick Forge AI Documentation</Banner>
   const navbar = <Navbar logo={<strong>Quick Forge AI</strong>} />
   const footer = (
     <Footer>
@@ -20,7 +20,7 @@ export default async function RootLayout({ children }) {
 
   return (
     <html
-      lang="zh-CN"
+      lang="en-US"
       dir="ltr"
       suppressHydrationWarning
     >
