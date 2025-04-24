@@ -1,15 +1,15 @@
 export default {
   index: {
-    title: '首页',
+    title: 'Home',
     type: 'page',
     display: 'hidden'
   },
   docs: {
-    title: '文档',
+    title: 'Documentation',
     type: 'page'
   },
   blog: {
-    title: '博客',
+    title: 'Blog',
     type: 'page'
   }
 } 

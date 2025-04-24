@@ -1,34 +1,34 @@
 ---
-title: 快速入门 Quick Forge AI
+title: Getting Started with Quick Forge AI
 date: 2024-07-01
-description: 本文将指导您如何使用 Quick Forge AI 构建您的第一个 AI 应用程序
+description: This article will guide you through building your first AI application using Quick Forge AI
 ---
 
-# 快速入门 Quick Forge AI
+# Getting Started with Quick Forge AI
 
-欢迎使用 Quick Forge AI，这是一个强大的 AI 应用构建平台。本文将指导您完成设置过程并创建您的第一个 AI 应用程序。
+Welcome to Quick Forge AI, a powerful AI application building platform. This article will guide you through the setup process and create your first AI application.
 
-## 安装和配置
+## Installation and Configuration
 
-首先，您需要安装 Quick Forge AI CLI：
+First, you need to install the Quick Forge AI CLI:
 
 ```bash
 npm install -g quick-forge-ai-cli
 ```
 
-安装完成后，初始化一个新项目：
+After installation, initialize a new project:
 
 ```bash
 quick-forge init my-ai-app
 cd my-ai-app
 ```
 
-## 创建您的第一个 AI 组件
+## Creating Your First AI Component
 
-Quick Forge AI 使用组件化方法构建 AI 应用。以下是创建简单聊天机器人组件的步骤：
+Quick Forge AI builds AI applications using a component-based approach. Here are the steps to create a simple chatbot component:
 
 ```javascript
-// 创建聊天机器人组件
+// Creating a chatbot component
 import { AIComponent } from 'quick-forge-ai';
 
 export const ChatBot = () => {
@@ -36,15 +36,15 @@ export const ChatBot = () => {
     <AIComponent
       type="chat"
       model="gpt-4"
-      prompt="你是一个有用的助手，回答用户的问题。"
+      prompt="You are a helpful assistant, answer user questions."
     />
   );
 };
 ```
 
-## 集成到您的应用程序
+## Integrating into Your Application
 
-将组件集成到应用程序中：
+Integrate the component into your application:
 
 ```javascript
 import { ChatBot } from './components/ChatBot';
@@ -53,7 +53,7 @@ function App() {
   return (
     <div className="app">
       <header>
-        <h1>我的 AI 应用</h1>
+        <h1>My AI Application</h1>
       </header>
       <main>
         <ChatBot />
@@ -65,27 +65,27 @@ function App() {
 export default App;
 ```
 
-## 运行应用程序
+## Running the Application
 
-运行以下命令启动应用程序：
+Run the following command to start the application:
 
 ```bash
 npm run dev
 ```
 
-您的应用程序现在应该在 `http://localhost:3000` 上运行。
+Your application should now be running at `http://localhost:3000`.
 
-## 下一步
+## Next Steps
 
-恭喜！您已成功创建了第一个 Quick Forge AI 应用程序。接下来，您可以探索更多高级功能：
+Congratulations! You have successfully created your first Quick Forge AI application. Next, you can explore more advanced features:
 
-- 定制 AI 模型设置
-- 添加多模态支持
-- 实现用户认证
-- 部署到生产环境
+- Customizing AI model settings
+- Adding multimodal support
+- Implementing user authentication
+- Deploying to a production environment
 
-请查阅我们的 [详细文档](/docs) 获取更多信息。
+Please refer to our [detailed documentation](/docs) for more information.
 
 ---
 
-如有任何问题，请随时在 [GitHub 仓库](https://github.com/telepace/quick-forge-ai) 上提交 issue。 
+If you have any questions, feel free to submit an issue on our [GitHub repository](https://github.com/telepace/quick-forge-ai).

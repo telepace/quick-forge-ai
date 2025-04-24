@@ -10,9 +10,9 @@ export default function CustomBlogFooter() {
           <p>MIT {new Date().getFullYear()} © Quick Forge AI</p>
         </div>
         <div className="footer-links">
-          <a href="/">首页</a>
-          <a href="/docs">文档</a>
-          <a href="/blog">博客</a>
+          <a href="/">Home</a>
+          <a href="/docs">Documentation</a>
+          <a href="/blog">Blog</a>
         </div>
       </div>
       <style jsx>{`

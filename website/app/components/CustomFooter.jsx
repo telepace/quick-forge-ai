@@ -10,8 +10,8 @@ export default function CustomFooter() {
           <p>MIT {new Date().getFullYear()} © Quick Forge AI</p>
         </div>
         <div className="footer-links">
-          <a href="/docs">文档</a>
-          <a href="/blog">博客</a>
+          <a href="/docs">Documentation</a>
+          <a href="/blog">Blog</a>
           <a href="https://github.com/telepace/quick-forge-ai" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
       </div>
