@@ -37,6 +37,12 @@ interface UserUpdateForm extends UserUpdate {
   confirm_password?: string
 }
 
+/**
+ * Renders a dialog for editing user details.
+ *
+ * @param {EditUserProps} user - The initial user data to edit.
+ * @returns {JSX.Element} - The rendered dialog component.
+ */
 const EditUser = ({ user }: EditUserProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -70,6 +76,20 @@ const EditUser = ({ user }: EditUserProps) => {
     },
   })
 
+  /**
+   * Handles form submission for updating user data.
+   *
+   * @async
+   * @function onSubmit
+   * @param {UserUpdateForm} data - The user update form data to be submitted.
+   * @returns {Promise<void>} A promise that resolves when the mutation is complete.
+   *
+   * @example
+   * onSubmit({
+   *   username: 'newUsername',
+   *   email: 'newemail@example.com'
+   * });
+   */
   const onSubmit: SubmitHandler<UserUpdateForm> = async (data) => {
     if (data.password === "") {
       data.password = undefined
