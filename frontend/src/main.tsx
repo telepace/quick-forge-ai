@@ -17,6 +17,12 @@ OpenAPI.TOKEN = async () => {
   return localStorage.getItem("access_token") || ""
 }
 
+/**
+ * Handles API errors by checking if they are instances of ApiError with specific status codes.
+ * If so, it clears the access token from local storage and redirects to the login page.
+ *
+ * @param {Error} error - The error object thrown by the API call.
+ */
 const handleApiError = (error: Error) => {
   if (error instanceof ApiError && [401, 403].includes(error.status)) {
     localStorage.removeItem("access_token")
