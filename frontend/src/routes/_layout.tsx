@@ -16,6 +16,11 @@ export const Route = createFileRoute("/_layout")({
   },
 })
 
+/**
+ * Renders the main application layout with a flex-based structure.
+ *
+ * @returns {JSX.Element} - The JSX element representing the application layout.
+ */
 function Layout() {
   return (
     <Flex direction="column" h="100vh">
