@@ -1,0 +1,43 @@
+{{- if .Values.prestart.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "backend.fullname" . }}-prestart
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prestart
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "backend.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: prestart
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: {{ .Chart.Name }}-prestart
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.prestart.image.repository }}:{{ .Values.prestart.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.prestart.image.pullPolicy }}
+          command: {{ .Values.prestart.command }}
+          resources:
+            {{- toYaml .Values.prestart.resources | nindent 12 }}
+          env:
+            - name: DOMAIN
+              value: {{ $.Values.global.domain | default "example.com" | quote }}
+            - name: STACK_NAME
+              value: {{ $.Values.global.stackName | default "qforge" | quote }}
+            - name: FRONTEND_HOST
+              value: {{ $.Values.global.frontendHost | default "https://dashboard.example.com" | quote }}
+            - name: ENVIRONMENT
+              value: {{ $.Values.global.env | default "production" | quote }}
+            {{- range $key, $value := $.Values.global.environment }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+{{- end }} 
