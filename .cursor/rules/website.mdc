@@ -1,0 +1,18 @@
+---
+description: 
+globs: website/**
+alwaysApply: false
+---
+Nextra 4.0 Migration Notice for AI Assistance
+
+Please be aware of the following major changes introduced in Nextra 4.0 to ensure compatibility and best practices:
+	1.	App Router by Default: Nextra 4.0 is fully built on Next.js App Router. The legacy Pages Router is no longer supported. Please structure content under the app/ directory accordingly.
+	2.	Updated Layout System: Introduces layout.js and template.js files for more flexible, nested, and section-based layouts.
+	3.	Theme Config Changes: The structure of theme.config.ts has been updated. Some fields (like project.link, docsRepositoryBase) may have been renamed or relocated — refer to the latest docs when updating.
+	4.	Enhanced MDX Support: Modernized MDX pipeline with broader support for Remark/Rehype plugins. Custom plugins may need to be adapted.
+	5.	Standardized Component Imports: Official components should be imported from @nextra/components. Legacy manual imports may not be compatible anymore.
+	6.	Improved i18n and Localization: Built-in support for better multi-language routing and content structure. Make sure to define language paths clearly in config.
+	7.	Build Performance Optimizations: Leveraging faster compilers and resolvers; note that some build hooks or plugin orders may behave differently.
+    8. Nextra 4.0 no longer supports the direct use of the theme and themeConfig properties in the configuration.
+
+Please ensure you’re using Nextra 4.0’s structure and configuration correctly — especially the App Router layout system, the updated theme.config.ts, and the new MDX plugin pipeline. Avoid deprecated APIs or legacy patterns from earlier versions.

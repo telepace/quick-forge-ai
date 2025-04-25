@@ -1,10 +1,10 @@
 services:
 
   # Local services are available on their ports, but also available on:
-  # http://api.localhost.tiangolo.com: backend
-  # http://dashboard.localhost.tiangolo.com: frontend
+  # http://api.localhost.nip.io: backend
+  # http://dashboard.localhost.nip.io: frontend
   # etc. To enable it, update .env, set:
-  # DOMAIN=localhost.tiangolo.com
+  # DOMAIN=localhost.nip.io
   proxy:
     image: traefik:3.0
     volumes:
