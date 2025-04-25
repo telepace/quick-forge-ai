@@ -69,7 +69,7 @@ jobs:
 
       - name: Get Docker metadata for backend
         id: metadata-backend
-        uses: docker/metadata-action@v5.5.1
+        uses: docker/metadata-action@v5.7.0
         with:
           images: |
             docker.io/${{ github.repository_owner }}/quick-forge-ai-backend${{ steps.env-suffix.outputs.ENV_SUFFIX }}
@@ -143,7 +143,7 @@ jobs:
 
       - name: Get Docker metadata for frontend
         id: metadata-frontend
-        uses: docker/metadata-action@v5.5.1
+        uses: docker/metadata-action@v5.7.0
         with:
           images: |
             docker.io/${{ github.repository_owner }}/quick-forge-ai-frontend${{ steps.set-env.outputs.ENV_SUFFIX }}
@@ -219,7 +219,7 @@ jobs:
 
       - name: 获取 Docker 元数据
         id: metadata-docs
-        uses: docker/metadata-action@v5.5.1
+        uses: docker/metadata-action@v5.7.0
         with:
           images: |
             docker.io/${{ github.repository_owner }}/quick-forge-ai-docs${{ steps.set-env-docs.outputs.ENV_SUFFIX }}
