@@ -27,6 +27,19 @@ const AccordionItem = ({
 }
 AccordionItem.displayName = 'AccordionItem'
 
+/**
+ * A component used as a trigger for an accordion item. It handles the interactive behavior of expanding or collapsing the accordion section.
+ *
+ * @param {Object} props - The properties passed to the AccordionTrigger component.
+ * @param {string} [props.className] - Additional class names to be added to the root element.
+ * @param {React.ReactNode} props.children - The content inside the trigger, typically a label or text.
+ * @returns {JSX.Element} - The rendered AccordionTrigger component.
+ *
+ * @example
+ * <AccordionTrigger className="my-2" onClick={() => console.log('Accordion clicked')}>
+ *   Click me to toggle accordion
+ * </AccordionTrigger>
+ */
 const AccordionTrigger = ({
   className,
   children,
@@ -52,6 +65,19 @@ const AccordionTrigger = ({
 }
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
+/**
+ * A component that represents the content of an accordion item. This component wraps its children with additional styling and animation effects.
+ *
+ * @param {Object} props - The properties for the AccordionContent component.
+ * @property {string} [className] - Additional CSS classes to apply to the accordion content.
+ * @property {React.ReactNode} children - The child elements to be rendered within the accordion content.
+ * @returns {JSX.Element} The JSX element representing the accordion content.
+ *
+ * @example
+ * <AccordionContent className="custom-content">
+ *   <p>Content goes here...</p>
+ * </AccordionContent>
+ */
 const AccordionContent = ({
   className,
   children,
