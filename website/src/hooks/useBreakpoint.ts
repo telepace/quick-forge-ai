@@ -2,6 +2,17 @@
 
 import { useMediaQuery } from 'react-responsive'
 
+/**
+ * Returns an object containing boolean properties indicating whether the current screen size matches a specific breakpoint.
+ *
+ * @returns {Object} - An object with properties 'isSm', 'isMd', 'isLg', 'isXl', and 'is2Xl'.
+ *   Each property is a boolean indicating if the current screen width is less than or equal to the respective breakpoint width.
+ *
+ * @example
+ * const { isSm, isMd } = useBreakpoint();
+ * console.log(isSm); // true if screen width <= 639px, otherwise false
+ * console.log(isMd); // true if screen width <= 767px, otherwise false
+ */
 export const useBreakpoint = () => {
   // sm 640px @media (max-width: 639px) { ... }
   const isSm = useMediaQuery({ query: '(max-width: 639px)' })
