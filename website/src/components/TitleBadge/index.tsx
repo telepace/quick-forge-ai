@@ -8,6 +8,18 @@ interface Props {
   children?: ReactNode
 }
 
+/**
+ * A component that renders a title badge with animated background gradient.
+ *
+ * @param {Object} props - The properties for the TitleBadge component.
+ * @param {string} [props.className=''] - Additional class names to apply to the badge.
+ * @param {React.ReactNode} [props.children='NEW'] - The content of the badge. Default is 'NEW'.
+ *
+ * @returns {JSX.Element} - The rendered TitleBadge component.
+ *
+ * @example
+ * <TitleBadge className="custom-class" children="Special Offer" />
+ */
 export const TitleBadge = ({
   className,
   children = 'NEW',
