@@ -11,6 +11,13 @@ import Marquee from 'react-fast-marquee'
 import { Section } from './Section'
 import { SetupHero } from './Setup'
 
+/**
+ * A React component representing an item in a stack with customizable styling.
+ *
+ * @param {Object} props - The properties for the StackItem component.
+ * @param {string} props.className - Additional CSS classes to apply to the stack item for custom styling.
+ * @returns {ReactElement} A React element representing the stack item.
+ */
 export const StackItem = ({
   className,
 }: {
@@ -30,6 +37,11 @@ export const StackItem = ({
   )
 }
 
+/**
+ * Represents the main hero section of the homepage.
+ *
+ * @returns {JSX.Element} - The JSX element representing the homepage hero section.
+ */
 export default function HomepageHero() {
   const { t } = useLocale()
 
