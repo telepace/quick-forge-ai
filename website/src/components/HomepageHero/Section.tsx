@@ -11,6 +11,23 @@ interface Props {
   tallPaddingY?: boolean
 }
 
+/**
+ * A React component that renders a section with a title, description, and children content.
+ *
+ * @param {Object} props - The properties for the Section component.
+ * @param {string} [props.className] - Additional CSS classes to apply to the section.
+ * @param {Object} [props.titleProps] - Properties to pass to the MotionWrapperFlash component for the title.
+ * @param {string} [props.title] - The title text of the section.
+ * @param {string} [props.description] - An optional description text for the section.
+ * @param {React.ReactNode} [props.children] - Content to be rendered within the section.
+ * @param {boolean} [tallPaddingY=false] - If true, adds additional padding to the top and bottom of the title.
+ * @returns {React.ReactElement} The rendered Section component.
+ *
+ * @example
+ * <Section title="Welcome" description="This is a welcome message." tallPaddingY={true}>
+ *   <p>Main content goes here.</p>
+ * </Section>
+ */
 export const Section = (props: Props) => {
   const {
     className,
