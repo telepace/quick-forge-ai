@@ -10,7 +10,11 @@ import { useCallback, useEffect } from 'react'
 const ONE_YEAR = 365 * 24 * 60 * 60 * 1000
 
 /**
- * 快速切换语言组件，用于覆盖 nextra 原生切换下拉框
+ * 快速切换语言组件，用于覆盖 nextra 原生切换下拉框。
+ *
+ * @param {Object} props - 组件的属性对象。
+ * @param {string} [props.className] - 自定义类名。
+ * @returns {JSX.Element} - 返回一个 LocaleToggle 组件。
  */
 export default function LocaleToggle({
   className,
