@@ -10,6 +10,20 @@ const HoverCard = HoverCardPrimitive.Root
 const HoverCardTrigger = HoverCardPrimitive.Trigger
 
 
+/**
+ * A component that renders a hover card content with customizable alignment and styling.
+ *
+ * @param {Object} props - The properties for the HoverCardContent component.
+ * @param {string} [props.className] - Additional CSS classes to apply to the content.
+ * @param {string} [props.align='center'] - The horizontal alignment of the content. Can be 'left', 'right', or 'center'.
+ * @param {number} [props.sideOffset=4] - The offset distance from the side in pixels.
+ * @returns {JSX.Element} - The rendered HoverCardContent component.
+ *
+ * @example
+ * <HoverCardContent className="custom-class" align="left" sideOffset={5}>
+ *   Content here
+ * </HoverCardContent>
+ */
 const HoverCardContent = ({ className, align = 'center', sideOffset = 4, ...props }: React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>) => {
   const itemRef = React.useRef<React.ComponentRef<typeof HoverCardPrimitive.Content>>(null)
   return (
