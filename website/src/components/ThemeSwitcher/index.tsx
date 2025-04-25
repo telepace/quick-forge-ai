@@ -5,6 +5,12 @@ import { useLocale } from '@/hooks'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'nextra-theme-docs'
 
+/**
+ * A component that allows users to switch between light and dark themes.
+ *
+ * @function
+ * @returns {JSX.Element} - The rendered ThemeSwitcher component.
+ */
 export const ThemeSwitcher = () => {
   const { setTheme } = useTheme()
   const { t } = useLocale()
