@@ -29,6 +29,20 @@ const toggleVariants = cva(
   },
 )
 
+/**
+ * A custom toggle component using React and Tailwind CSS utilities.
+ *
+ * @param {Object} props - The properties for the Toggle component.
+ * @property {string} [className] - Additional classes to apply to the toggle root element.
+ * @property {string} [variant] - The variant of the toggle (e.g., "primary", "secondary").
+ * @property {string} [size] - The size of the toggle (e.g., "sm", "md").
+ * @returns {JSX.Element} - The rendered Toggle component.
+ *
+ * @example
+ * <Toggle variant="primary" size="md" className="my-toggle-class">
+ *   Click me!
+ * </Toggle>
+ */
 const Toggle = ({
   className,
   variant,
