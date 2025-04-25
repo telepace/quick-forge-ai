@@ -5,6 +5,16 @@ import LocaleToggle from '@/widgets/locale-toggle'
 import ThemeToggle from '@/widgets/theme-toggle'
 import Link from 'next/link'
 
+/**
+ * A React component that renders a link with an optional underline effect.
+ *
+ * @param {Object} props - The properties for the UnderlineLink component.
+ * @param {ReactNode | string} props.label - The label to be displayed on the link.
+ * @param {string} props.link - The URL to navigate to when the link is clicked.
+ * @param {boolean} [props.underlineByDefault=false] - Determines if the underline effect should be applied by default.
+ *
+ * @returns {ReactElement} - A React element representing the UnderlineLink component.
+ */
 const UnderlineLink = ({
   link,
   label,
@@ -34,6 +44,14 @@ const UnderlineLink = ({
   )
 }
 
+/**
+ * Renders a custom footer component.
+ *
+ * This function returns a JSX element that represents the footer of the application. It includes links for copyright information,
+ * a link to a website, and toggle buttons for theme and locale settings.
+ *
+ * @returns {JSX.Element} - The rendered JSX element representing the custom footer.
+ */
 export function CustomFooter() {
   return (
     <div className="w-full flex justify-center items-center">
