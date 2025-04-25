@@ -8,6 +8,25 @@
 docker compose watch
 ```
 
+### Docker镜像构建与拉取规则
+
+对于frontend和backend服务，Docker Compose决定是构建还是拉取镜像的规则如下：
+
+1. 当镜像不存在时：
+   - 如果环境变量`DOCKER_IMAGE_BACKEND`或`DOCKER_IMAGE_FRONTEND`已设置，Docker会尝试拉取这些变量指定的镜像
+   - 如果变量未设置，则使用默认值（`telepace/quick-forge-ai-backend`或`telepace/quick-forge-ai-frontend`）拉取镜像
+   - 如果拉取失败，则使用`build`指令从本地构建
+
+2. 强制构建场景：
+   - 使用`docker-compose build`命令
+   - 使用`docker-compose up --build`参数
+   - 当`docker-compose.override.yml`中覆盖了构建配置时
+
+3. 使用已有本地镜像：
+   - 如果本地已有指定的镜像（包括标签匹配），Docker会直接使用，不会拉取或构建
+
+配置中的`${DOCKER_IMAGE_BACKEND:-telepace/quick-forge-ai-backend}`格式表示变量替换与默认值。
+
 * 现在你可以打开浏览器并与这些URL交互：
 
 使用Docker构建的前端，根据路径处理路由：http://localhost:5173
@@ -132,7 +151,7 @@ docker compose watch
 
 `pre-commit`已经是项目的依赖项之一，但你也可以全局安装它，按照[官方pre-commit文档](https://pre-commit.com/)。
 
-在安装了`pre-commit`工具并且它可用后，你需要在本地存储库中“安装”它，以便在每次提交前自动运行。
+在安装了`pre-commit`工具并且它可用后，你需要在本地存储库中"安装"它，以便在每次提交前自动运行。
 
 使用`uv`，你可以这样做：
 
