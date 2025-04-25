@@ -11,6 +11,22 @@ interface Props {
   children: ReactNode
 }
 
+/**
+ * A React component that wraps its children with animated motion effects. The animation includes initial state, hover state, and transition properties.
+ *
+ * @param {Object} props - The props for the MotionWrapperFlash component.
+ * @param {boolean} [props.disabledAnimation=true] - Determines whether to disable the animation effect.
+ * @param {boolean} [props.disabledHover=false] - Determines whether to disable the hover animation effect.
+ * @param {React.ReactNode} props.children - The children elements to be animated.
+ * @param {string} [props.className=''] - Additional classes to apply to the motion span.
+ *
+ * @returns {JSX.Element} - Returns a JSX element that renders the wrapped children with applied animation effects.
+ *
+ * @example
+ * <MotionWrapperFlash disabledAnimation={false}>
+ *   <button>Click me</button>
+ * </MotionWrapperFlash>
+ */
 export const MotionWrapperFlash: React.FC<Props> = (props) => {
   const {
     disabledAnimation = true,
