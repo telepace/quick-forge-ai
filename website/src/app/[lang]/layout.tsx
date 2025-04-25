@@ -27,6 +27,18 @@ export const metadata = {
 
 const repo = 'https://github.com/pdsuwwz/nextjs-nextra-starter'
 
+/**
+ * Renders a custom banner component with localized text.
+ *
+ * @async
+ * @function CustomBanner
+ * @param {I18nLangAsyncProps} props - The properties for the CustomBanner component.
+ * @returns {JSX.Element} A React JSX element representing the custom banner.
+ * @throws {Error} If an error occurs during server locale loading or rendering.
+ *
+ * @example
+ * <CustomBanner lang="en" />
+ */
 const CustomBanner = async ({ lang }: I18nLangAsyncProps) => {
   const { t } = await useServerLocale(lang)
   return (
@@ -49,6 +61,15 @@ const CustomBanner = async ({ lang }: I18nLangAsyncProps) => {
 }
 
 
+/** @async
+ * A React component representing a custom navigation bar with locale and theme toggles.
+ *
+ * @param {I18nLangAsyncProps} lang - The language object containing the current language setting.
+ * @returns {JSX.Element} - The rendered JSX for the CustomNavbar component.
+ *
+ * @example
+ * <CustomNavbar lang={currentLanguage} />
+ */
 const CustomNavbar = async ({ lang }: I18nLangAsyncProps) => {
   const { t } = await useServerLocale(lang)
   return (
@@ -68,6 +89,11 @@ const CustomNavbar = async ({ lang }: I18nLangAsyncProps) => {
   )
 }
 
+/**
+ * Renders a script tag to track user behavior using Baidu Analytics.
+ *
+ * @returns {JSX.Element} A React component that includes a script tag for Baidu tracking.
+ */
 const BaiduTrack = () => {
   return (
     <>
@@ -92,6 +118,23 @@ interface Props {
   params: Promise<{ lang: I18nLangKeys }>
 }
 
+/**
+ * The root layout component for the application.
+ *
+ * @async
+ * @function RootLayout
+ * @param {Object} props - The props object containing children and params.
+ * @param {React.ReactNode} props.children - The child components to render inside the layout.
+ * @param {Object} props.params - The parameters passed to the component, including the language.
+ * @param {string} props.params.lang - The current language code.
+ *
+ * @returns {JSX.Element} - The rendered JSX element for the root layout.
+ *
+ * @throws {Error} - If an error occurs while fetching dictionary or page map data.
+ *
+ * @example
+ * <RootLayout children={<div>Welcome to My Nextra Starter</div>} params={{ lang: 'en' }} />
+ */
 export default async function RootLayout({ children, params }: Props) {
   const { lang } = await params
   const dictionary = await getDictionary(lang)
