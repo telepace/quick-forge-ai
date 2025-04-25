@@ -66,6 +66,11 @@ export const LinkPreview = ({
 
   const translateX = useSpring(x, springConfig)
 
+  /**
+   * Handles the mouse move event on an element.
+   *
+   * @param {any} event - The mouse move event object. Expected to contain properties like `clientX`, `target`.
+   */
   const handleMouseMove = (event: any) => {
     const targetRect = event.target.getBoundingClientRect()
     const eventOffsetX = event.clientX - targetRect.left
