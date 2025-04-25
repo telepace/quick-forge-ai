@@ -6,7 +6,10 @@ import { useTheme } from 'nextra-theme-docs'
 import { useCallback } from 'react'
 
 /**
- * 快速切换暗黑模式组件，用于覆盖 nextra 原生切换下拉框
+ * 快速切换暗黑模式组件，用于覆盖 nextra 原生切换下拉框。
+ *
+ * @param {Object} props - 组件的属性对象。
+ * @param {string} [props.className] - 可选的 CSS 类名，用于自定义样式。
  */
 export default function ThemeToggle({
   className,
