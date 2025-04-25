@@ -22,6 +22,12 @@ const alertVariants = cva(
   },
 )
 
+/**
+ * A component that renders an alert message with customizable styling.
+ *
+ * @param {React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>} props - The properties for the Alert component.
+ * @returns {JSX.Element} - The rendered Alert element.
+ */
 const Alert = ({
   className,
   variant,
@@ -39,6 +45,16 @@ const Alert = ({
 }
 Alert.displayName = 'Alert'
 
+/**
+ * A component that renders an alert title with customizable styles.
+ *
+ * @param {Object} props - The properties of the component.
+ * @param {string} [props.className] - Additional classes to apply to the element.
+ * @returns {React.ReactNode} - The rendered AlertTitle component.
+ *
+ * @example
+ * <AlertTitle className="text-red-500">Important Notice</AlertTitle>
+ */
 const AlertTitle = ({
   className,
   ...props
@@ -55,6 +71,17 @@ const AlertTitle = ({
 }
 AlertTitle.displayName = 'AlertTitle'
 
+/**
+ * A React component used to display an alert description within a paragraph element.
+ *
+ * @param {React.HTMLAttributes<HTMLParagraphElement>} props - Additional properties passed to the underlying `HTMLParagraphElement`.
+ * @returns {JSX.Element} - The rendered JSX element.
+ *
+ * @example
+ * <AlertDescription className="custom-class">
+ *   This is an alert description.
+ * </AlertDescription>
+ */
 const AlertDescription = ({
   className,
   ...props
