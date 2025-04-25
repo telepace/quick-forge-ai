@@ -11,6 +11,12 @@ import Link from 'next/link'
 
 interface Props {
 }
+/**
+ * Sets up the hero section of the application.
+ *
+ * @param {Props} props - The properties passed to this component.
+ * @returns {JSX.Element} - The rendered JSX element for the hero section.
+ */
 export function SetupHero(props: Props) {
   const { t, currentLocale } = useLocale()
 
