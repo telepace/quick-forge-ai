@@ -11,6 +11,7 @@ const withNextra = createWithNextra({
  * @type {import("next").NextConfig}
  */
 export default withNextra({
+  output: 'standalone',
   images: {
     unoptimized: true,
   },

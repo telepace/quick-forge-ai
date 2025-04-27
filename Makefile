@@ -163,7 +163,7 @@ website-test: website-install
 .PHONY: docs
 docs:
 	@echo "===========> Building documentation"
-	@docker-compose -f docker-compose.docs.yml up --build
+	@cd $(WEBSITE_DIR) && pnpm run dev
 
 ## docker-build: Build all Docker images
 .PHONY: docker-build

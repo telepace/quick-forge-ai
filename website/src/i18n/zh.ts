@@ -1,7 +1,7 @@
 export default {
   systemTitle: '🚀 Nextra 启动模板',
   banner: {
-    title: '👋 嘿，欢迎来到 Next.js 起步模板!',
+    title: '👋 嘿，欢迎来到 Quick Forge AI!',
     more: '了解详情',
   },
 
