@@ -1,0 +1,125 @@
+---
+title: 项目结构
+description: 理解 Quick Forge AI 项目的结构和组织方式。
+---
+
+# 项目结构
+
+Quick Forge AI 遵循一个组织良好的结构，以分离关注点并使开发更加容易。本页面解释了主要目录及其用途。
+
+## 概述
+
+项目组织为几个主要目录：
+
+```
+quick-forge-ai/
+├── .github/                # GitHub 工作流和模板
+├── backend/                # FastAPI 应用程序
+├── frontend/               # TypeScript React 应用程序
+├── e2e/                    # 使用 Playwright 的端到端测试
+├── docker/                 # Docker 配置
+├── docs/                   # 文档
+├── scripts/                # 实用脚本
+├── docker-compose.yml      # Docker Compose 配置
+└── docker-compose.prod.yml # 生产环境 Docker Compose
+```
+
+让我们更详细地探索每个主要目录。
+
+## 后端
+
+后端是一个 FastAPI 应用程序，组织如下：
+
+```
+backend/
+├── app/                # API 代码
+│   ├── api/            # API 端点
+│   ├── core/           # 配置
+│   ├── db/             # 数据库模型和配置
+│   ├── services/       # 业务逻辑
+│   └── utils/          # 实用函数
+├── tests/              # 后端测试
+├── alembic/            # 数据库迁移
+├── poetry.lock         # 锁定的依赖项
+└── pyproject.toml      # Python 项目配置
+```
+
+主要组件：
+- `api/`：包含所有 API 端点，按功能分组
+- `core/`：核心配置，包括安全和设置
+- `db/`：数据库模型，会话管理和 SQLModel 定义
+- `services/`：与端点分离的业务逻辑
+- `utils/`：辅助函数和实用工具
+- `tests/`：单元测试和集成测试
+- `alembic/`：数据库迁移脚本
+
+## 前端
+
+前端是一个使用 TypeScript 的 React 应用程序，组织如下：
+
+```
+frontend/
+├── src/                # 应用程序代码
+│   ├── components/     # React 组件
+│   ├── hooks/          # 自定义 React 钩子
+│   ├── pages/          # 页面组件
+│   ├── services/       # API 服务集成
+│   ├── types/          # TypeScript 类型
+│   └── utils/          # 实用函数
+├── tests/              # 前端测试
+├── package.json        # npm 包配置
+└── vite.config.ts      # Vite 配置
+```
+
+主要组件：
+- `components/`：可重用的 React 组件
+- `hooks/`：用于共享逻辑的自定义 React 钩子
+- `pages/`：页面级组件
+- `services/`：API 客户端和服务集成
+- `types/`：TypeScript 类型定义
+- `utils/`：辅助函数
+- `tests/`：单元测试和集成测试
+
+## Docker 设置
+
+Docker 配置旨在提供一致的开发和生产环境：
+
+```
+docker/
+├── backend/            # 后端 Dockerfile
+└── frontend/           # 前端 Dockerfile
+```
+
+根目录包含各种 Docker Compose 文件：
+- `docker-compose.yml`：用于本地开发
+- `docker-compose.prod.yml`：用于生产部署
+- `docker-compose.docs.yml`：用于文档站点
+
+## GitHub 工作流
+
+`.github/workflows/` 目录包含 CI/CD 流水线：
+- 后端和前端的测试工作流
+- 构建和部署工作流
+- 文档站点部署
+
+## 脚本
+
+`scripts/` 目录包含用于以下用途的实用脚本：
+- 设置开发环境
+- 数据库管理
+- 部署帮助程序
+- 各种自动化任务
+
+## 下一步
+
+现在您了解了项目结构，您可以：
+
+1. 了解[后端开发](/zh/docs/backend)架构
+2. 探索[前端开发](/zh/docs/frontend)结构
+3. 探索如何实现[AI功能](/zh/docs/ai-integration)
+
+如果您对特定功能感兴趣，可以直接跳转至：
+- [认证系统](/zh/docs/backend/authentication)
+- [数据库模型](/zh/docs/backend/database)
+- [API 端点](/zh/docs/backend/api-endpoints)
+- [前端组件](/zh/docs/frontend/components) 

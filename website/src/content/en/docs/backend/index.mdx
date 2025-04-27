@@ -1,0 +1,107 @@
+---
+title: Backend Development
+description: Overview of the FastAPI backend architecture in Quick Forge AI.
+---
+
+# Backend Development
+
+The Quick Forge AI backend is built with FastAPI, a modern, fast web framework for building APIs with Python. This section covers the backend architecture, key components, and how to extend the backend for your needs.
+
+## Architecture Overview
+
+The backend follows a layered architecture:
+
+1. **API Layer** - FastAPI routes and endpoints 
+2. **Service Layer** - Business logic and operations
+3. **Data Layer** - Database models and data access
+4. **Core** - Configuration, security, and shared components
+
+This separation of concerns makes the codebase easier to maintain and extend.
+
+## Key Technologies
+
+- **FastAPI**: High-performance web framework
+- **SQLModel**: SQL database interactions with type safety
+- **Pydantic**: Data validation and settings management
+- **Alembic**: Database migration system
+- **JWT**: Authentication tokens
+- **Pytest**: Testing framework
+
+## Directory Structure
+
+```
+backend/
+├── app/
+│   ├── api/             # API endpoints and routes
+│   │   ├── deps.py      # Dependency injection
+│   │   └── routes/      # API route modules
+│   ├── core/            # Core configuration
+│   │   ├── config.py    # App settings
+│   │   └── security.py  # Security utilities
+│   ├── db/              # Database
+│   │   ├── base.py      # Base model
+│   │   ├── session.py   # DB session
+│   │   └── models/      # Database models
+│   ├── services/        # Business logic
+│   ├── utils/           # Utility functions
+│   └── main.py          # Application entry point
+├── tests/               # Test modules
+├── alembic/             # Database migrations
+│   └── versions/        # Migration scripts
+└── pyproject.toml       # Project dependencies
+```
+
+## Getting Started with Backend Development
+
+To start developing the backend:
+
+1. **Understand the existing code**: 
+   - Familiarize yourself with the API routes in `app/api/routes/`
+   - Review the data models in `app/db/models/`
+   - Look at the service implementations in `app/services/`
+
+2. **Set up your development environment**:
+   - Follow the [setup instructions](/en/docs/getting-started) 
+   - Activate the Python virtual environment
+   - Run the backend with hot-reload: `uvicorn app.main:app --reload`
+
+3. **Access the API documentation**:
+   - Once running, view the Swagger UI at `http://localhost:8000/docs`
+   - The OpenAPI schema is at `http://localhost:8000/openapi.json`
+
+## Main Components
+
+### API Routes
+
+API routes are organized in the `app/api/routes/` directory by feature area. Each module contains related endpoints. For example:
+
+- `users.py` - User management operations
+- `auth.py` - Authentication and authorization
+- `items.py` - Item CRUD operations
+
+### Dependency Injection
+
+FastAPI's dependency injection system is used extensively to:
+- Inject database sessions
+- Validate authentication and permissions
+- Share common functionality
+
+Dependencies are defined in `app/api/deps.py`.
+
+### Database Models
+
+Data models are defined using SQLModel, which combines the best of SQLAlchemy and Pydantic. Models are located in `app/db/models/`.
+
+### Business Logic
+
+Complex business logic is separated into service modules in `app/services/` to keep the route handlers clean and focused on HTTP concerns.
+
+## Next Steps
+
+Explore these topics to learn more about the backend:
+
+- [Authentication System](/en/docs/backend/authentication)
+- [Database Models](/en/docs/backend/database)
+- [API Endpoints](/en/docs/backend/api-endpoints)
+- [Testing](/en/docs/backend/testing)
+- [Email Integration](/en/docs/backend/email-integration) 

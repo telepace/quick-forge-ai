@@ -1,0 +1,195 @@
+---
+title: AI Integration
+description: Guide to implementing AI features into your Quick Forge AI application.
+---
+
+# AI Integration
+
+Quick Forge AI comes pre-configured for integrating AI capabilities into your application. This section covers how to connect to AI services, implement AI features, and optimize your application for AI workloads.
+
+## Overview
+
+AI integration in Quick Forge AI is designed to be:
+
+1. **Modular** - Plug in different AI services as needed
+2. **Performant** - Optimized for handling AI processing without blocking
+3. **Flexible** - Support for various AI models and providers
+4. **Secure** - Safe handling of API keys and sensitive data
+
+## Supported AI Services
+
+Quick Forge AI provides integration helpers for:
+
+- **OpenAI** - GPT-3.5/GPT-4 for text generation, embeddings, and more
+- **Anthropic** - Claude models for text processing
+- **Hugging Face** - Open-source models for various tasks
+- **Custom models** - Support for your own local or remote models
+
+## Architecture
+
+AI features are integrated through:
+
+```
+backend/
+├── app/
+│   ├── services/
+│   │   ├── ai/
+│   │   │   ├── base.py         # Base AI service interface
+│   │   │   ├── openai.py       # OpenAI implementation
+│   │   │   ├── anthropic.py    # Anthropic implementation
+│   │   │   └── huggingface.py  # Hugging Face implementation
+│   │   └── ai_service.py       # AI service factory
+│   ├── api/
+│   │   └── routes/
+│   │       └── ai/             # AI-related endpoints
+│   └── core/
+│       └── config.py           # AI configuration settings
+└── tests/
+    └── services/
+        └── ai/                 # AI service tests
+```
+
+## Getting Started with AI Integration
+
+### 1. Configure AI Provider
+
+First, set up your AI provider credentials in the `.env` file:
+
+```
+# OpenAI Configuration
+OPENAI_API_KEY=your-api-key-here
+OPENAI_ORGANIZATION=your-org-id-here  # Optional
+
+# Anthropic Configuration
+ANTHROPIC_API_KEY=your-api-key-here
+
+# Hugging Face Configuration
+HUGGINGFACE_API_KEY=your-api-key-here
+```
+
+### 2. Use the AI Service in Your Code
+
+In your backend code, you can use the AI service like this:
+
+```python
+from app.services.ai_service import get_ai_service
+
+async def generate_text(prompt: str):
+    # Get the configured AI service
+    ai_service = get_ai_service()
+    
+    # Generate text based on the prompt
+    response = await ai_service.generate_text(
+        prompt=prompt,
+        max_tokens=500,
+        temperature=0.7
+    )
+    
+    return response
+```
+
+### 3. Create API Endpoints
+
+Add API endpoints to expose AI functionality:
+
+```python
+from fastapi import APIRouter, Depends, HTTPException
+from app.services.ai_service import get_ai_service
+from app.schemas.ai import PromptRequest, AIResponse
+
+router = APIRouter()
+
+@router.post("/generate", response_model=AIResponse)
+async def generate_text(request: PromptRequest):
+    ai_service = get_ai_service()
+    try:
+        response = await ai_service.generate_text(
+            prompt=request.prompt,
+            max_tokens=request.max_tokens,
+            temperature=request.temperature
+        )
+        return {"text": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```
+
+### 4. Connect from the Frontend
+
+In your frontend code, call the AI endpoints:
+
+```typescript
+import { api } from '../services/api';
+
+// In a React component
+const GenerateText = () => {
+  const [prompt, setPrompt] = useState('');
+  const [result, setResult] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGenerate = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.ai.generateText({
+        prompt,
+        max_tokens: 500,
+        temperature: 0.7
+      });
+      setResult(response.text);
+    } catch (error) {
+      console.error('Error generating text:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <textarea 
+        value={prompt} 
+        onChange={(e) => setPrompt(e.target.value)} 
+        placeholder="Enter your prompt..."
+      />
+      <button onClick={handleGenerate} disabled={isLoading}>
+        {isLoading ? 'Generating...' : 'Generate'}
+      </button>
+      {result && (
+        <div>
+          <h3>Result:</h3>
+          <p>{result}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+## Best Practices
+
+When integrating AI features:
+
+1. **Handle rate limits** - Implement backoff strategies and queuing
+2. **Cache responses** - Avoid redundant calls to AI services
+3. **Implement streaming** - For long-form content, use streaming responses
+4. **Error handling** - Gracefully handle AI service outages
+5. **Cost management** - Monitor and control API usage
+
+## Common AI Features
+
+Quick Forge AI is well-suited for implementing:
+
+- **Chatbots and conversational interfaces**
+- **Content generation and summarization**
+- **Text and data analysis**
+- **Image and media generation**
+- **Recommendation systems**
+- **Language translation and processing**
+
+## Next Steps
+
+Explore these topics to learn more about AI integration:
+
+- [Setting Up AI Services](/en/docs/ai-integration/setup)
+- [Text Generation](/en/docs/ai-integration/text-generation)
+- [Image Generation](/en/docs/ai-integration/image-generation)
+- [Embeddings and Vector Search](/en/docs/ai-integration/embeddings)
+- [Streaming Responses](/en/docs/ai-integration/streaming) 

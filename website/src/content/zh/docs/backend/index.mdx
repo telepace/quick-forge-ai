@@ -1,0 +1,107 @@
+---
+title: 后端开发
+description: Quick Forge AI 中 FastAPI 后端架构概述。
+---
+
+# 后端开发
+
+Quick Forge AI 后端是使用 FastAPI 构建的，FastAPI 是一个现代、快速的 Python Web 框架，用于构建 API。本节涵盖后端架构、关键组件以及如何根据您的需求扩展后端。
+
+## 架构概述
+
+后端遵循分层架构：
+
+1. **API 层** - FastAPI 路由和端点
+2. **服务层** - 业务逻辑和操作
+3. **数据层** - 数据库模型和数据访问
+4. **核心层** - 配置、安全和共享组件
+
+这种关注点分离使代码库更容易维护和扩展。
+
+## 关键技术
+
+- **FastAPI**：高性能 Web 框架
+- **SQLModel**：具有类型安全的 SQL 数据库交互
+- **Pydantic**：数据验证和设置管理
+- **Alembic**：数据库迁移系统
+- **JWT**：认证令牌
+- **Pytest**：测试框架
+
+## 目录结构
+
+```
+backend/
+├── app/
+│   ├── api/             # API 端点和路由
+│   │   ├── deps.py      # 依赖注入
+│   │   └── routes/      # API 路由模块
+│   ├── core/            # 核心配置
+│   │   ├── config.py    # 应用设置
+│   │   └── security.py  # 安全实用工具
+│   ├── db/              # 数据库
+│   │   ├── base.py      # 基础模型
+│   │   ├── session.py   # 数据库会话
+│   │   └── models/      # 数据库模型
+│   ├── services/        # 业务逻辑
+│   ├── utils/           # 实用函数
+│   └── main.py          # 应用程序入口点
+├── tests/               # 测试模块
+├── alembic/             # 数据库迁移
+│   └── versions/        # 迁移脚本
+└── pyproject.toml       # 项目依赖
+```
+
+## 开始后端开发
+
+要开始开发后端：
+
+1. **了解现有代码**：
+   - 熟悉 `app/api/routes/` 中的 API 路由
+   - 查看 `app/db/models/` 中的数据模型
+   - 查看 `app/services/` 中的服务实现
+
+2. **设置开发环境**：
+   - 按照[设置说明](/zh/docs/getting-started)操作
+   - 激活 Python 虚拟环境
+   - 使用热重载运行后端：`uvicorn app.main:app --reload`
+
+3. **访问 API 文档**：
+   - 运行后，在 `http://localhost:8000/docs` 查看 Swagger UI
+   - OpenAPI 架构位于 `http://localhost:8000/openapi.json`
+
+## 主要组件
+
+### API 路由
+
+API 路由按功能区域组织在 `app/api/routes/` 目录中。每个模块包含相关端点。例如：
+
+- `users.py` - 用户管理操作
+- `auth.py` - 认证和授权
+- `items.py` - 项目 CRUD 操作
+
+### 依赖注入
+
+FastAPI 的依赖注入系统被广泛用于：
+- 注入数据库会话
+- 验证认证和权限
+- 共享通用功能
+
+依赖项在 `app/api/deps.py` 中定义。
+
+### 数据库模型
+
+数据模型使用 SQLModel 定义，它结合了 SQLAlchemy 和 Pydantic 的优点。模型位于 `app/db/models/` 中。
+
+### 业务逻辑
+
+复杂的业务逻辑被分离到 `app/services/` 中的服务模块，以保持路由处理程序的简洁，并专注于 HTTP 关注点。
+
+## 下一步
+
+探索这些主题以了解有关后端的更多信息：
+
+- [认证系统](/zh/docs/backend/authentication)
+- [数据库模型](/zh/docs/backend/database)
+- [API 端点](/zh/docs/backend/api-endpoints)
+- [测试](/zh/docs/backend/testing)
+- [电子邮件集成](/zh/docs/backend/email-integration) 

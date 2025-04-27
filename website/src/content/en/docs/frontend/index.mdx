@@ -1,0 +1,123 @@
+---
+title: Frontend Development
+description: Overview of the TypeScript/React frontend architecture in Quick Forge AI.
+---
+
+# Frontend Development
+
+The Quick Forge AI frontend is built with TypeScript and React, providing a modern, type-safe user interface. This section covers the frontend architecture, key components, and how to extend the frontend for your needs.
+
+## Architecture Overview
+
+The frontend follows a component-based architecture using React:
+
+1. **Components** - Reusable UI building blocks
+2. **Pages** - Route-specific views constructed from components
+3. **Hooks** - Custom logic for state management and side effects
+4. **Services** - API clients and external integrations
+5. **Utilities** - Helper functions and shared code
+
+## Key Technologies
+
+- **TypeScript**: Type safety for JavaScript
+- **React**: UI component library
+- **Chakra UI**: Component library for responsive design
+- **React Router**: Client-side routing
+- **React Query**: Data fetching and caching
+- **Vite**: Fast build tool and development server
+- **Jest/Testing Library**: Testing frameworks
+
+## Directory Structure
+
+```
+frontend/
+├── src/
+│   ├── components/     # Reusable UI components
+│   │   ├── common/     # Shared components
+│   │   ├── layout/     # Layout components
+│   │   └── forms/      # Form components
+│   ├── hooks/          # Custom React hooks
+│   ├── pages/          # Page components
+│   ├── services/       # API clients and services
+│   │   ├── api.ts      # Auto-generated API client
+│   │   └── auth.ts     # Auth service
+│   ├── types/          # TypeScript type definitions
+│   ├── utils/          # Utility functions
+│   ├── App.tsx         # Root component
+│   └── main.tsx        # Entry point
+├── tests/              # Test files
+│   ├── components/     # Component tests
+│   └── utils/          # Utility tests
+├── public/             # Static assets
+└── vite.config.ts      # Vite configuration
+```
+
+## Getting Started with Frontend Development
+
+To start developing the frontend:
+
+1. **Understand the existing code**:
+   - Explore the component structure in `src/components/`
+   - Review the page components in `src/pages/`
+   - Look at the API integration in `src/services/`
+
+2. **Set up your development environment**:
+   - Follow the [setup instructions](/en/docs/getting-started)
+   - Run the frontend development server: `cd frontend && pnpm dev`
+
+3. **Access the application**:
+   - Once running, access the app at `http://localhost:3000`
+   - The backend should also be running for API calls to work
+
+## Main Components
+
+### UI Components
+
+The UI is built with reusable components organized in `src/components/`. These include:
+
+- **Common Components**: Buttons, cards, modals, etc.
+- **Layout Components**: Page layouts, navigation, sidebar
+- **Form Components**: Input fields, forms, validation
+- **Feature Components**: Components tied to specific features
+
+### Routing
+
+Routing is handled with React Router in `src/App.tsx`, defining:
+
+- Public routes (accessible to anyone)
+- Protected routes (requiring authentication)
+- Layout routes (for consistent page structure)
+
+### State Management
+
+State is managed using a combination of:
+
+- React's built-in `useState` and `useReducer` for local state
+- Context API for shared state across components
+- React Query for server state (API data)
+
+### API Integration
+
+The frontend communicates with the backend through:
+
+- Auto-generated TypeScript API client based on OpenAPI schema
+- Custom service modules in `src/services/`
+- Authentication handling with JWT tokens
+
+### Theming
+
+The application supports dark/light mode using Chakra UI's theming system, with:
+
+- Consistent color schemes
+- Responsive design for all screen sizes
+- Accessible components following WCAG guidelines
+
+## Next Steps
+
+Explore these topics to learn more about the frontend:
+
+- [Components](/en/docs/frontend/components)
+- [Routing](/en/docs/frontend/routing)
+- [State Management](/en/docs/frontend/state-management)
+- [API Integration](/en/docs/frontend/api-integration)
+- [Testing](/en/docs/frontend/testing) 

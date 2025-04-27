@@ -1,0 +1,195 @@
+---
+title: AI 集成
+description: 将 AI 功能集成到 Quick Forge AI 应用程序的指南。
+---
+
+# AI 集成
+
+Quick Forge AI 预先配置了将 AI 能力集成到您的应用程序中的功能。本节介绍如何连接 AI 服务、实现 AI 功能以及为 AI 工作负载优化您的应用程序。
+
+## 概述
+
+Quick Forge AI 中的 AI 集成设计为：
+
+1. **模块化** - 根据需要插入不同的 AI 服务
+2. **高性能** - 优化处理 AI 处理而不阻塞
+3. **灵活** - 支持各种 AI 模型和提供商
+4. **安全** - 安全处理 API 密钥和敏感数据
+
+## 支持的 AI 服务
+
+Quick Forge AI 提供以下集成助手：
+
+- **OpenAI** - GPT-3.5/GPT-4 用于文本生成、嵌入等
+- **Anthropic** - Claude 模型用于文本处理
+- **Hugging Face** - 用于各种任务的开源模型
+- **自定义模型** - 支持您自己的本地或远程模型
+
+## 架构
+
+AI 功能通过以下方式集成：
+
+```
+backend/
+├── app/
+│   ├── services/
+│   │   ├── ai/
+│   │   │   ├── base.py         # 基础 AI 服务接口
+│   │   │   ├── openai.py       # OpenAI 实现
+│   │   │   ├── anthropic.py    # Anthropic 实现
+│   │   │   └── huggingface.py  # Hugging Face 实现
+│   │   └── ai_service.py       # AI 服务工厂
+│   ├── api/
+│   │   └── routes/
+│   │       └── ai/             # AI 相关端点
+│   └── core/
+│       └── config.py           # AI 配置设置
+└── tests/
+    └── services/
+        └── ai/                 # AI 服务测试
+```
+
+## 开始 AI 集成
+
+### 1. 配置 AI 提供商
+
+首先，在 `.env` 文件中设置您的 AI 提供商凭据：
+
+```
+# OpenAI 配置
+OPENAI_API_KEY=您的 API 密钥
+OPENAI_ORGANIZATION=您的组织 ID  # 可选
+
+# Anthropic 配置
+ANTHROPIC_API_KEY=您的 API 密钥
+
+# Hugging Face 配置
+HUGGINGFACE_API_KEY=您的 API 密钥
+```
+
+### 2. 在您的代码中使用 AI 服务
+
+在您的后端代码中，您可以这样使用 AI 服务：
+
+```python
+from app.services.ai_service import get_ai_service
+
+async def generate_text(prompt: str):
+    # 获取配置的 AI 服务
+    ai_service = get_ai_service()
+    
+    # 根据提示生成文本
+    response = await ai_service.generate_text(
+        prompt=prompt,
+        max_tokens=500,
+        temperature=0.7
+    )
+    
+    return response
+```
+
+### 3. 创建 API 端点
+
+添加 API 端点以暴露 AI 功能：
+
+```python
+from fastapi import APIRouter, Depends, HTTPException
+from app.services.ai_service import get_ai_service
+from app.schemas.ai import PromptRequest, AIResponse
+
+router = APIRouter()
+
+@router.post("/generate", response_model=AIResponse)
+async def generate_text(request: PromptRequest):
+    ai_service = get_ai_service()
+    try:
+        response = await ai_service.generate_text(
+            prompt=request.prompt,
+            max_tokens=request.max_tokens,
+            temperature=request.temperature
+        )
+        return {"text": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```
+
+### 4. 从前端连接
+
+在您的前端代码中，调用 AI 端点：
+
+```typescript
+import { api } from '../services/api';
+
+// 在 React 组件中
+const GenerateText = () => {
+  const [prompt, setPrompt] = useState('');
+  const [result, setResult] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGenerate = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.ai.generateText({
+        prompt,
+        max_tokens: 500,
+        temperature: 0.7
+      });
+      setResult(response.text);
+    } catch (error) {
+      console.error('生成文本时出错：', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <textarea 
+        value={prompt} 
+        onChange={(e) => setPrompt(e.target.value)} 
+        placeholder="输入您的提示..."
+      />
+      <button onClick={handleGenerate} disabled={isLoading}>
+        {isLoading ? '生成中...' : '生成'}
+      </button>
+      {result && (
+        <div>
+          <h3>结果：</h3>
+          <p>{result}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+## 最佳实践
+
+集成 AI 功能时：
+
+1. **处理速率限制** - 实现退避策略和队列
+2. **缓存响应** - 避免对 AI 服务的冗余调用
+3. **实现流式处理** - 对于长篇内容，使用流式响应
+4. **错误处理** - 优雅地处理 AI 服务中断
+5. **成本管理** - 监控和控制 API 使用情况
+
+## 常见 AI 功能
+
+Quick Forge AI 非常适合实现：
+
+- **聊天机器人和对话界面**
+- **内容生成和摘要**
+- **文本和数据分析**
+- **图像和媒体生成**
+- **推荐系统**
+- **语言翻译和处理**
+
+## 下一步
+
+探索这些主题以了解有关 AI 集成的更多信息：
+
+- [设置 AI 服务](/zh/docs/ai-integration/setup)
+- [文本生成](/zh/docs/ai-integration/text-generation)
+- [图像生成](/zh/docs/ai-integration/image-generation)
+- [嵌入和向量搜索](/zh/docs/ai-integration/embeddings)
+- [流式响应](/zh/docs/ai-integration/streaming) 

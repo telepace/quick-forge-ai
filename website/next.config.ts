@@ -1,4 +1,5 @@
 import createWithNextra from 'nextra'
+import path from 'path'
 
 const withNextra = createWithNextra({
   defaultShowCopyCode: true,
@@ -24,5 +25,12 @@ export default withNextra({
   },
   sassOptions: {
     silenceDeprecations: ['legacy-js-api'],
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+    }
+    return config
   },
 })
