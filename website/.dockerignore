@@ -1,0 +1,30 @@
+# Dependency directories
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+out
+
+# Cache
+.cache
+.npm
+
+# Log files
+logs
+*.log
+npm-debug.log*
+
+# Development files
+.git
+.github
+.vscode
+*.md
+!README.md
+tests
+
+# Local environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local 
