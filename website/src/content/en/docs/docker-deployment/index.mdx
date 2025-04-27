@@ -1,0 +1,143 @@
+---
+title: Docker and Deployment
+description: Learn how to containerize and deploy your Quick Forge AI application to various environments.
+---
+
+# Docker and Deployment
+
+This guide will help you understand how to containerize your Quick Forge AI application and deploy it to various environments.
+
+## Docker Setup
+
+Quick Forge AI comes with pre-configured Docker support to make containerization easy and consistent across environments.
+
+### Docker Compose Configuration
+
+The project includes several Docker Compose files for different purposes:
+
+- `docker-compose.yml` - Base configuration for development
+- `docker-compose.override.yml` - Local development overrides
+- `docker-compose.traefik.yml` - Configuration with Traefik for routing
+- `docker-compose.docs.yml` - Documentation website deployment
+
+### Basic Docker Commands
+
+Start all services in development mode:
+
+```bash
+docker-compose up
+```
+
+Build and start in detached mode:
+
+```bash
+docker-compose up -d --build
+```
+
+View logs for all services:
+
+```bash
+docker-compose logs -f
+```
+
+Stop all services:
+
+```bash
+docker-compose down
+```
+
+## Production Deployment
+
+### Environment Preparation
+
+Before deploying to production, ensure you have set all required environment variables in your `.env` file or your deployment platform's environment configuration.
+
+Key variables to configure:
+
+```
+SECRET_KEY=secure-production-key
+BACKEND_CORS_ORIGINS=https://yourdomain.com
+POSTGRES_SERVER=your-db-server
+POSTGRES_USER=production-user
+POSTGRES_PASSWORD=secure-db-password
+POSTGRES_DB=quick_forge_prod
+```
+
+### Deployment Options
+
+Quick Forge AI can be deployed to various platforms:
+
+#### Kubernetes with Helm
+
+The project includes Helm charts in the `helm-charts` directory for Kubernetes deployment:
+
+```bash
+# From the project root
+cd helm-charts
+helm install quick-forge-ai ./quick-forge-ai --values ./your-values.yaml
+```
+
+#### Fly.io Deployment
+
+Deploy to Fly.io using the provided configuration:
+
+```bash
+# Install the flyctl CLI
+curl -L https://fly.io/install.sh | sh
+
+# Login to Fly.io
+fly auth login
+
+# Deploy the application
+fly launch
+```
+
+#### Docker Swarm
+
+For Docker Swarm deployment:
+
+```bash
+# Initialize swarm if not already done
+docker swarm init
+
+# Deploy the stack
+docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml quick-forge-ai
+```
+
+## Continuous Integration/Continuous Deployment
+
+The project includes GitHub Actions workflows in the `.github/workflows` directory for CI/CD integration:
+
+- Automated testing
+- Code quality checks
+- Build and deployment to your hosting environment
+
+## Scaling Considerations
+
+### Database Scaling
+
+For production environments, consider:
+- Using a managed PostgreSQL service
+- Implementing connection pooling with PgBouncer
+- Setting up read replicas for high-traffic applications
+
+### Application Scaling
+
+The application is designed to scale horizontally. Configure your deployment to:
+- Use multiple backend instances behind a load balancer
+- Implement a CDN for frontend static assets
+- Use Redis for caching and session management in distributed environments
+
+## Monitoring and Logging
+
+For production deployments, implement:
+- Application monitoring with Prometheus or similar tools
+- Centralized logging with ELK Stack or managed services
+- Error tracking with Sentry (already integrated in the backend)
+
+## Next Steps
+
+After deploying your application:
+1. Set up [SSL certificates](/en/docs/deployment/ssl)
+2. Configure [backup strategies](/en/docs/deployment/backups)
+3. Implement a [CI/CD pipeline](/en/docs/deployment/ci-cd) tailored to your specific needs 
