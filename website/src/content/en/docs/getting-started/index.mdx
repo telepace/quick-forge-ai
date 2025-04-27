@@ -1,0 +1,108 @@
+---
+title: Getting Started with Quick Forge AI
+description: Learn how to set up and start using the Quick Forge AI template for your projects.
+---
+
+# Getting Started with Quick Forge AI
+
+This guide will help you set up and start working with Quick Forge AI. Follow these steps to create your development environment and understand the basic project structure.
+
+## Prerequisites
+
+Before you begin, make sure you have the following installed on your system:
+
+- **Python 3.10+**
+- **Node.js 18+**
+- **Docker and Docker Compose** (optional but recommended)
+- **Git**
+
+## Installation
+
+### Step 1: Clone the Repository
+
+Start by cloning the Quick Forge AI repository to your local machine:
+
+```bash
+git clone https://github.com/telepace/quick-forge-ai.git
+cd quick-forge-ai
+```
+
+### Step 2: Setup the Environment
+
+You can set up your development environment using the automated script:
+
+```bash
+./setup.sh
+```
+
+Or, you can set up manually:
+
+#### Backend Setup
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install poetry
+poetry install
+```
+
+#### Frontend Setup
+
+```bash
+cd ../frontend
+pnpm install
+```
+
+### Step 3: Configuration
+
+Create a `.env` file in the root directory based on the provided `.env.example`. Important values to update:
+
+```
+# Generate secure secret keys with:
+# python -c "import secrets; print(secrets.token_urlsafe(32))"
+
+# Required security settings
+SECRET_KEY=your-generated-secret-key
+FIRST_SUPERUSER=admin@example.com
+FIRST_SUPERUSER_PASSWORD=your-secure-password
+POSTGRES_PASSWORD=your-db-password
+
+# Optional email settings
+SMTP_HOST=
+SMTP_USER=
+SMTP_PASSWORD=
+EMAILS_FROM_EMAIL=info@example.com
+```
+
+### Step 4: Start the Development Servers
+
+Start all services using Docker Compose:
+
+```bash
+docker-compose up
+```
+
+This will start:
+- PostgreSQL database
+- Backend FastAPI service
+- Frontend development server
+- Traefik for routing (if configured)
+
+## Verifying the Setup
+
+Once the services are running, you can verify the setup by accessing:
+
+- Backend API at [http://localhost:8000](http://localhost:8000)
+- API documentation at [http://localhost:8000/docs](http://localhost:8000/docs)
+- Frontend application at [http://localhost:3000](http://localhost:3000)
+
+## Next Steps
+
+Now that you have Quick Forge AI up and running, you can:
+
+1. Explore the [Project Structure](/en/docs/getting-started/project-structure) to understand how the codebase is organized
+2. Learn how to use the [Authentication System](/en/docs/backend/authentication)
+3. Start building your own [API Endpoints](/en/docs/backend/api-endpoints)
+4. Create new [Frontend Components](/en/docs/frontend/components)
+5. Implement [AI Features](/en/docs/ai-integration/overview) into your application 

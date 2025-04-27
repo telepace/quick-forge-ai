@@ -1,0 +1,125 @@
+---
+title: Project Structure
+description: Understanding the structure and organization of the Quick Forge AI project.
+---
+
+# Project Structure
+
+Quick Forge AI follows a well-organized structure to separate concerns and make development easier. This page explains the key directories and their purpose.
+
+## Overview
+
+The project is organized into several main directories:
+
+```
+quick-forge-ai/
+├── .github/                # GitHub workflows and templates
+├── backend/                # FastAPI application
+├── frontend/               # TypeScript React application
+├── e2e/                    # End-to-end tests with Playwright
+├── docker/                 # Docker configuration
+├── docs/                   # Documentation
+├── scripts/                # Utility scripts
+├── docker-compose.yml      # Docker Compose configuration
+└── docker-compose.prod.yml # Production Docker Compose
+```
+
+Let's explore each of the main directories in more detail.
+
+## Backend
+
+The backend is a FastAPI application organized as follows:
+
+```
+backend/
+├── app/                # API code
+│   ├── api/            # API endpoints
+│   ├── core/           # Configuration
+│   ├── db/             # Database models and config
+│   ├── services/       # Business logic
+│   └── utils/          # Utility functions
+├── tests/              # Backend tests
+├── alembic/            # Database migrations
+├── poetry.lock         # Locked dependencies
+└── pyproject.toml      # Python project config
+```
+
+Key components:
+- `api/`: Contains all API endpoints, grouped by functionality
+- `core/`: Core configuration, including security and settings
+- `db/`: Database models, session management, and SQLModel definitions
+- `services/`: Business logic separated from endpoints
+- `utils/`: Helper functions and utilities
+- `tests/`: Unit and integration tests
+- `alembic/`: Database migration scripts
+
+## Frontend
+
+The frontend is a React application with TypeScript, organized as follows:
+
+```
+frontend/
+├── src/                # Application code
+│   ├── components/     # React components
+│   ├── hooks/          # Custom React hooks
+│   ├── pages/          # Page components
+│   ├── services/       # API service integrations
+│   ├── types/          # TypeScript types
+│   └── utils/          # Utility functions
+├── tests/              # Frontend tests
+├── package.json        # npm package config
+└── vite.config.ts      # Vite configuration
+```
+
+Key components:
+- `components/`: Reusable React components
+- `hooks/`: Custom React hooks for shared logic
+- `pages/`: Page-level components
+- `services/`: API client and service integrations
+- `types/`: TypeScript type definitions
+- `utils/`: Helper functions
+- `tests/`: Unit and integration tests
+
+## Docker Setup
+
+The Docker configuration is designed to provide a consistent development and production environment:
+
+```
+docker/
+├── backend/            # Backend Dockerfile
+└── frontend/           # Frontend Dockerfile
+```
+
+The root directory contains various Docker Compose files:
+- `docker-compose.yml`: For local development
+- `docker-compose.prod.yml`: For production deployment
+- `docker-compose.docs.yml`: For documentation site
+
+## GitHub Workflows
+
+The `.github/workflows/` directory contains CI/CD pipelines:
+- Test workflows for backend and frontend
+- Build and deployment workflows
+- Documentation site deployment
+
+## Scripts
+
+The `scripts/` directory contains utility scripts for:
+- Setting up the development environment
+- Database management
+- Deployment helpers
+- Various automation tasks
+
+## Next Steps
+
+Now that you understand the project structure, you can:
+
+1. Learn about the [Backend Development](/en/docs/backend) architecture
+2. Explore the [Frontend Development](/en/docs/frontend) structure
+3. Discover how to implement [AI features](/en/docs/ai-integration)
+
+If you're interested in a specific feature, you can jump directly to:
+- [Authentication System](/en/docs/backend/authentication)
+- [Database Models](/en/docs/backend/database)
+- [API Endpoints](/en/docs/backend/api-endpoints)
+- [Frontend Components](/en/docs/frontend/components) 
