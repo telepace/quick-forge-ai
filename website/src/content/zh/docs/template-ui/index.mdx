@@ -1,0 +1,181 @@
+---
+title: 模板 UI 系统
+description: 了解 Quick Forge AI 中可用的预构建 UI 模板和组件。
+---
+
+# 模板 UI 系统
+
+Quick Forge AI 包含一套全面的预构建 UI 模板和组件，帮助您快速开发一致的用户界面。本指南涵盖了可用的模板、自定义选项和最佳实践。
+
+## 概述
+
+模板 UI 系统提供：
+
+- 适用于各种页面类型的响应式布局
+- 应用程序全局一致的主题
+- 符合无障碍标准的组件
+- 常见 UI 需求的即用型模式
+
+## 可用模板
+
+### 管理员仪表板
+
+管理员仪表板模板为应用程序管理提供了完整的界面：
+
+```jsx
+import { AdminDashboard } from '@/components/Admin/AdminDashboard';
+
+function AdminPage() {
+  return <AdminDashboard />;
+}
+```
+
+主要特点：
+- 带有可折叠部分的导航侧边栏
+- 带有用户配置文件和快速操作的页眉
+- 带有响应式网格的主要内容区域
+- 统计信息卡片和数据可视化组件
+
+### 用户设置
+
+用户设置模板为用户配置文件和偏好管理提供了完整的界面：
+
+```jsx
+import { UserSettings } from '@/components/UserSettings/UserSettings';
+
+function SettingsPage() {
+  return <UserSettings />;
+}
+```
+
+主要特点：
+- 不同设置类别的选项卡界面
+- 带有验证的表单组件
+- 在移动设备上也能正常工作的响应式设计
+- 敏感操作的确认对话框
+
+### 身份验证页面
+
+随时可用的身份验证页面：
+
+```jsx
+import { LoginPage } from '@/components/Auth/LoginPage';
+import { RegisterPage } from '@/components/Auth/RegisterPage';
+import { ForgotPasswordPage } from '@/components/Auth/ForgotPasswordPage';
+
+// 在路由配置中使用
+```
+
+### 数据显示模板
+
+用于显示和管理数据的模板：
+
+- `DataTable` - 带有排序、过滤和分页的高级表格
+- `DataGrid` - 基于卡片的网格视图，用于视觉数据显示
+- `DetailView` - 带有区段的单个项目的详细视图
+- `KanbanBoard` - 用于流程管理的拖放看板界面
+
+## UI 组件
+
+模板 UI 系统包括众多可重用组件：
+
+### 表单组件
+
+- `Input` - 带有验证的文本输入
+- `Select` - 下拉选择
+- `DatePicker` - 日期选择
+- `FileUpload` - 带有拖放功能的文件上传
+- `FormBuilder` - 基于模式的动态表单生成器
+
+### 显示组件
+
+- `Card` - 带有变体的内容容器
+- `Modal` - 覆盖对话框
+- `Tabs` - 选项卡界面
+- `Accordion` - 可折叠部分
+- `Toast` - 通知系统
+
+### 导航组件
+
+- `Navbar` - 应用程序页眉
+- `Sidebar` - 侧边导航
+- `Breadcrumbs` - 层次位置指示器
+- `Pagination` - 数据集的页面导航
+
+## 主题和自定义
+
+### 主题配置
+
+UI 系统使用可以自定义的主题配置：
+
+```jsx
+// 在 src/theme/index.ts 中
+export const theme = {
+  colors: {
+    primary: {
+      50: '#e3f2fd',
+      // ... 其他色调
+      500: '#2196f3', // 主要的主色调
+      // ... 其他色调
+    },
+    // ... 其他颜色类别
+  },
+  fonts: {
+    body: 'Inter, system-ui, sans-serif',
+    heading: 'Inter, system-ui, sans-serif',
+    mono: 'Menlo, monospace',
+  },
+  // ... 其他主题设置
+};
+```
+
+### 自定义方法
+
+1. **主题覆盖** - 自定义主题变量
+2. **组件属性** - 使用属性修改组件外观
+3. **组件扩展** - 通过额外功能扩展组件
+4. **样式组件** - 使用 styled-components 创建自定义变体
+
+## 响应式设计
+
+所有模板和组件都设计为在以下设备上响应：
+
+- 桌面端 (1200px+)
+- 平板端 (768px - 1199px)
+- 移动端 (< 768px)
+
+响应式特点包括：
+- 适应屏幕尺寸的流体布局
+- 在较小屏幕上可折叠的导航
+- 适合移动设备的触控友好控件
+- 优化的排版以提高可读性
+
+## 无障碍性
+
+模板 UI 系统遵循 WCAG 2.1 AA 无障碍指南：
+
+- 适当的语义 HTML 结构
+- 键盘导航支持
+- 屏幕阅读器的 ARIA 属性
+- 充分的颜色对比度
+- 交互元素的焦点指示器
+
+## 最佳实践
+
+使用模板 UI 系统时：
+
+1. **保持一致性** - 使用提供的组件而不是创建新组件
+2. **利用主题变量** - 使用主题变量而不是硬编码值
+3. **尊重组件 API** - 遵循记录的属性和使用模式
+4. **考虑移动优先** - 首先为移动屏幕设计，然后为更大的屏幕增强
+5. **测试无障碍性** - 定期使用无障碍工具测试您的 UI
+
+## 后续步骤
+
+现在您已了解模板 UI 系统，深入探索：
+
+1. [组件 API 参考](/zh/docs/template-ui/components)
+2. [主题指南](/zh/docs/template-ui/theming)
+3. [布局模板](/zh/docs/template-ui/layouts)
+4. [表单系统](/zh/docs/template-ui/forms)
+5. [无障碍指南](/zh/docs/template-ui/accessibility) 

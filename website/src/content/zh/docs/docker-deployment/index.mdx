@@ -1,0 +1,143 @@
+---
+title: Docker 和部署
+description: 学习如何容器化并将您的 Quick Forge AI 应用程序部署到各种环境中。
+---
+
+# Docker 和部署
+
+本指南将帮助您了解如何将 Quick Forge AI 应用程序容器化并部署到各种环境中。
+
+## Docker 设置
+
+Quick Forge AI 附带预配置的 Docker 支持，使容器化在各种环境中变得简单和一致。
+
+### Docker Compose 配置
+
+项目包含几个用于不同目的的 Docker Compose 文件：
+
+- `docker-compose.yml` - 开发的基本配置
+- `docker-compose.override.yml` - 本地开发覆盖
+- `docker-compose.traefik.yml` - 带有 Traefik 的路由配置
+- `docker-compose.docs.yml` - 文档网站部署
+
+### 基本的 Docker 命令
+
+在开发模式下启动所有服务：
+
+```bash
+docker-compose up
+```
+
+构建并在后台模式下启动：
+
+```bash
+docker-compose up -d --build
+```
+
+查看所有服务的日志：
+
+```bash
+docker-compose logs -f
+```
+
+停止所有服务：
+
+```bash
+docker-compose down
+```
+
+## 生产环境部署
+
+### 环境准备
+
+在部署到生产环境之前，确保您已经在 `.env` 文件或部署平台的环境配置中设置了所有必需的环境变量。
+
+需要配置的关键变量：
+
+```
+SECRET_KEY=secure-production-key
+BACKEND_CORS_ORIGINS=https://yourdomain.com
+POSTGRES_SERVER=your-db-server
+POSTGRES_USER=production-user
+POSTGRES_PASSWORD=secure-db-password
+POSTGRES_DB=quick_forge_prod
+```
+
+### 部署选项
+
+Quick Forge AI 可以部署到各种平台：
+
+#### 使用 Helm 部署到 Kubernetes
+
+项目在 `helm-charts` 目录中包含用于 Kubernetes 部署的 Helm 图表：
+
+```bash
+# 从项目根目录
+cd helm-charts
+helm install quick-forge-ai ./quick-forge-ai --values ./your-values.yaml
+```
+
+#### Fly.io 部署
+
+使用提供的配置部署到 Fly.io：
+
+```bash
+# 安装 flyctl CLI
+curl -L https://fly.io/install.sh | sh
+
+# 登录到 Fly.io
+fly auth login
+
+# 部署应用程序
+fly launch
+```
+
+#### Docker Swarm
+
+对于 Docker Swarm 部署：
+
+```bash
+# 如果尚未完成，初始化 swarm
+docker swarm init
+
+# 部署堆栈
+docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml quick-forge-ai
+```
+
+## 持续集成/持续部署
+
+项目在 `.github/workflows` 目录中包含 GitHub Actions 工作流程，用于 CI/CD 集成：
+
+- 自动化测试
+- 代码质量检查
+- 构建并部署到您的托管环境
+
+## 扩展考虑
+
+### 数据库扩展
+
+对于生产环境，请考虑：
+- 使用托管的 PostgreSQL 服务
+- 使用 PgBouncer 实现连接池
+- 为高流量应用程序设置读取副本
+
+### 应用程序扩展
+
+该应用程序设计为水平扩展。配置您的部署以：
+- 在负载均衡器后使用多个后端实例
+- 为前端静态资产实现 CDN
+- 在分布式环境中使用 Redis 进行缓存和会话管理
+
+## 监控和日志
+
+对于生产部署，实施：
+- 使用 Prometheus 或类似工具进行应用程序监控
+- 使用 ELK Stack 或托管服务进行集中日志记录
+- 使用 Sentry 进行错误跟踪（后端已集成）
+
+## 后续步骤
+
+部署应用程序后：
+1. 设置 [SSL 证书](/zh/docs/deployment/ssl)
+2. 配置 [备份策略](/zh/docs/deployment/backups)
+3. 实施适合您特定需求的 [CI/CD 流程](/zh/docs/deployment/ci-cd) 

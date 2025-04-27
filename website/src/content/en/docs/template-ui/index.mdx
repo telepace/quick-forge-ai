@@ -1,0 +1,181 @@
+---
+title: Template UI System
+description: Learn about the pre-built UI templates and components available in Quick Forge AI.
+---
+
+# Template UI System
+
+Quick Forge AI includes a comprehensive set of pre-built UI templates and components to help you rapidly develop consistent user interfaces. This guide covers the available templates, customization options, and best practices.
+
+## Overview
+
+The Template UI system provides:
+
+- Responsive layouts for various page types
+- Consistent theming across the application
+- Accessibility-compliant components
+- Ready-to-use patterns for common UI needs
+
+## Available Templates
+
+### Admin Dashboard
+
+The admin dashboard template provides a complete interface for application administration:
+
+```jsx
+import { AdminDashboard } from '@/components/Admin/AdminDashboard';
+
+function AdminPage() {
+  return <AdminDashboard />;
+}
+```
+
+Key features:
+- Navigation sidebar with collapsible sections
+- Header with user profile and quick actions
+- Main content area with responsive grid
+- Statistics cards and data visualization components
+
+### User Settings
+
+The user settings template provides a complete interface for user profile and preference management:
+
+```jsx
+import { UserSettings } from '@/components/UserSettings/UserSettings';
+
+function SettingsPage() {
+  return <UserSettings />;
+}
+```
+
+Key features:
+- Tabbed interface for different settings categories
+- Form components with validation
+- Responsive design that works on mobile devices
+- Confirmation dialogs for sensitive actions
+
+### Authentication Pages
+
+Ready-to-use authentication pages:
+
+```jsx
+import { LoginPage } from '@/components/Auth/LoginPage';
+import { RegisterPage } from '@/components/Auth/RegisterPage';
+import { ForgotPasswordPage } from '@/components/Auth/ForgotPasswordPage';
+
+// Use in your routing configuration
+```
+
+### Data Display Templates
+
+Templates for displaying and managing data:
+
+- `DataTable` - Advanced table with sorting, filtering, and pagination
+- `DataGrid` - Card-based grid view for visual data display
+- `DetailView` - Detailed view of a single item with sections
+- `KanbanBoard` - Drag-and-drop kanban interface for process management
+
+## UI Components
+
+The Template UI system includes numerous reusable components:
+
+### Form Components
+
+- `Input` - Text input with validation
+- `Select` - Dropdown selection
+- `DatePicker` - Date selection
+- `FileUpload` - File upload with drag and drop
+- `FormBuilder` - Dynamic form generator from schema
+
+### Display Components
+
+- `Card` - Content container with variants
+- `Modal` - Overlay dialog
+- `Tabs` - Tabbed interface
+- `Accordion` - Collapsible sections
+- `Toast` - Notification system
+
+### Navigation Components
+
+- `Navbar` - Application header
+- `Sidebar` - Side navigation
+- `Breadcrumbs` - Hierarchical location indicator
+- `Pagination` - Page navigation for data sets
+
+## Theming and Customization
+
+### Theme Configuration
+
+The UI system uses a theme configuration that can be customized:
+
+```jsx
+// In src/theme/index.ts
+export const theme = {
+  colors: {
+    primary: {
+      50: '#e3f2fd',
+      // ... other shades
+      500: '#2196f3', // Main primary color
+      // ... other shades
+    },
+    // ... other color categories
+  },
+  fonts: {
+    body: 'Inter, system-ui, sans-serif',
+    heading: 'Inter, system-ui, sans-serif',
+    mono: 'Menlo, monospace',
+  },
+  // ... other theme settings
+};
+```
+
+### Customization Approaches
+
+1. **Theme Override** - Customize the theme variables
+2. **Component Props** - Use props to modify component appearance 
+3. **Component Extension** - Extend components with additional features
+4. **Styled Components** - Use styled-components to create custom variants
+
+## Responsive Design
+
+All templates and components are designed to be responsive across:
+
+- Desktop (1200px+)
+- Tablet (768px - 1199px)
+- Mobile (< 768px)
+
+Responsive features include:
+- Fluid layouts that adjust to screen size
+- Collapsible navigation on smaller screens
+- Touch-friendly controls for mobile devices
+- Optimized typography for readability
+
+## Accessibility
+
+The Template UI system follows WCAG 2.1 AA accessibility guidelines:
+
+- Proper semantic HTML structure
+- Keyboard navigation support
+- ARIA attributes for screen readers
+- Sufficient color contrast
+- Focus indicators for interactive elements
+
+## Best Practices
+
+When using the Template UI system:
+
+1. **Maintain Consistency** - Use the provided components rather than creating new ones
+2. **Leverage Theme Variables** - Use theme variables instead of hardcoded values
+3. **Respect Component API** - Follow the documented props and usage patterns
+4. **Consider Mobile First** - Design for mobile screens first, then enhance for larger screens
+5. **Test Accessibility** - Regularly test your UI with accessibility tools
+
+## Next Steps
+
+Now that you understand the Template UI system, dive deeper into:
+
+1. [Component API Reference](/en/docs/template-ui/components)
+2. [Theming Guide](/en/docs/template-ui/theming)
+3. [Layout Templates](/en/docs/template-ui/layouts)
+4. [Form System](/en/docs/template-ui/forms)
+5. [Accessibility Guidelines](/en/docs/template-ui/accessibility) 
