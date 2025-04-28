@@ -6,17 +6,10 @@ from sqlmodel import Field, Relationship, SQLModel
 
 # Shared properties
 class UserBase(SQLModel):
-    email: str = Field(unique=True, index=True, max_length=255)
+    email: EmailStr = Field(unique=True, index=True, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
-    
-    @field_validator('email')
-    @classmethod
-    def validate_email(cls, value):
-        # 使用 EmailStr 的验证逻辑，但类型仍为 str
-        EmailStr.validate(value)
-        return value
 
 
 # Properties to receive via API on creation
@@ -50,7 +43,14 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    items: list["Item"] = Relationship(
+        back_populates="owner",
+        sa_relationship_kwargs={
+            "cascade": "all, delete-orphan",
+            "primaryjoin": "User.id == Item.owner_id",
+            "foreign_keys": "[Item.owner_id]",
+        },
+    )
 
 
 # Properties to return via API, id is always required
@@ -82,10 +82,15 @@ class ItemUpdate(ItemBase):
 # Database model, database table inferred from class name
 class Item(ItemBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    owner_id: uuid.UUID = Field(
-        foreign_key="user.id:uuid.UUID:cascade", nullable=False
+    # Remove foreign_key constraint, but keep it indexed for performance
+    owner_id: uuid.UUID = Field(index=True, nullable=False)
+    owner: User | None = Relationship(
+        back_populates="items",
+        sa_relationship_kwargs={
+            "primaryjoin": "User.id == Item.owner_id",
+            "foreign_keys": "[Item.owner_id]",
+        },
     )
-    owner: User | None = Relationship(back_populates="items")
 
 
 # Properties to return via API, id is always required
