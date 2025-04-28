@@ -11,6 +11,17 @@ import Link from 'next/link'
 
 interface Props {
 }
+/**
+ * A React component that sets up and renders a hero section with various features and links.
+ *
+ * @param {Object} props - The properties for the component.
+ * @param {Function} props.t - A translation function for localizing text.
+ * @param {string} props.currentLocale - The current locale of the application.
+ * @returns {JSX.Element} - The rendered JSX element representing the hero section.
+ *
+ * Example usage:
+ * <SetupHero t={t} currentLocale="en" />
+ */
 export function SetupHero(props: Props) {
   const { t, currentLocale } = useLocale()
 
