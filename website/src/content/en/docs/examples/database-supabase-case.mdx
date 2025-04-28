@@ -1,0 +1,146 @@
+---
+title: Supabase Integration Case Study
+description: A real-world example of migrating from direct PostgreSQL to Supabase in Quick Forge AI
+category: Examples
+---
+
+# Supabase Integration Case Study
+
+This case study describes how a team migrated their Quick Forge AI application from direct PostgreSQL deployment to Supabase for enhanced scalability and reduced operational overhead.
+
+## Project Background
+
+**Company**: TechStartup Inc.  
+**Project**: Customer Support Dashboard  
+**Team Size**: 3 developers  
+**Development Timeline**: 8 weeks  
+
+The team built a customer support dashboard using Quick Forge AI to help their customer service representatives track and resolve support tickets. Initially, they deployed with the default PostgreSQL option for simplicity during development.
+
+## Challenges with Direct PostgreSQL
+
+After three months in production, the team faced several challenges:
+
+1. **Database Management Overhead**: The team spent significant time on database maintenance, backups, and updates
+2. **Scaling Issues**: As their user base grew, they needed to manually scale their PostgreSQL instance
+3. **Geographic Distribution**: They needed to serve users in multiple regions with low latency
+4. **Security Concerns**: They wanted enhanced security features without additional implementation work
+
+## Decision to Migrate to Supabase
+
+The team decided to migrate to Supabase for these key reasons:
+
+- **Managed Service**: No need to worry about database administration
+- **Automatic Backups**: Built-in point-in-time recovery
+- **Global Distribution**: Better performance for their international customers
+- **Row-Level Security**: Enhanced security capabilities out of the box
+- **Additional Features**: Auth, Storage, and Realtime features they could use later
+
+## Migration Process
+
+### Step 1: Setting Up Supabase
+
+```bash
+# Create a new Supabase project through the Supabase dashboard
+# https://app.supabase.com/projects
+```
+
+They created a new project in Supabase and noted their connection details.
+
+### Step 2: Exporting Existing Data
+
+```bash
+# Export data from their existing PostgreSQL database
+docker-compose exec db pg_dump -U postgres -d app > database_backup.sql
+```
+
+### Step 3: Schema Review and Adjustments
+
+They reviewed their schema and made some adjustments to optimize for Supabase:
+
+- Added appropriate indexes for their most common queries
+- Set up Row Level Security policies for enhanced data protection
+- Modified a few column types to better align with Supabase recommendations
+
+### Step 4: Importing Data to Supabase
+
+```bash
+# Install psql client locally if needed
+# brew install postgresql (on macOS)
+# apt-get install postgresql-client (on Ubuntu)
+
+# Import data to Supabase
+psql "postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres" < database_backup.sql
+```
+
+### Step 5: Configuring Quick Forge AI
+
+They used the configuration helper to switch to Supabase:
+
+```bash
+make configure-db
+```
+
+When prompted, they selected option 2 for Supabase and entered their connection URL.
+
+### Step 6: Testing in Staging
+
+Before deploying to production, they:
+
+1. Deployed to a staging environment
+2. Ran comprehensive tests to ensure all functionality worked correctly
+3. Measured performance to ensure it met or exceeded their previous setup
+
+### Step 7: Production Deployment
+
+After confirming everything worked correctly in staging, they updated their production environment:
+
+```bash
+# Update environment variables in production
+USE_SUPABASE=true
+SUPABASE_URL=postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres
+USE_POSTGRES_SERVICE=none
+USE_POSTGRES_PRESTART_SERVICE=none
+
+# Restart their production services
+docker-compose down
+docker-compose up -d
+```
+
+## Results and Benefits
+
+After migrating to Supabase, the team experienced several benefits:
+
+1. **Reduced Operational Overhead**: 90% reduction in database management time
+2. **Improved Performance**: 30% faster query response times due to optimized hosting
+3. **Cost Savings**: Despite being a managed service, they saved on operational costs
+4. **Enhanced Security**: Row-level security simplified their authorization logic
+5. **Developer Productivity**: Team could focus on features rather than infrastructure
+
+## Lessons Learned
+
+1. **Test Thoroughly**: They faced a few unexpected issues with some complex queries that needed optimization for Supabase
+2. **Monitor Performance**: After migration, they needed to adjust some indexes to optimize for their specific query patterns
+3. **Use Connection Pooling**: For production loads, they needed to enable connection pooling in Supabase
+
+## Specific Configuration Details
+
+Their final production configuration looked like this:
+
+```
+# .env file (sensitive values replaced)
+USE_SUPABASE=true
+SUPABASE_URL=postgresql://postgres:********@db.abcdefghijkl.supabase.co:5432/postgres
+USE_POSTGRES_SERVICE=none
+USE_POSTGRES_PRESTART_SERVICE=none
+
+# Added Supabase-specific optimizations
+PGSSLMODE=require
+PGCONNECT_TIMEOUT=15
+```
+
+## Conclusion
+
+Migrating from direct PostgreSQL to Supabase allowed the team to focus more on their application's features and less on database management. The built-in scalability, security features, and reduced operational overhead made it an excellent choice for their growing application.
+
+Quick Forge AI's flexible database configuration options made this migration straightforward, allowing the team to switch between database options without any changes to their application code. 

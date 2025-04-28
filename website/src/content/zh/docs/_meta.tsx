@@ -8,4 +8,6 @@ export default {
   'docker-deployment': 'Docker 和部署',
   'template-ui': '模板 UI 系统',
   'ai-integration': 'AI 集成',
+  'best-practices': '最佳实践',
+  examples: '案例示例',
 } satisfies MetaRecord

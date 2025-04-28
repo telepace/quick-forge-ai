@@ -1,49 +1,62 @@
-# Stage 1: Build the application
-FROM node:20-alpine AS builder
+# Stage 1: Dependencies
+FROM node:20-alpine AS deps
 
 # Install pnpm
 RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copy dependency definition files first for better caching
+# Copy dependency files for better layer caching
 COPY package.json pnpm-lock.yaml ./
-# Add .npmrc if it exists
 COPY .npmrc* ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies with frozen lockfile for reproducible builds
+RUN npm install --frozen-lockfile
 
-# Copy the rest of the application code
-COPY . .
-
-# Set environment variables (if any needed during build)
-# ARG NEXT_PUBLIC_...=...
-# ENV NEXT_PUBLIC_...=$NEXT_PUBLIC_...
-
-# Build the Next.js application
-RUN pnpm build
-
-# Stage 2: Production image
-FROM node:20-alpine
+# Stage 2: Build the application
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Set environment variables for production
-# ENV NODE_ENV=production
-# ENV NEXT_TELEMETRY_DISABLED=1
-# Add any other production environment variables here
-# ENV FOO=bar
+# Copy dependencies from previous stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
-# Install pnpm only to leverage the deploy command if needed,
-# otherwise, copy artifacts directly if using standalone output.
-# Using standalone output is generally preferred for Next.js.
-# Check your next.config.ts if output: 'standalone' is configured.
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+# Set build-time environment variables
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_TELEMETRY_DISABLED=1
 
-EXPOSE 8000
+# Build the Next.js application
+RUN npm run build
+
+# Stage 3: Production runtime
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Set runtime environment variables
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create a non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy only the necessary files from the build stage
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Set correct permissions
+USER nextjs
+
+# Expose the application port
+EXPOSE 3000
+
+# Health check to verify the application is running
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
 # Command to run the application
 CMD ["node", "server.js"]

@@ -1,0 +1,146 @@
+---
+title: Supabase 集成案例研究
+description: Quick Forge AI 中从直接 PostgreSQL 迁移到 Supabase 的实际案例
+category: 案例示例
+---
+
+# Supabase 集成案例研究
+
+本案例研究描述了一个团队如何将其 Quick Forge AI 应用程序从直接 PostgreSQL 部署迁移到 Supabase，以提高可扩展性并减少运营开销。
+
+## 项目背景
+
+**公司**: TechStartup Inc.  
+**项目**: 客户支持控制面板  
+**团队规模**: 3 名开发人员  
+**开发时间**: 8 周  
+
+该团队使用 Quick Forge AI 构建了一个客户支持控制面板，帮助客服人员跟踪和解决支持工单。最初，他们在开发阶段使用了默认的 PostgreSQL 选项以简化部署。
+
+## 直接使用 PostgreSQL 的挑战
+
+在生产环境中使用三个月后，团队面临了几个挑战：
+
+1. **数据库管理开销**: 团队花费大量时间进行数据库维护、备份和更新
+2. **扩展问题**: 随着用户群体的增长，他们需要手动扩展 PostgreSQL 实例
+3. **地理分布**: 他们需要以低延迟为多个地区的用户提供服务
+4. **安全顾虑**: 他们希望获得增强的安全功能，而无需额外的实施工作
+
+## 决定迁移到 Supabase
+
+团队决定迁移到 Supabase 的关键原因：
+
+- **托管服务**: 无需担心数据库管理
+- **自动备份**: 内置的时间点恢复功能
+- **全球分布**: 为国际客户提供更好的性能
+- **行级安全**: 开箱即用的增强安全功能
+- **额外功能**: 可以在后期使用的身份验证、存储和实时功能
+
+## 迁移过程
+
+### 第 1 步: 设置 Supabase
+
+```bash
+# 通过 Supabase 控制面板创建新项目
+# https://app.supabase.com/projects
+```
+
+他们在 Supabase 中创建了一个新项目并记录了连接详情。
+
+### 第 2 步: 导出现有数据
+
+```bash
+# 从现有 PostgreSQL 数据库导出数据
+docker-compose exec db pg_dump -U postgres -d app > database_backup.sql
+```
+
+### 第 3 步: 架构审查和调整
+
+他们审查了架构并进行了一些调整以优化 Supabase：
+
+- 为最常见的查询添加了适当的索引
+- 设置了行级安全策略以增强数据保护
+- 修改了一些列类型以更好地符合 Supabase 建议
+
+### 第 4 步: 导入数据到 Supabase
+
+```bash
+# 如需要，本地安装 psql 客户端
+# brew install postgresql (macOS)
+# apt-get install postgresql-client (Ubuntu)
+
+# 导入数据到 Supabase
+psql "postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres" < database_backup.sql
+```
+
+### 第 5 步: 配置 Quick Forge AI
+
+他们使用配置助手切换到 Supabase：
+
+```bash
+make configure-db
+```
+
+当提示时，他们选择了选项 2 用于 Supabase 并输入了他们的连接 URL。
+
+### 第 6 步: 在测试环境中测试
+
+在部署到生产环境之前，他们：
+
+1. 部署到测试环境
+2. 运行全面测试以确保所有功能正常工作
+3. 测量性能以确保它达到或超过之前的设置
+
+### 第 7 步: 生产环境部署
+
+在确认一切在测试环境中正常工作后，他们更新了生产环境：
+
+```bash
+# 在生产环境中更新环境变量
+USE_SUPABASE=true
+SUPABASE_URL=postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres
+USE_POSTGRES_SERVICE=none
+USE_POSTGRES_PRESTART_SERVICE=none
+
+# 重启生产服务
+docker-compose down
+docker-compose up -d
+```
+
+## 结果和益处
+
+迁移到 Supabase 后，团队体验到了几个好处：
+
+1. **减少运营开销**: 数据库管理时间减少 90%
+2. **性能改进**: 由于优化的托管，查询响应时间快了 30%
+3. **成本节约**: 尽管是托管服务，但他们节省了运营成本
+4. **增强安全性**: 行级安全简化了他们的授权逻辑
+5. **开发者生产力**: 团队可以专注于功能而非基础设施
+
+## 经验教训
+
+1. **全面测试**: 他们遇到了一些需要为 Supabase 优化的复杂查询问题
+2. **监控性能**: 迁移后，他们需要调整一些索引以优化特定的查询模式
+3. **使用连接池**: 对于生产负载，他们需要在 Supabase 中启用连接池
+
+## 具体配置详情
+
+他们最终的生产配置如下：
+
+```
+# .env 文件 (敏感值已替换)
+USE_SUPABASE=true
+SUPABASE_URL=postgresql://postgres:********@db.abcdefghijkl.supabase.co:5432/postgres
+USE_POSTGRES_SERVICE=none
+USE_POSTGRES_PRESTART_SERVICE=none
+
+# 添加 Supabase 特定优化
+PGSSLMODE=require
+PGCONNECT_TIMEOUT=15
+```
+
+## 结论
+
+从直接 PostgreSQL 迁移到 Supabase 使团队能够更专注于应用程序的功能，而不是数据库管理。内置的可扩展性、安全功能和减少的运营开销使其成为不断发展的应用程序的绝佳选择。
+
+Quick Forge AI 灵活的数据库配置选项使这种迁移变得简单，允许团队在不改变应用程序代码的情况下切换数据库选项。 

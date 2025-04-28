@@ -246,7 +246,7 @@ QuickForge AI makes it simple to integrate various AI services:
 
 ## 📚 Documentation
 
-- [Backend API documentation](http://localhost:8000/docs) - Available when the backend is running
+- [Backend API documentation](http://localhost:3000/docs) - Available when the backend is running
 - [Frontend component documentation](http://localhost:3000/docs) - Available when the frontend is running
 - [Project architecture](./docs/architecture.md)
 - [Development guides](./docs/development.md)
@@ -303,3 +303,50 @@ See the [development guide](development.md) for instructions on setting up the d
 
 - **Linting**: We use various linters to maintain code quality
 - **Spell Checking**: We use [typos](https://github.com/crate-ci/typos) for spell checking. The configuration is in `_typos.toml`
+
+## Database Configuration Options
+
+Quick Forge AI supports two database deployment options:
+
+1. **Direct PostgreSQL Deployment (Default)**: A PostgreSQL database is deployed alongside your application.
+2. **Supabase Cloud Service**: Connect to a Supabase PostgreSQL database instance.
+
+### Configuring Your Database
+
+We provide a simple configuration script to set up your database:
+
+```bash
+make configure-db
+```
+
+This interactive script will prompt you to choose between PostgreSQL direct deployment or Supabase, and help you configure the necessary settings.
+
+### Manual Configuration
+
+If you prefer to configure the database manually:
+
+#### For PostgreSQL Direct Deployment:
+
+In your `.env` file, ensure these settings:
+
+```
+USE_SUPABASE=false
+USE_POSTGRES_SERVICE=default
+USE_POSTGRES_PRESTART_SERVICE=default
+POSTGRES_SERVER=db
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=app
+```
+
+#### For Supabase:
+
+In your `.env` file, set:
+
+```
+USE_SUPABASE=true
+SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
+USE_POSTGRES_SERVICE=none
+USE_POSTGRES_PRESTART_SERVICE=none
+```
