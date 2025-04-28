@@ -92,6 +92,16 @@ interface Props {
   params: Promise<{ lang: I18nLangKeys }>
 }
 
+/**
+ * Renders the root layout of the application.
+ *
+ * @param {Object} props - The props for the component.
+ * @param {React.ReactNode} props.children - The child components to render inside the layout.
+ * @param {Object} props.params - An object containing parameters passed to the layout, including the language code.
+ * @returns {JSX.Element} - The rendered root layout.
+ *
+ * @throws {Error} If there is an error fetching the dictionary or page map.
+ */
 export default async function RootLayout({ children, params }: Props) {
   const { lang } = await params
   const dictionary = await getDictionary(lang)
