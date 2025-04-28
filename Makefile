@@ -74,6 +74,13 @@ dev:
 	@echo "===========> Starting development environment"
 	docker-compose up -d
 
+## configure-db: Configure database (PostgreSQL or Supabase)
+.PHONY: configure-db
+configure-db:
+	@echo "===========> Configuring database settings"
+	@chmod +x $(ROOT_DIR)/scripts/configure-database.sh
+	@$(ROOT_DIR)/scripts/configure-database.sh
+
 ## backend-install: Install backend dependencies
 .PHONY: backend-install
 backend-install:

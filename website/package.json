@@ -5,23 +5,23 @@
   "description": "Next.js Nextra (v4) Tailwind CSS (v4) docs starter",
   "author": "Wisdom <pdsu.wwz@foxmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/pdsuwwz/nextjs-nextra-starter#readme",
+  "homepage": "https://github.com/telepace/quick-forge-ai#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pdsuwwz/nextjs-nextra-starter.git"
+    "url": "git+https://github.com/telepace/quick-forge-ai.git"
   },
   "bugs": {
-    "url": "https://github.com/pdsuwwz/nextjs-nextra-starter/issues"
+    "url": "https://github.com/telepace/quick-forge-ai/issues"
   },
   "engines": {
     "node": ">=20.x",
     "pnpm": ">=9.x"
   },
   "scripts": {
-    "dev": "next dev --turbopack -p 8000",
+    "dev": "next dev --turbopack -p 3000",
     "build": "next build",
     "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
-    "start": "next start -p 7000",
+    "start": "next start -p 3000",
     "lint": "eslint --fix ."
   },
   "dependencies": {

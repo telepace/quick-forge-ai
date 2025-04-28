@@ -285,15 +285,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 设置环境变量
-        id: set-env-docs
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.environment }}" == "testing" ]]; then
-            echo "ENV_SUFFIX=-testing" >> $GITHUB_OUTPUT
-          else
-            echo "ENV_SUFFIX=" >> $GITHUB_OUTPUT
-          fi
-
       - name: 获取 Docker 元数据
         id: metadata-docs
         uses: docker/metadata-action@v5.7.0
