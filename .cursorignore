@@ -7,10 +7,6 @@ dist/
 build/
 target/
 
-# Ignore environment variable configurations
-.env
-.env.*
-
 # Ignore IDE and editor cache files
 .vscode/
 .idea/
