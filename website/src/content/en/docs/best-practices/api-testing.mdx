@@ -1,0 +1,197 @@
+---
+title: API Testing Best Practices
+description: Learn how to test APIs using Swagger UI, ReDoc, and Apifox
+---
+
+# API Testing Best Practices
+
+API testing is a crucial part of the development process that ensures your backend services work as expected. Quick Forge AI provides several tools to streamline the API testing process. This tutorial will detail how to use these tools.
+
+## Using Swagger UI for API Testing
+
+Swagger UI is an interactive API documentation tool that not only displays detailed information about your API but also allows you to test the API directly.
+
+### Accessing Swagger UI
+
+1. Ensure your backend service is running (typically via the `make backend-dev` command)
+2. Open [http://localhost:8000/docs](http://localhost:8000/docs) in your browser
+
+### Steps for Using Swagger UI
+
+1. **Browse API Endpoints**: Swagger UI lists all available API endpoints, grouped by routes.
+2. **View API Details**: Click on any endpoint to view its details, including:
+   - Request methods (GET, POST, PUT, DELETE, etc.)
+   - Endpoint paths
+   - Request parameters
+   - Response models
+   - Authentication requirements
+
+3. **Test an API**:
+   - Click on the endpoint you want to test
+   - Click the "Try it out" button
+   - Fill in the necessary parameters (URL parameters, request body, etc.)
+   - If authentication is required, click the "Authorize" button in the top-right corner
+   - Click the "Execute" button to send the request
+   - View the response results, including status code, headers, and body
+
+4. **Authentication**:
+   - For endpoints requiring authentication, click the "Authorize" button in the top-right corner
+   - According to the authentication type (typically JWT Bearer Token), enter the appropriate credentials
+   - Click "Authorize" to complete authentication
+
+### Example: Creating a New User
+
+1. Find the `/api/v1/users/` POST endpoint
+2. Click "Try it out"
+3. Fill in the request body with JSON data:
+```json
+{
+  "email": "test@example.com",
+  "password": "securepassword",
+  "full_name": "Test User"
+}
+```
+4. Click "Execute"
+5. View the response result and status code
+
+## Using ReDoc to View API Documentation
+
+ReDoc provides a more streamlined, easy-to-read view of API documentation, ideal for developers to quickly browse and understand the API.
+
+### Accessing ReDoc
+
+1. Ensure your backend service is running
+2. Open [http://localhost:8000/redoc](http://localhost:8000/redoc) in your browser
+
+### ReDoc Features
+
+1. **Clear Documentation Structure**:
+   - Left sidebar displays all API groups and endpoints
+   - Right panel shows detailed API information
+
+2. **Detailed API Information**:
+   - Request parameters and format
+   - Response format and examples
+   - Error code descriptions
+   - Model schemas
+
+3. **Search Functionality**:
+   - Use the search box at the top to quickly find specific API endpoints
+
+4. **Differences from Swagger**:
+   - ReDoc only provides documentation viewing, not direct API testing
+   - Interface is more concise, suitable for reading and referencing documentation
+   - Supports offline export and sharing
+
+## Using Apifox for Professional API Testing
+
+Apifox is a more powerful API development tool that integrates API design, testing, mocking, and documentation. It's an ideal choice for professional API testing.
+
+### Installing and Setting Up Apifox
+
+1. Visit the [Apifox website](https://www.apifox.cn/) to download and install
+2. Create a new project or open an existing one
+
+### Importing API Documentation
+
+1. In Apifox, click the "Import" button in the left navigation bar
+2. Select "Import Data > OpenAPI(Swagger)"
+3. Enter your OpenAPI URL: `http://localhost:8000/openapi.json`
+4. Click the "Import" button
+
+### Creating Environment Variables
+
+1. Click the "Environment" dropdown menu at the top
+2. Select "Add Environment"
+3. Enter an environment name, such as "Local Development"
+4. Add the following variables:
+   - `BASE_URL`: `http://localhost:8000`
+   - `TOKEN`: Your authentication token (can be updated later)
+5. Click "Save"
+
+### Testing API Endpoints
+
+1. **Browse APIs**:
+   - Browse the imported APIs in the left navigation bar
+
+2. **Set Up Request**:
+   - Select the API endpoint to test
+   - Confirm the request method and URL are correct
+   - Set request parameters (path parameters, query parameters, form data, or JSON)
+   - Add request headers (such as authentication token):
+     - Add header: `Authorization: Bearer {{TOKEN}}`
+
+3. **Send Request**:
+   - Click the "Send" button
+   - View response results, status code, and response time
+
+4. **Save Request**:
+   - Click the "Save" button to save this request configuration
+   - Add description and tags for the request (optional)
+
+### Creating Test Cases
+
+1. On the API details page, click the "Test Cases" tab
+2. Click the "Add Test Case" button
+3. Configure the test case:
+   - Name: A descriptive test name
+   - Request parameters: Set specific test data
+   - Expected results: Add assertions to check response status code, response body, etc.
+4. Click the "Save" button
+
+### Creating Test Scenarios
+
+1. Click "Test Scenarios" in the left navigation bar
+2. Click "Create Test Scenario"
+3. Add steps:
+   - Drag saved API requests into the scenario
+   - Set up data transfer between steps (e.g., using response data from a previous step)
+4. Configure environment variable extractors to extract values from responses:
+   - Click on a step, select "Variable Extraction"
+   - Configure extraction rules, e.g., extracting a token from a login response
+5. Click the "Run" button to execute the entire scenario
+
+### Setting Up Automated Testing
+
+1. Click "Automated Testing" in the left navigation bar
+2. Click "Create Task"
+3. Select test scenarios or test cases to include
+4. Set the running frequency (on-demand, scheduled, etc.)
+5. Configure notification settings (optional)
+6. Click "Save" and run the test
+
+### Generating Test Reports
+
+1. After running a test scenario or automated task
+2. Click "Test Reports"
+3. View detailed test results, including:
+   - Number of passed/failed tests
+   - Response time statistics
+   - Error details
+4. Export the report (PDF, HTML, etc.) to share with team members
+
+## Best Practices and Tips
+
+1. **Scenarios for Using Different Tools**:
+   - Swagger UI: Quick testing and API exploration, suitable for development phase
+   - ReDoc: Viewing and sharing API documentation, suitable for team collaboration
+   - Apifox: Complete API testing solution, suitable for testing, automation, and continuous integration
+
+2. **API Testing Strategy**:
+   - Create comprehensive test suites covering all endpoints
+   - Test both happy paths and error paths
+   - Include boundary condition tests
+   - Perform load and performance testing (using Apifox's stress testing features)
+
+3. **Workflow Recommendations**:
+   - Manually test new features in Swagger UI first
+   - Add successful test cases to Apifox
+   - Create test scenarios to simulate user workflows
+   - Set up automated testing, integrated with CI/CD processes
+
+4. **Security Considerations**:
+   - Don't include sensitive information in shared documentation or test reports
+   - Use environment variables to manage keys and tokens
+   - Regularly update test authentication credentials
+
+By following these best practices and using the appropriate tools, you can establish an efficient, comprehensive API testing process to ensure your application interfaces are reliable, secure, and performant.

@@ -1,6 +1,6 @@
 import uuid
 
-from pydantic import EmailStr, field_validator
+from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 from sqlalchemy import String
 
