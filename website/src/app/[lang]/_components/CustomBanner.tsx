@@ -6,6 +6,14 @@ import { Banner } from 'nextra/components'
 
 const repo = 'https://github.com/telepace/quick-forge-ai'
 
+/**
+ * Renders a custom banner component with localized text and an external link.
+ *
+ * @param {Object} props - The component's properties.
+ * @param {string} props.lang - The language code for localization.
+ *
+ * @returns {JSX.Element} A JSX element representing the custom banner.
+ */
 export function CustomBanner({ lang }: { lang: string }) {
   const { t } = useLocale()
   
