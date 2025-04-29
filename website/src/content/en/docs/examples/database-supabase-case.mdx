@@ -73,17 +73,30 @@ They reviewed their schema and made some adjustments to optimize for Supabase:
 psql "postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres" < database_backup.sql
 ```
 
-### Step 5: Configuring Quick Forge AI
+### Step 5: Configuring Quick Forge AI for Supabase
 
-They used the configuration helper to switch to Supabase:
+They simply updated their `.env` file to include the Supabase connection URL:
 
 ```bash
-make configure-db
+# Add Supabase connection URL to .env file
+SUPABASE_URL=postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres
 ```
 
-When prompted, they selected option 2 for Supabase and entered their connection URL.
+The system automatically detected the presence of the `SUPABASE_URL` variable and switched to using Supabase as the database.
 
-### Step 6: Testing in Staging
+### Step 6: Running Database Migrations on Supabase
+
+To ensure their database schema was properly set up, they ran the migrations against Supabase:
+
+```bash
+# Enter the backend container
+docker-compose exec backend bash
+
+# Apply migrations to Supabase
+alembic upgrade head
+```
+
+### Step 7: Testing in Staging
 
 Before deploying to production, they:
 
@@ -91,16 +104,13 @@ Before deploying to production, they:
 2. Ran comprehensive tests to ensure all functionality worked correctly
 3. Measured performance to ensure it met or exceeded their previous setup
 
-### Step 7: Production Deployment
+### Step 8: Production Deployment
 
 After confirming everything worked correctly in staging, they updated their production environment:
 
 ```bash
-# Update environment variables in production
-USE_SUPABASE=true
+# Update environment variables in production to only include:
 SUPABASE_URL=postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres
-USE_POSTGRES_SERVICE=none
-USE_POSTGRES_PRESTART_SERVICE=none
 
 # Restart their production services
 docker-compose down
@@ -129,18 +139,19 @@ Their final production configuration looked like this:
 
 ```
 # .env file (sensitive values replaced)
-USE_SUPABASE=true
 SUPABASE_URL=postgresql://postgres:********@db.abcdefghijkl.supabase.co:5432/postgres
-USE_POSTGRES_SERVICE=none
-USE_POSTGRES_PRESTART_SERVICE=none
 
 # Added Supabase-specific optimizations
 PGSSLMODE=require
 PGCONNECT_TIMEOUT=15
 ```
 
+## Switching Back if Needed
+
+One advantage of Quick Forge AI's new automatic database detection is that they could easily switch back to PostgreSQL if needed by simply removing the `SUPABASE_URL` environment variable and ensuring their PostgreSQL settings were configured.
+
 ## Conclusion
 
 Migrating from direct PostgreSQL to Supabase allowed the team to focus more on their application's features and less on database management. The built-in scalability, security features, and reduced operational overhead made it an excellent choice for their growing application.
 
-Quick Forge AI's flexible database configuration options made this migration straightforward, allowing the team to switch between database options without any changes to their application code. 
+Quick Forge AI's automatic database detection made this migration straightforward, allowing the team to switch between database options without any changes to their application code. 

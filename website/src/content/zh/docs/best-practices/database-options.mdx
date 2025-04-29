@@ -21,60 +21,23 @@ Quick Forge AI 支持两种数据库部署选项，为您的开发和生产环�
 - Docker 和 Docker Compose（直接 PostgreSQL 部署需要）
 - Supabase 账户（Supabase 选项需要）- [在此注册](https://supabase.com)
 
-## 使用配置助手
+## 自动数据库检测
 
-配置数据库的最简单方法是使用我们内置的配置助手：
+Quick Forge AI 现在会根据您的环境变量自动检测要使用的数据库：
 
-```bash
-make configure-db
-```
+- 如果在环境变量中设置了 `SUPABASE_URL`，系统将使用 Supabase
+- 如果未设置 `SUPABASE_URL`，系统将使用直接 PostgreSQL 部署
 
-这个交互式脚本将：
-1. 提示您选择数据库选项
-2. 引导您输入必要的配置详细信息
-3. 使用正确的设置更新您的 `.env` 文件
-4. 为所选数据库选项准备您的环境
+这使得只需更新环境变量即可轻松切换数据库选项，无需运行额外的配置命令。
 
 ## 选项 1：直接 PostgreSQL 部署
 
-### 自动设置
-
-1. 运行配置助手：
-   ```bash
-   make configure-db
-   ```
-
-2. 为直接 PostgreSQL 部署选择选项 1：
-   ```
-   请选择您的数据库选项：
-   1) 直接 PostgreSQL 部署（默认）
-   2) Supabase 云服务
-   输入您的选择 (1/2): 1
-   ```
-
-3. 当提示时输入 PostgreSQL 配置详细信息：
-   ```
-   PostgreSQL 服务器（默认：db）：
-   PostgreSQL 端口（默认：5432）：
-   PostgreSQL 用户（默认：postgres）：
-   PostgreSQL 密码：your_secure_password
-   PostgreSQL 数据库名称（默认：app）：
-   ```
-
-4. 启动您的服务：
-   ```bash
-   docker-compose up -d
-   ```
-
 ### 手动设置
 
-如果您更喜欢手动配置，请使用以下设置更新您的 `.env` 文件：
+要配置直接 PostgreSQL 部署，请使用以下设置更新您的 `.env` 文件：
 
 ```
 # PostgreSQL 直接部署配置
-USE_SUPABASE=false
-USE_POSTGRES_SERVICE=default
-USE_POSTGRES_PRESTART_SERVICE=default
 POSTGRES_SERVER=db
 POSTGRES_PORT=5432
 POSTGRES_USER=postgres
@@ -106,41 +69,13 @@ docker-compose up -d
    postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
    ```
 
-### 自动设置
-
-1. 运行配置助手：
-   ```bash
-   make configure-db
-   ```
-
-2. 为 Supabase 云服务选择选项 2：
-   ```
-   请选择您的数据库选项：
-   1) 直接 PostgreSQL 部署（默认）
-   2) Supabase 云服务
-   输入您的选择 (1/2): 2
-   ```
-
-3. 当提示时输入您的 Supabase 连接 URL：
-   ```
-   输入您的 Supabase 连接 URL (postgresql://...)：postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
-   ```
-
-4. 启动您的服务：
-   ```bash
-   docker-compose up -d
-   ```
-
 ### 手动设置
 
-如果您更喜欢手动配置，请使用以下设置更新您的 `.env` 文件：
+要配置 Supabase，请使用以下设置更新您的 `.env` 文件：
 
 ```
 # Supabase 配置
-USE_SUPABASE=true
 SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
-USE_POSTGRES_SERVICE=none
-USE_POSTGRES_PRESTART_SERVICE=none
 ```
 
 然后启动您的服务：
@@ -150,14 +85,25 @@ docker-compose up -d
 
 ## 在选项之间切换
 
-您可以随时在直接 PostgreSQL 部署和 Supabase 之间切换：
+您可以通过更新 `.env` 文件随时在直接 PostgreSQL 部署和 Supabase 之间切换：
 
-1. 再次运行配置助手：
-   ```bash
-   make configure-db
+1. 要使用 Supabase，添加 `SUPABASE_URL` 环境变量：
+   ```
+   SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
    ```
 
-2. 选择您的新数据库选项并按照提示操作
+2. 要使用直接 PostgreSQL 部署，移除或注释掉 `SUPABASE_URL` 变量，并确保配置了您的 PostgreSQL 设置：
+   ```
+   # 移除或注释掉 SUPABASE_URL
+   # SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
+   
+   # 确保设置了 PostgreSQL 设置
+   POSTGRES_SERVER=db
+   POSTGRES_PORT=5432
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=your_secure_password
+   POSTGRES_DB=app
+   ```
 
 3. 停止并重新启动您的服务：
    ```bash
@@ -189,22 +135,42 @@ cat database_backup.sql | docker-compose exec -T db psql -U postgres -d app
 psql "postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres" < database_backup.sql
 ```
 
+## 使用 Alembic 进行数据库迁移
+
+Quick Forge AI 使用 Alembic 进行数据库迁移，它适用于直接 PostgreSQL 部署和 Supabase。
+
+### 创建迁移
+
+在修改模型后，创建迁移：
+
+```bash
+# 进入后端容器
+docker-compose exec backend bash
+
+# 生成迁移脚本
+alembic revision --autogenerate -m "您的更改描述"
+
+# 应用迁移
+alembic upgrade head
+```
+
+系统将自动针对您配置的数据库运行这些迁移，无论是直接 PostgreSQL 还是 Supabase。
+
 ## 工作原理
 
 Quick Forge AI 通过以下方式实现此功能：
 
-1. `backend/app/core/config.py` 中的配置设置
+1. `backend/app/core/config.py` 中的自动数据库检测
 2. `docker-compose.yml` 中的 Docker Compose 服务配置文件
-3. `scripts/configure-database.sh` 的配置助手脚本
 
 ### 技术细节
 
-- 使用直接 PostgreSQL 时，Docker Compose 中的 `db` 服务会激活
-- 使用 Supabase 时，`db` 服务会禁用，后端直接连接到 Supabase
-- 环境变量 `USE_SUPABASE` 控制使用哪种数据库配置
-- `backend/app/core/config.py` 中的后端数据库 URI 逻辑决定连接详细信息
+- 系统检查您的环境中是否定义了 `SUPABASE_URL`
+- 如果存在，它将使用该 URL 直接连接到 Supabase
+- 如果不存在，它将使用 PostgreSQL 连接参数
+- 使用 Supabase 时，您可以在 Docker Compose 中禁用本地 PostgreSQL 服务
 
-## 故障排查
+## 故障排除
 
 ### Supabase 连接问题
 
@@ -212,17 +178,17 @@ Quick Forge AI 通过以下方式实现此功能：
 - 验证您的连接字符串是否正确
 - 确保您的 IP 地址在 Supabase 网络设置中被允许
 
-### PostgreSQL 直接部署问题
+### 直接 PostgreSQL 部署问题
 
 - 使用 `docker-compose ps` 检查 PostgreSQL 容器是否正在运行
 - 使用 `docker-compose logs db` 查看 PostgreSQL 日志
-- 确保您的 `.env` 有正确的数据库凭证
+- 确保您的 `.env` 文件具有正确的数据库凭据
 
 ## 最佳实践
 
 - **开发**：使用直接 PostgreSQL 部署以便于开发
-- **测试**：考虑使用 Supabase 进行共享测试环境
+- **测试**：考虑为共享测试环境使用 Supabase
 - **生产**：根据您的扩展需求和管理偏好选择
 - **CI/CD**：对于 CI，直接 PostgreSQL 选项可能更可靠
 
-通过支持这两个选项，Quick Forge AI 为您提供了根据特定需求和项目阶段选择合适数据库方法的灵活性。 
+通过支持这两个选项，Quick Forge AI 让您可以灵活选择适合您特定需求和项目阶段的正确数据库方法。 

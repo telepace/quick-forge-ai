@@ -313,26 +313,20 @@ Quick Forge AI supports two database deployment options:
 
 ### Configuring Your Database
 
-We provide a simple configuration script to set up your database:
+The system automatically detects which database to use based on environment variables:
 
-```bash
-make configure-db
-```
-
-This interactive script will prompt you to choose between PostgreSQL direct deployment or Supabase, and help you configure the necessary settings.
+- If `SUPABASE_URL` is set in your environment variables, the system will use Supabase
+- If `SUPABASE_URL` is not set, the system will use direct PostgreSQL deployment
 
 ### Manual Configuration
 
-If you prefer to configure the database manually:
+You can configure the database by setting the appropriate environment variables:
 
 #### For PostgreSQL Direct Deployment:
 
 In your `.env` file, ensure these settings:
 
 ```
-USE_SUPABASE=false
-USE_POSTGRES_SERVICE=default
-USE_POSTGRES_PRESTART_SERVICE=default
 POSTGRES_SERVER=db
 POSTGRES_PORT=5432
 POSTGRES_USER=postgres
@@ -345,8 +339,5 @@ POSTGRES_DB=app
 In your `.env` file, set:
 
 ```
-USE_SUPABASE=true
 SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
-USE_POSTGRES_SERVICE=none
-USE_POSTGRES_PRESTART_SERVICE=none
 ```

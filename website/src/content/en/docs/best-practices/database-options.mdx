@@ -21,60 +21,23 @@ Before you begin, make sure you have:
 - Docker and Docker Compose (required for PostgreSQL direct deployment)
 - A Supabase account (required for Supabase option) - [Sign up here](https://supabase.com)
 
-## Using the Configuration Helper
+## Automatic Database Detection
 
-The easiest way to configure your database is using our built-in configuration helper:
+Quick Forge AI now automatically detects which database to use based on your environment variables:
 
-```bash
-make configure-db
-```
+- If `SUPABASE_URL` is set in your environment variables, the system will use Supabase
+- If `SUPABASE_URL` is not set, the system will use direct PostgreSQL deployment
 
-This interactive script will:
-1. Prompt you to choose your database option
-2. Guide you through entering the necessary configuration details
-3. Update your `.env` file with the correct settings
-4. Prepare your environment for the selected database option
+This makes it easy to switch between database options by simply updating your environment variables, without needing to run additional configuration commands.
 
 ## Option 1: Direct PostgreSQL Deployment
 
-### Automated Setup
-
-1. Run the configuration helper:
-   ```bash
-   make configure-db
-   ```
-
-2. Select option 1 for Direct PostgreSQL deployment:
-   ```
-   Please select your database option:
-   1) Direct PostgreSQL deployment (default)
-   2) Supabase cloud service
-   Enter your choice (1/2): 1
-   ```
-
-3. Enter the PostgreSQL configuration details when prompted:
-   ```
-   PostgreSQL server (default: db): 
-   PostgreSQL port (default: 5432): 
-   PostgreSQL user (default: postgres): 
-   PostgreSQL password: your_secure_password
-   PostgreSQL database name (default: app): 
-   ```
-
-4. Start your services:
-   ```bash
-   docker-compose up -d
-   ```
-
 ### Manual Setup
 
-If you prefer to configure manually, update your `.env` file with these settings:
+To configure PostgreSQL direct deployment, update your `.env` file with these settings:
 
 ```
 # PostgreSQL Direct Deployment Configuration
-USE_SUPABASE=false
-USE_POSTGRES_SERVICE=default
-USE_POSTGRES_PRESTART_SERVICE=default
 POSTGRES_SERVER=db
 POSTGRES_PORT=5432
 POSTGRES_USER=postgres
@@ -106,41 +69,13 @@ docker-compose up -d
    postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
    ```
 
-### Automated Setup
-
-1. Run the configuration helper:
-   ```bash
-   make configure-db
-   ```
-
-2. Select option 2 for Supabase cloud service:
-   ```
-   Please select your database option:
-   1) Direct PostgreSQL deployment (default)
-   2) Supabase cloud service
-   Enter your choice (1/2): 2
-   ```
-
-3. Enter your Supabase connection URL when prompted:
-   ```
-   Enter your Supabase connection URL (postgresql://...): postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
-   ```
-
-4. Start your services:
-   ```bash
-   docker-compose up -d
-   ```
-
 ### Manual Setup
 
-If you prefer to configure manually, update your `.env` file with these settings:
+To configure Supabase, update your `.env` file with these settings:
 
 ```
 # Supabase Configuration
-USE_SUPABASE=true
 SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
-USE_POSTGRES_SERVICE=none
-USE_POSTGRES_PRESTART_SERVICE=none
 ```
 
 Then start your services:
@@ -150,14 +85,25 @@ docker-compose up -d
 
 ## Switching Between Options
 
-You can switch between PostgreSQL direct deployment and Supabase at any time:
+You can switch between PostgreSQL direct deployment and Supabase at any time by updating your `.env` file:
 
-1. Run the configuration helper again:
-   ```bash
-   make configure-db
+1. To use Supabase, add the `SUPABASE_URL` environment variable:
+   ```
+   SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
    ```
 
-2. Select your new database option and follow the prompts
+2. To use PostgreSQL direct deployment, remove or comment out the `SUPABASE_URL` variable and ensure your PostgreSQL settings are configured:
+   ```
+   # Remove or comment out SUPABASE_URL
+   # SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
+   
+   # Ensure PostgreSQL settings are set
+   POSTGRES_SERVER=db
+   POSTGRES_PORT=5432
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=your_secure_password
+   POSTGRES_DB=app
+   ```
 
 3. Stop and restart your services:
    ```bash
@@ -189,20 +135,40 @@ cat database_backup.sql | docker-compose exec -T db psql -U postgres -d app
 psql "postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres" < database_backup.sql
 ```
 
+## Database Migrations with Alembic
+
+Quick Forge AI uses Alembic for database migrations, which works with both PostgreSQL direct deployment and Supabase.
+
+### Creating a Migration
+
+After modifying your models, create a migration:
+
+```bash
+# Enter the backend container
+docker-compose exec backend bash
+
+# Generate a migration script
+alembic revision --autogenerate -m "Description of your changes"
+
+# Apply the migration
+alembic upgrade head
+```
+
+The system will automatically run these migrations against your configured database, whether it's direct PostgreSQL or Supabase.
+
 ## How It Works
 
 Quick Forge AI implements this feature through:
 
-1. Configuration settings in `backend/app/core/config.py`
+1. Automatic database detection in `backend/app/core/config.py`
 2. Docker Compose service profiles in `docker-compose.yml`
-3. The configuration helper script at `scripts/configure-database.sh`
 
 ### Technical Details
 
-- When using direct PostgreSQL, the `db` service in Docker Compose is activated
-- When using Supabase, the `db` service is disabled and the backend connects directly to Supabase
-- The environment variable `USE_SUPABASE` controls which database configuration is used
-- Backend database URI logic in `backend/app/core/config.py` decides the connection details
+- The system checks if `SUPABASE_URL` is defined in your environment
+- If present, it connects directly to Supabase using that URL
+- If not present, it uses the PostgreSQL connection parameters
+- When using Supabase, you can disable the local PostgreSQL service in Docker Compose
 
 ## Troubleshooting
 

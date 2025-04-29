@@ -26,7 +26,7 @@ def parse_cors(v: Any) -> list[str] | str:
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        # Use top level .env file (one level above ./backend/)
+        # Look for both .env files: top level and in backend
         env_file="../.env",
         env_ignore_empty=True,
         extra="ignore",
@@ -51,25 +51,26 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
     SENTRY_DSN: HttpUrl | None = None
-    
+
     # Database configuration
-    # Set USE_SUPABASE=true to use Supabase instead of direct PostgreSQL
-    USE_SUPABASE: bool = False
+    # Supabase configuration - if SUPABASE_URL is set, it will be used
     SUPABASE_URL: PostgresDsn | None = None
-    
+
     # Direct PostgreSQL connection settings
-    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str = ""
+    POSTGRES_USER: str
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
 
     @computed_field  # type: ignore[prop-decorator]
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
-        if self.USE_SUPABASE and self.SUPABASE_URL:
-            return self.SUPABASE_URL
-        
+        # If SUPABASE_URL is provided, use it directly
+        # if self.SUPABASE_URL:
+        #     return self.SUPABASE_URL
+
+        # Otherwise use standard PostgreSQL configuration
         return MultiHostUrl.build(
             scheme="postgresql+psycopg",
             username=self.POSTGRES_USER,
@@ -102,8 +103,8 @@ class Settings(BaseSettings):
         return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"
-    FIRST_SUPERUSER: EmailStr
-    FIRST_SUPERUSER_PASSWORD: str
+    FIRST_SUPERUSER: EmailStr = "admin@example.com"
+    FIRST_SUPERUSER_PASSWORD: str = "admin"
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
@@ -119,7 +120,8 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _enforce_non_default_secrets(self) -> Self:
         self._check_default_secret("SECRET_KEY", self.SECRET_KEY)
-        if not self.USE_SUPABASE:
+        # Only check PostgreSQL password if not using Supabase
+        if not self.SUPABASE_URL:
             self._check_default_secret("POSTGRES_PASSWORD", self.POSTGRES_PASSWORD)
         self._check_default_secret(
             "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD

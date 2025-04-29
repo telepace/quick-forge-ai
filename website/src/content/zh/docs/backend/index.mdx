@@ -51,50 +51,496 @@ backend/
 └── pyproject.toml       # 项目依赖
 ```
 
-## 开始后端开发
+## 环境设置
 
-要开始开发后端：
+### 使用 uv 设置环境
 
-1. **了解现有代码**：
-   - 熟悉 `app/api/routes/` 中的 API 路由
-   - 查看 `app/db/models/` 中的数据模型
-   - 查看 `app/services/` 中的服务实现
+我们推荐使用 uv 进行 Python 包管理，它比 pip 更快，并提供更好的依赖解析。
 
-2. **设置开发环境**：
-   - 按照[设置说明](/zh/docs/getting-started)操作
-   - 激活 Python 虚拟环境
-   - 使用热重载运行后端：`uvicorn app.main:app --reload`
+```bash
+# 如果您没有 uv，请安装它
+pip install uv
 
-3. **访问 API 文档**：
-   - 运行后，在 `http://localhost:8000/docs` 查看 Swagger UI
-   - OpenAPI 架构位于 `http://localhost:8000/openapi.json`
+# 导航到后端目录
+cd backend
 
-## 主要组件
+# 创建并激活虚拟环境
+uv venv
+source .venv/bin/activate  # Windows上: .venv\Scripts\activate
 
-### API 路由
+# 安装依赖
+uv pip install -r requirements.txt
+```
 
-API 路由按功能区域组织在 `app/api/routes/` 目录中。每个模块包含相关端点。例如：
+### 运行后端服务器
 
-- `users.py` - 用户管理操作
-- `auth.py` - 认证和授权
-- `items.py` - 项目 CRUD 操作
+```bash
+# 在虚拟环境已激活的情况下
+uvicorn app.main:app --reload
+```
 
-### 依赖注入
+这将启动开发服务器，并在代码更改时自动重新加载。
 
-FastAPI 的依赖注入系统被广泛用于：
-- 注入数据库会话
-- 验证认证和权限
-- 共享通用功能
+## 数据库配置
 
-依赖项在 `app/api/deps.py` 中定义。
+Quick Forge AI 支持两种数据库配置选项：
 
-### 数据库模型
+1. **直接 PostgreSQL 部署**：使用 Docker 部署的 PostgreSQL 数据库
+2. **Supabase**：使用 Supabase 管理的 PostgreSQL 数据库
 
-数据模型使用 SQLModel 定义，它结合了 SQLAlchemy 和 Pydantic 的优点。模型位于 `app/db/models/` 中。
+### 自动数据库检测
 
-### 业务逻辑
+最新版本实现了自动数据库检测功能，系统会根据您的环境变量自动选择使用哪种数据库：
 
-复杂的业务逻辑被分离到 `app/services/` 中的服务模块，以保持路由处理程序的简洁，并专注于 HTTP 关注点。
+- 如果设置了 `SUPABASE_URL` 环境变量，系统将使用 Supabase
+- 如果未设置 `SUPABASE_URL`，系统将使用直接 PostgreSQL 配置
+
+这种设计简化了配置过程，无需额外的命令或脚本即可切换数据库。
+
+### 配置 PostgreSQL
+
+要使用直接 PostgreSQL 部署，在 `.env` 文件中设置以下环境变量：
+
+```
+# PostgreSQL 配置
+POSTGRES_SERVER=db
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password
+POSTGRES_DB=app
+```
+
+### 配置 Supabase
+
+要使用 Supabase，只需在 `.env` 文件中设置 Supabase 连接 URL：
+
+```
+# Supabase 配置
+SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
+```
+
+**注意**：如果遇到 `ModuleNotFoundError: No module named 'psycopg2'` 错误，您需要修改 Supabase URL 的格式。将协议从 `postgresql://` 修改为 `postgresql+psycopg://`，这样 SQLAlchemy 就会使用 psycopg 驱动而不是 psycopg2：
+
+```
+# 修改后的 Supabase 配置
+SUPABASE_URL=postgresql+psycopg://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
+```
+
+### Supabase 数据库迁移与初始化
+
+当使用 Supabase 作为数据库后端时，数据库迁移和初始化流程与标准 PostgreSQL 基本相同，但有一些注意事项：
+
+#### 初始迁移
+
+首次连接到 Supabase 数据库时，您需要运行初始迁移来创建表结构：
+
+```bash
+# 确保您的 .env 文件中已正确配置 SUPABASE_URL
+cd backend
+alembic upgrade head
+```
+
+这将应用所有迁移到 Supabase 数据库。
+
+#### 权限管理
+
+Supabase 有自己的权限系统（Row Level Security），如果您需要与 Supabase 的权限系统集成，需要额外的配置：
+
+1. 登录 Supabase 管理控制台
+2. 导航到 SQL 编辑器
+3. 为相关表创建适当的 RLS 策略
+
+#### 同步与冲突处理
+
+当多个开发人员或服务对同一个 Supabase 数据库进行修改时，可能会出现迁移冲突。解决方法：
+
+```bash
+# 查看当前迁移状态
+alembic current
+
+# 如果发现冲突，先编辑冲突的迁移文件
+# 然后再次运行迁移
+alembic upgrade head
+```
+
+#### 本地开发与生产环境分离
+
+建议为开发和生产环境使用不同的 Supabase 项目：
+
+```bash
+# 开发环境 .env 文件
+SUPABASE_URL=postgresql+psycopg://postgres:dev-password@dev-project.supabase.co:5432/postgres
+
+# 生产环境 .env 文件
+SUPABASE_URL=postgresql+psycopg://postgres:prod-password@prod-project.supabase.co:5432/postgres
+```
+
+### 数据库连接原理
+
+数据库连接配置在 `app/core/config.py` 中处理：
+
+```python
+@computed_field
+@property
+def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+    # 如果提供了 SUPABASE_URL，直接使用它
+    if self.SUPABASE_URL:
+        return self.SUPABASE_URL
+    
+    # 否则使用标准 PostgreSQL 配置
+    return MultiHostUrl.build(
+        scheme="postgresql+psycopg",
+        username=self.POSTGRES_USER,
+        password=self.POSTGRES_PASSWORD,
+        host=self.POSTGRES_SERVER,
+        port=self.POSTGRES_PORT,
+        path=self.POSTGRES_DB,
+    )
+```
+
+## 数据库迁移与 Alembic
+
+Quick Forge AI 使用 Alembic 进行数据库迁移管理。Alembic 可以跟踪模型变更并应用到数据库，确保数据库结构与代码保持同步。
+
+### 运行现有迁移
+
+首次启动应用程序或部署到新环境时，需要运行迁移以创建/更新数据库结构：
+
+```bash
+# 进入后端容器
+docker compose exec backend bash
+
+# 运行迁移
+alembic upgrade head
+```
+
+这将应用所有待处理的迁移到您配置的数据库（无论是 PostgreSQL 还是 Supabase）。
+
+### 创建新迁移
+
+当您修改数据模型后，需要创建新的迁移脚本：
+
+```bash
+# 进入后端容器
+docker compose exec backend bash
+
+# 创建新的迁移脚本
+alembic revision --autogenerate -m "描述您的更改"
+```
+
+Alembic 将检测模型变更并自动生成迁移脚本。生成的脚本位于 `app/alembic/versions/` 目录中。
+
+### 回滚迁移
+
+如果需要回滚最后一次迁移：
+
+```bash
+alembic downgrade -1
+```
+
+要回滚到特定版本：
+
+```bash
+alembic downgrade <revision_id>
+```
+
+## 模型定义
+
+Quick Forge AI 使用 SQLModel 定义数据模型，它结合了 SQLAlchemy 的功能和 Pydantic 的验证能力。
+
+### 基本模型示例
+
+```python
+from typing import Optional
+from sqlmodel import Field, SQLModel
+from uuid import UUID, uuid4
+
+class User(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    email: str = Field(index=True, unique=True)
+    hashed_password: str
+    full_name: Optional[str] = None
+    is_active: bool = True
+    is_superuser: bool = False
+```
+
+### 关系模型
+
+```python
+from typing import List, Optional
+from sqlmodel import Field, Relationship, SQLModel
+from uuid import UUID, uuid4
+
+class Item(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    title: str
+    description: Optional[str] = None
+    owner_id: UUID = Field(foreign_key="user.id")
+    owner: "User" = Relationship(back_populates="items")
+
+# 更新 User 模型以包含反向关系
+class User(SQLModel, table=True):
+    # ... 其他字段 ...
+    items: List["Item"] = Relationship(back_populates="owner")
+```
+
+## 依赖注入
+
+FastAPI 的依赖注入系统在 Quick Forge AI 中广泛使用，用于提供数据库会话、验证用户和处理权限。
+
+### 数据库会话依赖
+
+```python
+from fastapi import Depends
+from sqlmodel import Session
+from app.db.session import get_db
+
+def get_items(db: Session = Depends(get_db)):
+    # 使用数据库会话执行操作
+    return db.query(Item).all()
+```
+
+### 当前用户依赖
+
+```python
+from fastapi import Depends, HTTPException, status
+from app.api import deps
+
+def user_items(
+    current_user: User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db)
+):
+    items = db.query(Item).filter(Item.owner_id == current_user.id).all()
+    return items
+```
+
+## API 端点开发
+
+### 创建新路由
+
+1. 在 `app/api/routes/` 目录中创建新的路由模块：
+
+```python
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from app.api import deps
+from app.models import MyModel, MyModelCreate
+
+router = APIRouter()
+
+@router.post("/my-models/", response_model=MyModel)
+def create_my_model(
+    my_model: MyModelCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    db_obj = MyModel.from_orm(my_model)
+    db_obj.owner_id = current_user.id
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+@router.get("/my-models/", response_model=List[MyModel])
+def read_my_models(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    query = select(MyModel).where(MyModel.owner_id == current_user.id)
+    query = query.offset(skip).limit(limit)
+    return db.exec(query).all()
+```
+
+2. 在 `app/api/api.py` 中注册路由：
+
+```python
+from fastapi import APIRouter
+from app.api.routes import users, login, items, my_models
+
+api_router = APIRouter()
+api_router.include_router(login.router, tags=["login"])
+api_router.include_router(users.router, prefix="/users", tags=["users"])
+api_router.include_router(items.router, prefix="/items", tags=["items"])
+api_router.include_router(my_models.router, tags=["my-models"])
+```
+
+## 单元测试
+
+Quick Forge AI 使用 pytest 进行单元测试。
+
+### 运行测试
+
+```bash
+# 运行所有测试
+cd backend
+pytest
+
+# 运行带有覆盖率报告的测试
+pytest --cov=app
+```
+
+### 编写测试
+
+测试文件位于 `backend/tests/` 目录中。测试数据库使用 SQLite 内存数据库。
+
+```python
+import pytest
+from sqlmodel import Session, SQLModel, create_engine
+from sqlalchemy.pool import StaticPool
+
+from app.db.models.user import User
+from app.core.security import get_password_hash
+
+@pytest.fixture
+def db_session():
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    SQLModel.metadata.create_all(engine)
+    with Session(engine) as session:
+        yield session
+
+def test_create_user(db_session):
+    user = User(
+        email="test@example.com",
+        hashed_password=get_password_hash("password"),
+        full_name="Test User"
+    )
+    db_session.add(user)
+    db_session.commit()
+    
+    stored_user = db_session.query(User).filter(User.email == "test@example.com").first()
+    assert stored_user is not None
+    assert stored_user.email == "test@example.com"
+```
+
+## 代码质量工具
+
+Quick Forge AI 使用多种工具确保代码质量：
+
+### Ruff
+
+用于代码检查和格式化：
+
+```bash
+# 检查代码
+ruff check .
+
+# 格式化代码
+ruff format .
+```
+
+### MyPy
+
+用于类型检查：
+
+```bash
+mypy .
+```
+
+### Pre-commit 钩子
+
+使用 pre-commit 钩子在提交代码前自动运行检查：
+
+```bash
+# 安装 pre-commit 钩子
+pre-commit install
+
+# 运行所有 pre-commit 检查
+pre-commit run --all-files
+```
+
+## API 文档
+
+FastAPI 自动为您的 API 生成交互式文档：
+
+- Swagger UI：http://localhost:8000/docs
+- ReDoc：http://localhost:8000/redoc
+
+文档会根据您的端点定义、Pydantic 模型和类型提示自动更新。
+
+## 常见场景和最佳实践
+
+### 处理环境变量
+
+所有配置通过 `app/core/config.py` 中的 `Settings` 类处理：
+
+```python
+from pydantic import PostgresDsn, computed_field
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    # 使用 .env 文件中的环境变量
+    model_config = SettingsConfigDict(
+        env_file="../.env",
+        env_ignore_empty=True,
+    )
+    
+    # 数据库配置
+    SUPABASE_URL: Optional[PostgresDsn] = None
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    # ... 其他设置 ...
+```
+
+### 实现异步操作
+
+FastAPI 支持异步操作，适用于 I/O 密集型任务：
+
+```python
+@router.get("/async-items/")
+async def read_items_async():
+    # 异步执行外部 API 调用
+    results = await external_api_client.get_items()
+    return results
+```
+
+### 实现后台任务
+
+```python
+from fastapi import BackgroundTasks
+
+@router.post("/send-notification/")
+def send_notification(
+    email: str,
+    background_tasks: BackgroundTasks
+):
+    background_tasks.add_task(send_email_notification, email=email)
+    return {"message": "Notification scheduled"}
+```
+
+## 扩展与集成
+
+### 集成 AI 服务
+
+```python
+from app.services.ai_service import AIService
+
+ai_service = AIService()
+
+@router.post("/analyze-text/")
+def analyze_text(text: str):
+    result = ai_service.analyze(text)
+    return {"analysis": result}
+```
+
+### 整合第三方 API
+
+```python
+from app.services.external_api import ExternalAPIClient
+
+client = ExternalAPIClient()
+
+@router.get("/external-data/")
+async def get_external_data():
+    data = await client.fetch_data()
+    return {"data": data}
+```
 
 ## 下一步
 
@@ -104,4 +550,4 @@ FastAPI 的依赖注入系统被广泛用于：
 - [数据库模型](/zh/docs/backend/database)
 - [API 端点](/zh/docs/backend/api-endpoints)
 - [测试](/zh/docs/backend/testing)
-- [电子邮件集成](/zh/docs/backend/email-integration) 
+- [电子邮件集成](/zh/docs/backend/email-integration)

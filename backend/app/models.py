@@ -2,11 +2,14 @@ import uuid
 
 from pydantic import EmailStr, field_validator
 from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy import String
 
 
 # Shared properties
 class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True, index=True, max_length=255)
+    email: EmailStr = Field(
+        unique=True, index=True, max_length=255, sa_type=String(255)
+    )
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)

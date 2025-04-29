@@ -1,11 +1,11 @@
 ---
 title: 前端开发
-description: Quick Forge AI 中 TypeScript/React 前端架构概述。
+description: Quick Forge AI 中 Next.js 和 React 前端架构概述。
 ---
 
 # 前端开发
 
-Quick Forge AI 前端使用 TypeScript 和 React 构建，提供现代、类型安全的用户界面。本节涵盖前端架构、关键组件以及如何根据您的需求扩展前端。
+Quick Forge AI 前端使用 Next.js、TypeScript 和 React 构建，提供现代、类型安全的用户界面。本节涵盖前端架构、关键组件以及如何根据您的需求扩展前端。
 
 ## 架构概述
 
@@ -19,98 +19,491 @@ Quick Forge AI 前端使用 TypeScript 和 React 构建，提供现代、类型�
 
 ## 关键技术
 
+- **Next.js**：React 框架，提供服务器端渲染、静态生成和 API 路由
 - **TypeScript**：JavaScript 的类型安全
 - **React**：UI 组件库
-- **Chakra UI**：响应式设计的组件库
-- **React Router**：客户端路由
-- **React Query**：数据获取和缓存
-- **Vite**：快速构建工具和开发服务器
+- **Tailwind CSS**：实用优先的 CSS 框架
+- **Zustand**：轻量级状态管理
 - **Jest/Testing Library**：测试框架
+
+## 环境设置
+
+要设置前端开发环境：
+
+```bash
+# 导航到前端目录
+cd frontend
+
+# 安装依赖
+npm install  # 或 pnpm install 或 yarn
+
+# 启动开发服务器
+npm run dev  # 或 pnpm dev 或 yarn dev
+```
+
+这将在 http://localhost:3000 启动带有热重载功能的 Next.js 开发服务器。
 
 ## 目录结构
 
+Quick Forge AI 的前端遵循 Next.js App Router 结构：
+
 ```
 frontend/
+├── public/                # 静态文件
 ├── src/
-│   ├── components/     # 可重用的 UI 组件
-│   │   ├── common/     # 共享组件
-│   │   ├── layout/     # 布局组件
-│   │   └── forms/      # 表单组件
-│   ├── hooks/          # 自定义 React 钩子
-│   ├── pages/          # 页面组件
-│   ├── services/       # API 客户端和服务
-│   │   ├── api.ts      # 自动生成的 API 客户端
-│   │   └── auth.ts     # 认证服务
-│   ├── types/          # TypeScript 类型定义
-│   ├── utils/          # 实用函数
-│   ├── App.tsx         # 根组件
-│   └── main.tsx        # 入口点
-├── tests/              # 测试文件
-│   ├── components/     # 组件测试
-│   └── utils/          # 实用工具测试
-├── public/             # 静态资源
-└── vite.config.ts      # Vite 配置
+│   ├── app/               # Next.js App Router
+│   │   ├── components/    # React 组件
+│   │   ├── stores/        # Zustand 状态管理
+│   │   ├── types/         # TypeScript 类型
+│   │   ├── globals.css    # 全局样式
+│   │   ├── layout.tsx     # 根布局
+│   │   └── page.tsx       # 首页
+│   ├── client/            # 客户端逻辑
+│   │   ├── core/          # 核心逻辑
+│   │   └── api/           # API 集成
+│   ├── components/        # 可重用的 UI 组件
+│   │   ├── Common/        # 共享组件
+│   │   ├── Items/         # 项目相关组件
+│   │   └── ui/            # UI 基础组件
+│   └── hooks/             # 自定义 React 钩子
+├── next.config.mjs        # Next.js 配置
+├── package.json           # 依赖和脚本
+├── tailwind.config.ts     # Tailwind CSS 配置
+└── tsconfig.json          # TypeScript 配置
 ```
 
-## 开始前端开发
+## 关键特性
 
-要开始开发前端：
+### 组件
 
-1. **了解现有代码**：
-   - 探索 `src/components/` 中的组件结构
-   - 查看 `src/pages/` 中的页面组件
-   - 查看 `src/services/` 中的 API 集成
+Quick Forge AI 包含多种预构建组件，分为几个关键类别：
 
-2. **设置开发环境**：
-   - 按照[设置说明](/zh/docs/getting-started)操作
-   - 运行前端开发服务器：`cd frontend && pnpm dev`
+- **UI 组件**：基础 UI 元素，如按钮、卡片、表单控件
+- **布局组件**：页面布局、导航栏、侧边栏
+- **功能组件**：特定功能相关的组件，如用户设置、认证表单
 
-3. **访问应用程序**：
-   - 运行后，在 `http://localhost:3000` 访问应用程序
-   - 后端也应该运行以使 API 调用正常工作
+示例组件：
 
-## 主要组件
+```tsx
+// src/components/ui/Button.tsx
+import React from 'react';
 
-### UI 组件
+interface ButtonProps {
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  onClick?: () => void;
+}
 
-UI 由 `src/components/` 中组织的可重用组件构建。这些包括：
-
-- **通用组件**：按钮、卡片、模态框等
-- **布局组件**：页面布局、导航、侧边栏
-- **表单组件**：输入字段、表单、验证
-- **功能组件**：与特定功能相关联的组件
-
-### 路由
-
-路由使用 `src/App.tsx` 中的 React Router 处理，定义：
-
-- 公共路由（任何人都可访问）
-- 受保护路由（需要认证）
-- 布局路由（用于一致的页面结构）
+export function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  onClick,
+}: ButtonProps) {
+  const baseStyles = 'rounded font-medium transition-colors';
+  
+  const variantStyles = {
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
+    outline: 'border border-gray-300 bg-transparent hover:bg-gray-100',
+  };
+  
+  const sizeStyles = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2',
+    lg: 'px-5 py-2.5 text-lg',
+  };
+  
+  return (
+    <button
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]}`}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+```
 
 ### 状态管理
 
-状态使用以下组合管理：
+Quick Forge AI 使用 Zustand 进行状态管理，这是一个轻量级且易于使用的状态管理库。
 
-- React 内置的 `useState` 和 `useReducer` 用于本地状态
-- Context API 用于组件间共享状态
-- React Query 用于服务器状态（API 数据）
+**示例 Zustand Store：**
 
-### API 集成
+```tsx
+// src/app/stores/app-store.ts
+import { create } from 'zustand';
 
-前端通过以下方式与后端通信：
+interface AppState {
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
 
-- 基于 OpenAPI 架构的自动生成 TypeScript API 客户端
-- `src/services/` 中的自定义服务模块
-- 使用 JWT 令牌的认证处理
+export const useAppStore = create<AppState>((set) => ({
+  isLoading: false,
+  setIsLoading: (isLoading: boolean) => set({ isLoading }),
+  darkMode: false,
+  toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
+}));
+```
 
-### 主题
+**在组件中使用 Store：**
 
-应用程序使用 Chakra UI 的主题系统支持深色/浅色模式，具有：
+```tsx
+import { useAppStore } from '../stores/app-store';
 
-- 一致的配色方案
-- 适用于所有屏幕尺寸的响应式设计
-- 遵循 WCAG 指南的无障碍组件
+function LoadingIndicator() {
+  const isLoading = useAppStore((state) => state.isLoading);
+  
+  if (!isLoading) return null;
+  
+  return <div className="spinner">Loading...</div>;
+}
+```
+
+### TypeScript 类型
+
+项目使用 TypeScript 提供强类型支持。常见类型定义位于 `src/app/types` 目录中。
+
+```tsx
+// src/app/types/item.ts
+export interface Item {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  ownerId: string;
+}
+
+export interface ItemCreate {
+  title: string;
+  description: string;
+}
+
+export interface ItemUpdate {
+  title?: string;
+  description?: string;
+}
+```
+
+### 样式设计
+
+Quick Forge AI 使用 Tailwind CSS 进行样式设计，这是一个实用优先的 CSS 框架。
+
+**Tailwind 使用示例：**
+
+```tsx
+<div className="flex flex-col p-4 m-2 rounded-lg shadow bg-white dark:bg-gray-800">
+  <h2 className="text-xl font-bold text-gray-900 dark:text-white">卡片标题</h2>
+  <p className="mt-2 text-gray-600 dark:text-gray-300">卡片内容</p>
+  <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+    点击按钮
+  </button>
+</div>
+```
+
+通过 `tailwind.config.ts` 自定义 Tailwind：
+
+```ts
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: "#0070f3",
+        secondary: "#1f2937",
+      },
+      fontSize: {
+        '2xs': '0.625rem',
+      },
+      spacing: {
+        '18': '4.5rem',
+      }
+    },
+  },
+  plugins: [],
+};
+
+export default config;
+```
+
+### API 通信
+
+前端与后端 API 通信的示例：
+
+```tsx
+// 在组件中获取数据
+import { useState, useEffect } from 'react';
+
+function ApiExample() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const backendHost = process.env.NEXT_PUBLIC_BACKEND_HOST || 'localhost';
+        const backendPort = process.env.NEXT_PUBLIC_BACKEND_PORT || '8000';
+        const response = await fetch(`http://${backendHost}:${backendPort}/api/example`);
+
+        if (!response.ok) {
+          throw new Error(`API 请求失败，状态码 ${response.status}`);
+        }
+
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        console.error('获取 API 示例时出错:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div>加载中...</div>;
+  if (error) return <div>错误: {error}</div>;
+  
+  return (
+    <div>
+      <h2>API 示例</h2>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+}
+```
+
+### 添加新页面
+
+在 Next.js App Router 中创建新页面非常简单：
+
+1. 在 `src/app` 下创建一个新目录
+2. 在该目录中添加 `page.tsx` 文件
+
+**示例：创建"关于我们"页面**
+
+```tsx
+// src/app/about/page.tsx
+export default function AboutPage() {
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-2xl font-bold">关于我们</h1>
+      <p className="mt-4">这是关于我们页面。</p>
+    </div>
+  );
+}
+```
+
+要添加带有布局的页面：
+
+```tsx
+// src/app/dashboard/layout.tsx
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex">
+      <aside className="w-64 bg-gray-100 min-h-screen p-4">
+        {/* 侧边栏导航 */}
+        <nav>
+          <ul>
+            <li>仪表盘</li>
+            <li>项目</li>
+            <li>设置</li>
+          </ul>
+        </nav>
+      </aside>
+      <main className="flex-1 p-6">
+        {children}
+      </main>
+    </div>
+  );
+}
+
+// src/app/dashboard/page.tsx
+export default function DashboardPage() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">仪表盘</h1>
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* 仪表盘内容 */}
+      </div>
+    </div>
+  );
+}
+```
+
+### 构建生产版本
+
+要构建前端的生产版本：
+
+```bash
+npm run build
+```
+
+构建后的文件将位于 `.next` 目录中。
+
+要在本地预览生产构建：
+
+```bash
+npm run start
+```
+
+## 代码质量
+
+Quick Forge AI 使用多种工具确保代码质量：
+
+### ESLint
+
+用于 JavaScript/TypeScript 代码检查：
+
+```bash
+# 运行 linting
+npm run lint
+```
+
+### TypeScript 类型检查
+
+```bash
+# 运行类型检查
+npm run typecheck
+```
+
+## 测试
+
+Quick Forge AI 使用 Jest 和 React Testing Library 进行测试。
+
+### 运行测试
+
+```bash
+# 运行所有测试
+npm test
+
+# 运行带有监视模式的测试
+npm test -- --watch
+```
+
+### 编写组件测试
+
+```tsx
+// src/components/ui/Button.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Button } from './Button';
+
+describe('Button', () => {
+  it('renders correctly', () => {
+    render(<Button>点击我</Button>);
+    expect(screen.getByText('点击我')).toBeInTheDocument();
+  });
+
+  it('calls onClick when clicked', () => {
+    const handleClick = jest.fn();
+    render(<Button onClick={handleClick}>点击我</Button>);
+    fireEvent.click(screen.getByText('点击我'));
+    expect(handleClick).toHaveBeenCalled();
+  });
+
+  it('applies the correct variant classes', () => {
+    const { rerender } = render(<Button variant="primary">按钮</Button>);
+    expect(screen.getByText('按钮')).toHaveClass('bg-blue-600');
+
+    rerender(<Button variant="secondary">按钮</Button>);
+    expect(screen.getByText('按钮')).toHaveClass('bg-gray-200');
+  });
+});
+```
+
+## 自定义模板
+
+### 修改主题和样式
+
+通过编辑 `tailwind.config.ts` 文件自定义主题：
+
+```tsx
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9",
+          600: "#0284c7",
+          700: "#0369a1",
+          800: "#075985",
+          900: "#0c4a6e",
+        },
+        secondary: {
+          50: "#f8fafc",
+          // ... 更多色调
+          900: "#0f172a",
+        },
+      },
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'],
+        serif: ['Merriweather', 'serif'],
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+  ],
+};
+export default config;
+```
+
+### 添加插件和库
+
+在 `package.json` 中添加新的依赖：
+
+```bash
+npm install --save react-icons @headlessui/react framer-motion
+```
+
+然后在组件中使用：
+
+```tsx
+import { motion } from 'framer-motion';
+import { HiOutlineShoppingCart } from 'react-icons/hi';
+
+export function AnimatedCart() {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      className="p-2 bg-white rounded-full shadow"
+    >
+      <HiOutlineShoppingCart className="w-6 h-6 text-primary-600" />
+    </motion.div>
+  );
+}
+```
 
 ## 下一步
 
