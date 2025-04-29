@@ -3,7 +3,7 @@ import { TitleBadge } from '@/components/TitleBadge'
 
 export default {
   index: {
-    type: 'page',
+    title: 'Home',
     display: 'hidden',
     theme: {
       timestamp: false,
@@ -12,16 +12,17 @@ export default {
     },
   },
   introduction: {
-    type: 'page',
     title: 'This is Introduction',
     theme: {
       navbar: true,
       toc: false,
     },
   },
+  blog: {
+    title: '📝 Blog',
+  },
   docs: {
     title: '📦 Some Examples',
-    type: 'page',
   },
   upgrade: {
     title: (
@@ -30,6 +31,5 @@ export default {
         <TitleBadge />
       </span>
     ),
-    type: 'page',
   },
 } satisfies MetaRecord

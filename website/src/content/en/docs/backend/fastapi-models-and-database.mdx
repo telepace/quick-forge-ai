@@ -1,0 +1,244 @@
+---
+title: 'FastAPI Models and Database'
+description: 'Explore database models, configuration, and migration system in the Full-Stack FastAPI Template'
+---
+
+# FastAPI Models and Database
+
+This document describes the database models, configuration, and migration system used in the Full-Stack FastAPI Template. It covers how SQLModel is used to define both database schema and API data structures, PostgreSQL configuration, and how Alembic handles database migrations.
+
+## Database Stack Overview
+
+The template uses the following database technology stack:
+
+* **PostgreSQL**: Primary relational database
+* **SQLModel**: ORM (Object-Relational Mapping) library that combines SQLAlchemy Core and Pydantic
+* **Alembic**: Database migration tool
+* **Psycopg**: PostgreSQL adapter for Python
+
+```
+API Layer
+  ↓
+Database Layer
+  ↓
+DB Session
+  ↓
+PostgreSQL Database
+  ↑
+SQLModel ORM
+  ↑
+Alembic Migrations
+  ↑
+CRUD Operations
+  ↑
+FastAPI Application
+  ↑
+API Routes
+  ↑
+Dependency Injection
+```
+
+## Data Models
+
+The application uses SQLModel to define its data models. SQLModel combines Pydantic for validation and SQLAlchemy for database ORM functionality, allowing models to serve both as database schema definitions and API data structures.
+
+### Entity Relationship Diagram
+
+```
+User
+  uuid id (PK)
+  string email (unique, indexed)
+  string hashed_password
+  boolean is_active (default: true)
+  boolean is_superuser (default: false)
+  string full_name (optional)
+    ↓
+    ↓ has many
+    ↓
+Item
+  uuid id (PK)
+  string title
+  string description (optional)
+  uuid owner_id (FK, CASCADE delete)
+```
+
+### Model Structure and Inheritance
+
+The template uses a hierarchical model structure that separates concerns between database tables, API input validation, and API output schemas:
+
+```
+        "table=True"             "table=True"
+          ↓                         ↓
+UserBase                      ItemBase
++email: EmailStr              +title: str
++is_active: bool              +description: str|None
++is_superuser: bool              ↓
++full_name: str|None             ↓
+     ↓                           ↓
+     ↓                           ↓
+User                          Item
++id: uuid.UUID                +id: uuid.UUID
++hashed_password: str         +owner_id: uuid.UUID
++items: list[Item]            +owner: User|None
+     ↓     ↑                     ↓
+     ↓     ↑                     ↓
+UserCreate                    ItemCreate
++password: str                    ↓
+     ↓                           ↓
+     ↓                           ↓
+UserPublic                    ItemPublic
++id: uuid.UUID                +id: uuid.UUID
+                              +owner_id: uuid.UUID
+```
+
+## Model Types and Patterns
+
+The application follows a structured pattern for each entity, with distinct model types serving different purposes:
+
+| Model Type | Purpose | Examples |
+| --- | --- | --- |
+| Base models | Define common attributes | `UserBase`, `ItemBase` |
+| Table models | Define database tables (with `table=True`) | `User`, `Item` |
+| Create models | Validate data for creation operations | `UserCreate`, `UserRegister`, `ItemCreate` |
+| Update models | Validate data for update operations | `UserUpdate`, `ItemUpdate` |
+| Public models | Format response data returned by API | `UserPublic`, `ItemPublic` |
+| Collection models | Format list responses with pagination | `UsersPublic`, `ItemsPublic` |
+
+### User Models
+
+The User models include:
+
+- UserBase (common fields)
+- UserCreate (creation with password)
+- User (database table)
+- UserPublic (API responses)
+- UserUpdate (admin updates)
+- UsersPublic (paginated list)
+- UserRegister (public registration)
+- UserUpdateMe (self-service updates)
+
+### Item Models
+
+The Item models include:
+
+- ItemBase (common fields)
+- ItemCreate (creation)
+- Item (database table)
+- ItemPublic (API responses)
+- ItemUpdate (updates)
+- ItemsPublic (paginated list)
+
+## Key Design Features
+
+### UUID Primary Keys
+
+The template uses UUID primary keys for all entities rather than sequential integers, as shown in this excerpt from the `User` model:
+
+```python
+class User(UserBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    hashed_password: str
+    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+```
+
+### Cascade Delete Relationships
+
+The models implement cascade deletion, ensuring that when a parent record is deleted, all related records are automatically removed:
+
+1. Through SQLModel relationship definition:
+```python
+items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+```
+
+2. Through database foreign key constraints:
+```python
+owner_id: uuid.UUID = Field(
+    foreign_key="user.id",
+    nullable=False,
+    ondelete="CASCADE"
+)
+```
+
+### Field Validation
+
+The models use Pydantic field validation to enforce constraints:
+
+1. Length constraints:
+   * Email: max 255 characters
+   * Password: min 8, max 40 characters
+   * Full name: max 255 characters
+   * Item title: min 1, max 255 characters
+   * Item description: max 255 characters
+
+2. Type constraints:
+   * Email fields use `EmailStr` for format validation
+   * UUIDs for IDs and relationships
+
+## Database Configuration
+
+### Connection Setup
+
+The database connection is configured through environment variables and established using SQLModel's `create_engine`:
+
+```python
+from sqlmodel import Session, create_engine, select
+from app.core.config import settings
+
+engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+```
+
+### Database Initialization
+
+The template includes a function to initialize the database with a first superuser:
+
+```python
+def init_db(session: Session) -> None:
+    # Check if superuser exists
+    user = session.exec(
+        select(User).where(User.email == settings.FIRST_SUPERUSER)
+    ).first()
+    if not user:
+        # Create first superuser if not exists
+        user_in = UserCreate(
+            email=settings.FIRST_SUPERUSER,
+            password=settings.FIRST_SUPERUSER_PASSWORD,
+            is_superuser=True,
+        )
+        user = crud.create_user(session=session, user_create=user_in)
+```
+
+## Migrations with Alembic
+
+The template uses Alembic to manage database migrations. Migrations are stored in the `backend/app/alembic/versions/` directory.
+
+### Example Migrations
+
+1. Adding field length constraints:
+```python
+def upgrade():
+    # Adjust the length of the email field in the User table
+    op.alter_column('user', 'email', existing_type=sa.String(), type_=sa.String(length=255), existing_nullable=False)
+    # (Similar operations for other fields)
+```
+
+2. Setting up cascade delete:
+```python
+def upgrade():
+    # Make owner_id not nullable
+    op.alter_column('item', 'owner_id', existing_type=sa.UUID(), nullable=False)
+    # Add cascade delete constraint
+    op.drop_constraint('item_owner_id_fkey', 'item', type_='foreignkey')
+    op.create_foreign_key(None, 'item', 'user', ['owner_id'], ['id'], ondelete='CASCADE')
+```
+
+## Model Usage Patterns
+
+The models in this template follow several patterns that help maintain separation of concerns:
+
+1. **Input/Output Separation**: Different models for database representation, input validation, and API responses
+2. **Shared Base Models**: Common fields are defined in base classes which other models inherit from
+3. **Table vs Non-Table Models**: Only models that need to be stored in the database have `table=True`
+4. **Nullable vs Optional**: Fields that can be omitted in updates use `field: type | None` pattern
+5. **Pagination Wrappers**: Collection responses include both items and count for pagination
+
+These patterns help ensure type safety, proper validation, and clean API contracts throughout the application. 

@@ -1,0 +1,201 @@
+---
+title: Features and Release Notes
+description: An overview of the main features of Quick Forge AI and a record of important changes across versions.
+---
+
+# Features and Release Notes
+
+This document provides a comprehensive overview of the main features of Quick Forge AI and tracks important changes across versions. It aims to give developers a clear understanding of the template's capabilities and how they evolve over time.
+
+For a detailed overview of the system architecture, please refer to the [Backend Development](/en/docs/backend) and [Frontend Development](/en/docs/frontend) pages.
+
+## Core Features
+
+Quick Forge AI combines a FastAPI backend with a React frontend to provide a complete solution for building modern web applications. The template includes:
+
+### Backend Features
+
+| Feature | Description | Implementation |
+| --- | --- | --- |
+| FastAPI Application | High-performance API framework with auto-documentation | `backend/app/main.py` |
+| SQLModel ORM | Type-safe database ORM using SQLAlchemy core | `backend/app/models/` |
+| JWT Authentication | Secure token-based authentication | `backend/app/core/security.py` |
+| RESTful API Routes | Structured endpoints for users, items, login, and utilities | `backend/app/api/routes/` |
+| PostgreSQL Database | Robust relational database | `backend/app/core/db.py` |
+| Environment Configuration | Settings management via environment variables | `backend/app/core/config.py` |
+| Database Migrations | Schema versioning with Alembic | `backend/app/alembic/` |
+| Email System | Templated email sending functionality | `backend/app/utils/email.py` |
+| Dependency Injection | Simplified request handling using FastAPI dependencies | `backend/app/dependencies/` |
+| Health Checks | System status monitoring endpoints | `backend/app/api/routes/utils.py` |
+| Pagination | Support for paginated data responses | `backend/app/api/routes/items.py` |
+| UUID Primary Keys | Using UUIDs instead of sequential integers for improved security | `backend/app/models/` |
+
+### Frontend Features
+
+| Feature | Description | Implementation |
+| --- | --- | --- |
+| React Application | Component-based UI with TypeScript | `frontend/src/main.tsx` |
+| Chakra UI | Accessible component library with theming capabilities | `frontend/src/theme/` |
+| TanStack Query | Data fetching and cache management | `frontend/src/providers/query.tsx` |
+| TanStack Router | Type-safe routing system | `frontend/src/routes/` |
+| OpenAPI Client | Auto-generated API client from backend specification | `frontend/src/client/` |
+| Authentication | Complete login, registration, and password reset flows | `frontend/src/hooks/auth.ts` |
+| Dark Mode | Built-in theme switching support | `frontend/src/theme/` |
+| Form Validation | Input validation and error handling | `frontend/src/components/forms/` |
+| Responsive Design | Mobile-friendly layouts and components | `frontend/src/components/` |
+| Suspense Integration | Loading states using React Suspense | Multiple components |
+
+### Development and Deployment Features
+
+| Feature | Description | Implementation |
+| --- | --- | --- |
+| Docker Compose | Container orchestration for all services | `docker-compose.yml` |
+| Traefik | Reverse proxy for routing and SSL termination | `traefik/` |
+| GitHub Actions CI/CD | Automated testing and deployment | `.github/workflows/` |
+| E2E Testing | End-to-end tests with Playwright | `frontend/playwright/` |
+| Multi-Environment | Support for test and production environments | `docker-compose.*yml` |
+| Adminer | Database management interface | `docker-compose.yml` |
+| MailCatcher | Local email testing tool | `docker-compose.yml` |
+| Health Checks | Container health monitoring | `docker-compose.yml` |
+| Automatic OpenAPI | Client generation in CI pipeline | `.github/workflows/` |
+| Test Coverage Reports | Code coverage with Smokeshow | `.github/workflows/` |
+
+## Feature Relationships and Code Structure
+
+This diagram shows the relationship between key features and specific code components:
+
+```
+Application Structure
+
+FastAPI Backend                React Frontend              PostgreSQL Database      Traefik Proxy
+
+main.py: App initialization    main.tsx: App entry          
+api/: Route definitions        routes/: Page components     
+models/: Data models           components/: UI components   
+core/: Core configuration      hooks/: Custom hooks         
+utils/: Utilities              providers/: Context providers
+dependencies/: DI components   client/: Generated API client
+
+routes/users.py: User endpoints    login.tsx: Login page        User: User model
+routes/items.py: Item endpoints    items.tsx: Item management   Item: Item model
+routes/login.py: Auth endpoints    users.tsx: User management   Token: Auth token model
+routes/utils.py: Utility endpoints dashboard.tsx: Main dashboard
+                                  
+config.py: Settings               forms/: Form components      
+security.py: Auth logic           layout/: Layout components   
+db.py: Database setup             common/: Shared components   
+                                  auth.ts: Auth hooks 
+                                  query.ts: Data fetching hooks
+```
+
+## Authentication Flow
+
+The template implements a robust authentication system using JWT tokens. Here is the authentication flow between frontend and backend components:
+
+```
+Database(SQLModel) → Security(core/security.py) → Login API(routes/login.py) → API Client(client/) → Auth Hooks(hooks/auth.ts) → Login Page(routes/login.tsx) → Browser
+
+1. User enters credentials
+2. Login page calls auth hook
+3. Auth hook calls API client
+4. API client sends POST to /login/access-token
+5. Login API processes request
+6. Security module authenticates user
+7. Database validates credentials
+8. If valid, token is created and returned
+9. Token is stored in local storage
+10. Auth state is updated
+11. User redirected to dashboard
+```
+
+## Database Models
+
+The template uses SQLModel to define data models with relationships:
+
+```
+User
+- UUID id
+- EmailStr email
+- str hashed_password
+- str full_name
+- bool is_active
+- bool is_superuser
+- relationship items
+
+Item
+- UUID id
+- str title
+- str description
+- UUID owner_id
+- relationship owner
+
+Relationship: User(1) owns Item(*)
+```
+
+## Release History
+
+### Recent Changes
+
+Recent updates to the template include:
+
+* **Fixes**:
+  * Close sidebar drawer on user selection
+  * Fix required password validation when editing user fields
+* **Refactoring**:
+  * Remove redundant fields in inheritance classes
+  * Add subtle UI adjustments in skeleton screens and other components
+* **Internal Improvements**:
+  * Add npm and docker package ecosystems to Dependabot config
+
+### Version 0.8.0
+
+Version 0.8.0 introduced significant updates:
+
+* Migration to Chakra UI v3
+* Add private, local-only API for E2E tests
+* Migration to the latest openapi-ts
+* Fixed redirect to login page on 401/403 errors
+* Improved error handling and router configuration
+* Enhanced TypeScript types and configuration
+
+### Version 0.7.1
+
+Major improvements in version 0.7.1:
+
+* Migration from Poetry to `uv` for Python dependency management
+* Simplified Docker Compose files and Traefik configuration
+* Adopted domain structure with API on `api.example.com` and frontend on `dashboard.example.com`
+* Added database health checks
+* Updated backend port configuration for better compatibility with dev servers
+
+### Version 0.7.0
+
+Key features added in version 0.7.0:
+
+* Comprehensive E2E testing with Playwright
+* MailCatcher configuration for email development and testing
+* Pagination support for data listings
+* UUID implementation for database primary keys
+* User registration functionality
+* Multi-environment deployment support (test, production)
+* Multiple refactoring and improvements
+* Dependency upgrades
+
+### Version 0.6.0
+
+Foundational changes in version 0.6.0:
+
+* Update to latest FastAPI, Pydantic, and SQLModel
+* Complete frontend rebuild with React, TypeScript, Vite, and Chakra UI
+* TanStack Query/Router integration
+* CI/CD with GitHub Actions
+* Test coverage improvement to over 90%
+* Migration from pgAdmin to Adminer
+
+## Development Workflow
+
+The template includes a comprehensive development workflow with integrated CI/CD:
+
+```
+Local Development → Create Pull Request → Automated Testing (Backend Tests, E2E Tests, Docker Compose Tests)
+``` 

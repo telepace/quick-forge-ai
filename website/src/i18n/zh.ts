@@ -10,6 +10,17 @@ export default {
   lastUpdated: '最后更新于:',
 
   getStarted: '开始使用',
+  
+  blog: {
+    title: '博客',
+    description: '最新文章、教程和更新',
+    readMore: '阅读更多',
+    latestPosts: '最新文章',
+    allPosts: '查看全部文章',
+    search: '搜索文章',
+    categories: '分类',
+    welcomeMessage: '欢迎访问 Quick Forge AI 的博客，这里有最新的技术文章、教程和更新。',
+  },
 
   themeSwitcher: {
     light: '浅色模式',

@@ -1,0 +1,156 @@
+---
+title: Sentry Integration
+description: How to set up and configure Sentry for error tracking in your application
+---
+
+# Sentry Integration
+
+## Introduction
+
+[Sentry](https://sentry.io/) is an error tracking and performance monitoring platform that helps you identify and fix issues in your application. This guide will walk you through setting up Sentry in your Quick Forge AI project.
+
+The backend of this project already comes with Sentry integration, which means you only need to configure it with your DSN to start tracking errors.
+
+## Prerequisites
+
+- A Sentry account (you can [sign up for free](https://sentry.io/signup/))
+- A deployed Quick Forge AI application or a local development environment
+
+## Setting Up Sentry
+
+### 1. Create a Sentry Project
+
+1. Sign in to your [Sentry account](https://sentry.io/auth/login/)
+2. Create a new project by clicking on "Create Project"
+3. Select "Python" as the platform
+4. Name your project (e.g., "quick-forge-backend")
+5. Follow the setup to create your project
+
+### 2. Get Your DSN
+
+After creating a project, Sentry will provide you with a Data Source Name (DSN). This is a unique identifier that Sentry uses to associate events with your project.
+
+1. Navigate to Settings → Projects → [Your Project] → Client Keys (DSN)
+2. Copy the DSN value, which should look like: `https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@xxxxxxx.ingest.sentry.io/xxxxxxx`
+
+### 3. Configure Your Application
+
+#### Environment Variables
+
+Add your Sentry DSN to your environment variables:
+
+1. In your local development environment, add the DSN to your `.env` file:
+
+```bash
+SENTRY_DSN=https://your-dsn-here@xxxxxxx.ingest.sentry.io/xxxxxxx
+```
+
+2. For production deployments, make sure the `SENTRY_DSN` environment variable is set in your deployment configuration.
+
+#### Docker Compose
+
+The `docker-compose.yml` file already includes the `SENTRY_DSN` environment variable, which will be picked up from your `.env` file:
+
+```yaml
+services:
+  backend:
+    environment:
+      - SENTRY_DSN=${SENTRY_DSN}
+```
+
+#### Kubernetes/Helm Deployment
+
+For Helm deployments, update the `values.yaml` or `values.prod.yaml` file:
+
+```yaml
+backend:
+  env:
+    SENTRY_DSN: "your-sentry-dsn"
+```
+
+## How Sentry Is Initialized
+
+The application will automatically initialize Sentry if the `SENTRY_DSN` environment variable is set and the environment is not "local". This is handled in `backend/app/main.py`:
+
+```python
+import sentry_sdk
+from fastapi import FastAPI
+from app.core.config import settings
+
+if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
+    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
+```
+
+This means:
+- Sentry is only enabled when you provide a DSN
+- Sentry is disabled in local development by default (to avoid sending development errors)
+- You can enable it in local development by setting your environment to something other than "local"
+
+## Testing Your Sentry Integration
+
+To verify that your Sentry integration is working correctly:
+
+1. Deploy your application with the `SENTRY_DSN` environment variable set
+2. Generate an error in your application (for testing purposes only)
+3. Check your Sentry dashboard to see if the error was captured
+
+Here's a simple way to generate a test error in a FastAPI endpoint:
+
+```python
+@app.get("/test-sentry")
+def test_sentry():
+    try:
+        1 / 0  # This will cause a division by zero error
+    except Exception as e:
+        # This will send the error to Sentry
+        raise e
+    return {"message": "This endpoint should raise an error"}
+```
+
+## Best Practices
+
+### Environment Separation
+
+Make sure to create separate Sentry projects for different environments (development, staging, production) to keep your error tracking organized.
+
+### Contextual Information
+
+You can enhance your error reports by adding context to your Sentry events:
+
+```python
+import sentry_sdk
+
+# Add user context
+sentry_sdk.set_user({"id": "12345", "email": "user@example.com"})
+
+# Add custom tags
+sentry_sdk.set_tag("transaction_id", "123456789")
+
+# Add extra data
+sentry_sdk.set_extra("order_details", {"amount": 100, "currency": "USD"})
+```
+
+### Performance Monitoring
+
+Sentry also offers performance monitoring capabilities. You can configure this by setting `enable_tracing=True` in the initialization (already done in the template) and adding performance monitoring code to specific parts of your application.
+
+## Troubleshooting
+
+### Events Not Being Captured
+
+If your events are not showing up in Sentry:
+
+1. Verify that your DSN is correct
+2. Check that your application environment is not set to "local"
+3. Ensure that your application has internet access to send events to Sentry
+4. Look for any errors in your application logs related to Sentry initialization
+
+### Rate Limiting
+
+If you're on a free Sentry plan, be aware that there are limits to the number of events you can send. Configure your integration to prioritize the most important errors.
+
+## Conclusion
+
+Sentry is a powerful tool for tracking and monitoring errors in your application. With the configuration outlined in this guide, you should be able to start capturing errors and improving the reliability of your Quick Forge AI application.
+
+For more advanced features and configuration options, refer to the [official Sentry documentation for Python](https://docs.sentry.io/platforms/python/). 

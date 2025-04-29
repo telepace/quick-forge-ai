@@ -1,0 +1,201 @@
+---
+title: 功能和发布说明
+description: Quick Forge AI 的主要功能综述以及各版本重要变更的追踪记录。
+---
+
+# 功能和发布说明
+
+本文档提供了 Quick Forge AI 主要功能的综合概述，并追踪了各个版本的重要变更。它旨在让开发者清晰了解模板的功能以及它们如何随时间演进。
+
+有关系统架构的详细概述，请参阅[后端开发](/zh/docs/backend)和[前端开发](/zh/docs/frontend)页面。
+
+## 核心功能
+
+Quick Forge AI 结合了 FastAPI 后端和 React 前端，为构建现代 Web 应用程序提供了完整的解决方案。该模板包括：
+
+### 后端功能
+
+| 功能 | 描述 | 实现 |
+| --- | --- | --- |
+| FastAPI 应用程序 | 具有自动文档的高性能 API 框架 | `backend/app/main.py` |
+| SQLModel ORM | 使用 SQLAlchemy 核心的类型安全数据库 ORM | `backend/app/models/` |
+| JWT 认证 | 安全的基于令牌的认证 | `backend/app/core/security.py` |
+| RESTful API 路由 | 用户、项目、登录和实用程序的结构化端点 | `backend/app/api/routes/` |
+| PostgreSQL 数据库 | 健壮的关系型数据库 | `backend/app/core/db.py` |
+| 环境配置 | 通过环境变量进行设置管理 | `backend/app/core/config.py` |
+| 数据库迁移 | 使用 Alembic 的架构版本控制 | `backend/app/alembic/` |
+| 电子邮件系统 | 模板化电子邮件发送功能 | `backend/app/utils/email.py` |
+| 依赖注入 | 使用 FastAPI 依赖项简化请求处理 | `backend/app/dependencies/` |
+| 健康检查 | 系统状态监控端点 | `backend/app/api/routes/utils.py` |
+| 分页 | 支持分页数据响应 | `backend/app/api/routes/items.py` |
+| UUID 主键 | 使用 UUID 而非顺序整数以提高安全性 | `backend/app/models/` |
+
+### 前端功能
+
+| 功能 | 描述 | 实现 |
+| --- | --- | --- |
+| React 应用程序 | 使用 TypeScript 的基于组件的 UI | `frontend/src/main.tsx` |
+| Chakra UI | 具有主题化功能的无障碍组件库 | `frontend/src/theme/` |
+| TanStack Query | 数据获取和缓存管理 | `frontend/src/providers/query.tsx` |
+| TanStack Router | 类型安全的路由系统 | `frontend/src/routes/` |
+| OpenAPI 客户端 | 从后端规范自动生成的 API 客户端 | `frontend/src/client/` |
+| 认证 | 完整的登录、注册和密码重置流程 | `frontend/src/hooks/auth.ts` |
+| 暗黑模式 | 内置主题切换支持 | `frontend/src/theme/` |
+| 表单验证 | 输入验证和错误处理 | `frontend/src/components/forms/` |
+| 响应式设计 | 移动友好的布局和组件 | `frontend/src/components/` |
+| Suspense 集成 | 使用 React Suspense 的加载状态 | 多个组件 |
+
+### 开发和部署功能
+
+| 功能 | 描述 | 实现 |
+| --- | --- | --- |
+| Docker Compose | 所有服务的容器编排 | `docker-compose.yml` |
+| Traefik | 用于路由和 SSL 终止的反向代理 | `traefik/` |
+| GitHub Actions CI/CD | 自动化测试和部署 | `.github/workflows/` |
+| E2E 测试 | 基于 Playwright 的端到端测试 | `frontend/playwright/` |
+| 多环境 | 支持测试和生产环境 | `docker-compose.*yml` |
+| Adminer | 数据库管理界面 | `docker-compose.yml` |
+| MailCatcher | 本地电子邮件测试工具 | `docker-compose.yml` |
+| 健康检查 | 容器健康监控 | `docker-compose.yml` |
+| 自动 OpenAPI | CI 流程中的客户端生成 | `.github/workflows/` |
+| 测试覆盖率报告 | 使用 Smokeshow 的代码覆盖率 | `.github/workflows/` |
+
+## 功能关系和代码结构
+
+此图表显示了关键功能与特定代码组件的关系：
+
+```
+应用程序结构
+
+FastAPI 后端                      React 前端                   PostgreSQL 数据库             Traefik 代理
+
+main.py: 应用初始化              main.tsx: 应用入口          
+api/: 路由定义                   routes/: 页面组件     
+models/: 数据模型                components/: UI 组件   
+core/: 核心配置                  hooks/: 自定义钩子         
+utils/: 实用工具                 providers/: 上下文提供者
+dependencies/: 依赖注入组件       client/: 生成的 API 客户端
+
+routes/users.py: 用户端点        login.tsx: 登录页面        User: 用户模型
+routes/items.py: 项目端点        items.tsx: 项目管理        Item: 项目模型
+routes/login.py: 认证端点        users.tsx: 用户管理        Token: 认证令牌模型
+routes/utils.py: 实用端点        dashboard.tsx: 主仪表板
+                                 
+config.py: 设置                  forms/: 表单组件      
+security.py: 认证逻辑            layout/: 布局组件   
+db.py: 数据库设置                common/: 共享组件   
+                                 auth.ts: 认证钩子 
+                                 query.ts: 数据获取钩子
+```
+
+## 认证流程
+
+该模板实现了一个使用 JWT 令牌的健壮认证系统。以下是前端和后端组件之间的认证流程：
+
+```
+数据库(SQLModel) → 安全(core/security.py) → 登录 API(routes/login.py) → API 客户端(client/) → 认证钩子(hooks/auth.ts) → 登录页面(routes/login.tsx) → 浏览器
+
+1. 用户输入凭证
+2. 登录页面调用认证钩子
+3. 认证钩子调用 API 客户端
+4. API 客户端发送 POST 到 /login/access-token
+5. 登录 API 处理请求
+6. 安全模块认证用户
+7. 数据库验证凭证
+8. 如果有效，创建并返回令牌
+9. 令牌存储在本地存储中
+10. 更新认证状态
+11. 用户重定向到仪表板
+```
+
+## 数据库模型
+
+模板使用 SQLModel 定义具有关系的数据模型：
+
+```
+User（用户）
+- UUID id
+- EmailStr email
+- str hashed_password
+- str full_name
+- bool is_active
+- bool is_superuser
+- relationship items
+
+Item（项目）
+- UUID id
+- str title
+- str description
+- UUID owner_id
+- relationship owner
+
+关系：User(1) 拥有 Item(*)
+```
+
+## 发布历史
+
+### 最新变更
+
+模板的最近更新包括：
+
+* **修复**：
+  * 用户选择时关闭侧边栏抽屉
+  * 修复编辑用户字段时的必需密码验证
+* **重构**：
+  * 删除继承类中的冗余字段
+  * 在骨架屏和其他组件中添加细微的 UI 调整
+* **内部改进**：
+  * 在 Dependabot 配置中添加 npm 和 docker 包生态系统
+
+### 版本 0.8.0
+
+0.8.0 版本引入了重要更新：
+
+* 迁移到 Chakra UI v3
+* 为 E2E 测试添加私有、仅本地 API
+* 迁移到最新的 openapi-ts
+* 修复 401/403 错误时重定向到登录页面
+* 改进错误处理和路由器配置
+* 增强 TypeScript 类型和配置
+
+### 版本 0.7.1
+
+0.7.1 版本的主要改进：
+
+* 从 Poetry 迁移到 `uv` 进行 Python 依赖管理
+* 简化 Docker Compose 文件和 Traefik 配置
+* 采用域结构，API 使用 `api.example.com`，前端使用 `dashboard.example.com`
+* 添加数据库健康检查
+* 更新后端端口配置以更好地兼容开发服务器
+
+### 版本 0.7.0
+
+0.7.0 版本添加的主要功能：
+
+* 使用 Playwright 进行全面的 E2E 测试
+* 为电子邮件开发和测试配置 MailCatcher
+* 数据列表的分页支持
+* 为数据库主键实现 UUID
+* 用户注册功能
+* 多环境部署支持（测试、生产）
+* 多项重构和改进
+* 依赖项升级
+
+### 版本 0.6.0
+
+0.6.0 版本的基础变更：
+
+* 更新到最新的 FastAPI、Pydantic 和 SQLModel
+* 使用 React、TypeScript、Vite、Chakra UI 完全重建前端
+* TanStack Query/Router 集成
+* 使用 GitHub Actions 实现 CI/CD
+* 测试覆盖率提高到 90% 以上
+* 从 pgAdmin 迁移到 Adminer
+
+## 开发工作流程
+
+该模板包括具有集成 CI/CD 的全面开发工作流程：
+
+```
+本地开发 → 创建拉取请求 → 自动化测试（后端测试、E2E 测试、Docker Compose 测试）
+``` 

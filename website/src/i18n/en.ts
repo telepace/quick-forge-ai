@@ -10,6 +10,17 @@ export default {
   lastUpdated: 'Last updated on:',
 
   getStarted: 'Get Started',
+  
+  blog: {
+    title: 'Blog',
+    description: 'Latest articles, tutorials and updates',
+    readMore: 'Read more',
+    latestPosts: 'Latest Posts',
+    allPosts: 'View all posts',
+    search: 'Search articles',
+    categories: 'Categories',
+    welcomeMessage: 'Welcome to the Quick Forge AI blog where we share the latest articles, tutorials and updates.',
+  },
 
   themeSwitcher: {
     light: 'Light Mode',
