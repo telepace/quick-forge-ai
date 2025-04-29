@@ -13,7 +13,7 @@ Swagger UI is an interactive API documentation tool that not only displays detai
 
 ### Accessing Swagger UI
 
-1. Ensure your backend service is running (typically via the `make backend-dev` command)
+1. Ensure your backend service is running (typically via the `make backend` command)
 2. Open [http://localhost:8000/docs](http://localhost:8000/docs) in your browser
 
 ### Steps for Using Swagger UI
@@ -39,6 +39,52 @@ Swagger UI is an interactive API documentation tool that not only displays detai
    - According to the authentication type (typically JWT Bearer Token), enter the appropriate credentials
    - Click "Authorize" to complete authentication
 
+### Detailed Authentication Setup (OAuth2PasswordBearer)
+
+Quick Forge AI uses OAuth2PasswordBearer authentication mechanism. Here are the detailed steps for setting up authentication in Swagger UI:
+
+1. **Open the Authentication Dialog**:
+   - Click the "Authorize" button in the top-right corner of Swagger UI
+   - You'll see a dialog titled "Available authorizations"
+
+2. **Understand Authorization Scopes**:
+   - The dialog header explains: "Scopes are used to grant an application different levels of access to data on behalf of the end user. Each API may declare one or more scopes."
+   - This means different API endpoints may require different levels of access
+
+3. **Fill in Authentication Information**:
+   - Authentication type: `OAuth2PasswordBearer (OAuth2, password)`
+   - Token URL: `/api/v1/login/access-token`
+   - Flow: `password`
+   - Username: Enter your user email
+   - Password: Enter your account password
+   - Client credentials location: Usually select "Authorization header"
+   - If needed, fill in client_id and client_secret (typically not required in standard setups)
+
+4. **Authorize**:
+   - Click the "Authorize" button
+   - If authentication is successful, the dialog will close, and the "Authorize" button in the top-right corner of the Swagger UI page will show a locked state
+
+5. **Verify Authentication Status**:
+   - After successful authentication, the "Authorize" button in the corner should appear locked
+   - Try accessing an endpoint that requires authentication, like `/api/v1/users/me`, to verify you can retrieve data
+
+6. **Logout**:
+   - If you need to switch users or log out, click the "Authorize" button again
+   - Click the "Logout" button to clear the current authentication
+
+### Authentication Troubleshooting
+
+When encountering authentication issues, try the following methods:
+
+1. **Check Credentials**: Ensure username and password are correct
+2. **Verify API Service Status**: Confirm the backend service is running properly
+3. **View Request/Response Details**:
+   - After sending a request, expand the "Responses" section
+   - Check the "Curl" tab to see complete request details
+   - Check "Response body" for error details
+4. **Clear Browser Cache**: Sometimes browser caching can cause authentication issues
+5. **Use Private Browsing Mode**: Avoid interference from cookies or cache
+
 ### Example: Creating a New User
 
 1. Find the `/api/v1/users/` POST endpoint
@@ -53,6 +99,16 @@ Swagger UI is an interactive API documentation tool that not only displays detai
 ```
 4. Click "Execute"
 5. View the response result and status code
+
+### Example: Getting an Authentication Token
+
+1. Find the `/api/v1/login/access-token` POST endpoint
+2. Click "Try it out"
+3. In the Form Data section, fill in:
+   - username: Your email
+   - password: Your password
+4. Click "Execute"
+5. If successful, the response will include an access_token that you can copy and use for other API calls
 
 ## Using ReDoc to View API Documentation
 
@@ -96,7 +152,7 @@ Apifox is a more powerful API development tool that integrates API design, testi
 
 1. In Apifox, click the "Import" button in the left navigation bar
 2. Select "Import Data > OpenAPI(Swagger)"
-3. Enter your OpenAPI URL: `http://localhost:8000/openapi.json`
+3. Enter your OpenAPI URL: `http://localhost:8000/api/v1/openapi.json`
 4. Click the "Import" button
 
 ### Creating Environment Variables
@@ -108,6 +164,76 @@ Apifox is a more powerful API development tool that integrates API design, testi
    - `BASE_URL`: `http://localhost:8000`
    - `TOKEN`: Your authentication token (can be updated later)
 5. Click "Save"
+
+### Setting Up Authentication in Apifox
+
+Apifox provides multiple ways to handle API authentication. Here are detailed steps for setting up OAuth2 authentication:
+
+1. **Get Access Token**:
+   - Find the `/api/v1/login/access-token` interface
+   - Fill in username and password in the request body
+   - Send the request to get the access_token
+
+2. **Store Token as Environment Variable**:
+   - After successfully getting the token, click the "Extract Variables" button on the right
+   - Select "Extract Response Content to Variables"
+   - Add extraction rule:
+     - Field name: access_token
+     - Extraction method: JSONPath
+     - Expression: $.access_token
+     - Target variable: TOKEN
+   - Click "Save"
+
+3. **Set Up Global Authentication**:
+   - Click "Project Settings" on the left
+   - Select the "Authentication Settings" tab
+   - Click "Add Authentication"
+   - Select "Bearer Token" type
+   - Token value: `{{TOKEN}}`
+   - Check "Use as project global authentication"
+   - Click "Save"
+
+4. **Set Up Authentication for Specific APIs**:
+   - If certain APIs need special authentication, when editing the API
+   - Click the "Authentication" tab
+   - Select the appropriate authentication method and configure it
+
+5. **Auto-refresh Token**:
+   - Create a pre-request script to check if the token is expired
+   - If expired, automatically call the login API to get a new token
+   - Script example:
+   ```javascript
+   // Check if token exists or is expired
+   if (!pm.environment.get("TOKEN") || isTokenExpired()) {
+     // Call login API to get new token
+     pm.sendRequest({
+       url: pm.environment.get("BASE_URL") + "/api/v1/login/access-token",
+       method: 'POST',
+       header: {
+         'Content-Type': 'application/x-www-form-urlencoded'
+       },
+       body: {
+         mode: 'urlencoded',
+         urlencoded: [
+           {key: "username", value: "your-email@example.com"},
+           {key: "password", value: "your-password"}
+         ]
+       }
+     }, function (err, res) {
+       if (err) {
+         console.error(err);
+       } else {
+         var responseJson = res.json();
+         pm.environment.set("TOKEN", responseJson.access_token);
+       }
+     });
+   }
+   
+   function isTokenExpired() {
+     // Implement token expiration check logic
+     return false; // Return true/false based on actual conditions
+   }
+   ```
 
 ### Testing API Endpoints
 
@@ -193,5 +319,24 @@ Apifox is a more powerful API development tool that integrates API design, testi
    - Don't include sensitive information in shared documentation or test reports
    - Use environment variables to manage keys and tokens
    - Regularly update test authentication credentials
+
+5. **Advanced Tips**:
+   - **Data-driven Testing**: Use Apifox's dataset feature to import test data from Excel or CSV files
+   - **Chaos Testing**: Deliberately send malformed data or boundary values to test API robustness
+   - **Performance Baselines**: Establish API response time baselines and monitor performance changes
+   - **Concurrency Testing**: Simulate scenarios with multiple users accessing APIs simultaneously
+   - **Latency Simulation**: Use Apifox's Mock features to simulate network latency and instability
+
+6. **Team Collaboration**:
+   - Use Apifox's team features to share API definitions and test cases
+   - Establish standard testing procedures and authentication methods
+   - Version control test scenarios to align with code versions
+   - Integrate test results with team notification channels (like Slack, Microsoft Teams, etc.)
+
+7. **Common Problem Resolution**:
+   - **CORS Issues**: When encountering cross-origin problems in API testing, resolve by setting up a proxy server
+   - **Authentication Failures**: Save all relevant information from login responses (token, refresh token, expiration time, etc.)
+   - **Request Timeouts**: For long-running APIs, appropriately increase timeout settings
+   - **Redirect Handling**: Configure tools to automatically follow HTTP redirects, or disable as needed
 
 By following these best practices and using the appropriate tools, you can establish an efficient, comprehensive API testing process to ensure your application interfaces are reliable, secure, and performant.

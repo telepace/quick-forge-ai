@@ -81,8 +81,8 @@ backend-install:
 	@cd $(BACKEND_DIR) && $(PIP) install -r .
 
 ## backend-build: Build backend
-.PHONY: backend-build
-backend-build:
+.PHONY: backend
+backend:
 	@echo "===========> Building backend"
 	@cd $(BACKEND_DIR) && fastapi dev app/main.py
 
@@ -112,8 +112,8 @@ frontend-install:
 	@cd $(FRONTEND_DIR) && $(NPM) install
 
 ## frontend-build: Build frontend
-.PHONY: frontend-build
-frontend-build: frontend-install
+.PHONY: frontend
+frontend:
 	@echo "===========> Building frontend"
 	@cd $(FRONTEND_DIR) && $(NPM) run build
 

@@ -13,7 +13,7 @@ Swagger UI是一个交互式的API文档工具，它不仅展示了API的详细�
 
 ### 访问Swagger UI
 
-1. 确保你的后端服务正在运行（通常是通过`make backend-dev`命令）
+1. 确保你的后端服务正在运行（通常是通过`make backend`命令）
 2. 在浏览器中打开 [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ### 使用Swagger UI的步骤
@@ -39,6 +39,52 @@ Swagger UI是一个交互式的API文档工具，它不仅展示了API的详细�
    - 根据认证类型（通常是JWT Bearer Token），填入相应的认证信息
    - 点击"Authorize"完成认证
 
+### 详细的认证设置 (OAuth2PasswordBearer)
+
+Quick Forge AI使用OAuth2PasswordBearer认证机制，在Swagger UI中设置认证的详细步骤如下：
+
+1. **打开认证对话框**：
+   - 点击Swagger UI右上角的"Authorize"按钮
+   - 你将看到标题为"Available authorizations"的对话框
+
+2. **了解认证范围**：
+   - 对话框顶部说明："Scopes are used to grant an application different levels of access to data on behalf of the end user. Each API may declare one or more scopes."
+   - 这意味着不同的API端点可能需要不同级别的访问权限
+
+3. **填写认证信息**：
+   - 认证类型：`OAuth2PasswordBearer (OAuth2, password)`
+   - Token URL：`/api/v1/login/access-token`
+   - Flow：`password`
+   - 用户名(username)：输入你的用户邮箱
+   - 密码(password)：输入你的账户密码
+   - 客户端凭据位置(Client credentials location)：通常选择"Authorization header"
+   - 如果需要，填写client_id和client_secret（在标准设置中通常不需要）
+
+4. **授权**：
+   - 点击"Authorize"按钮
+   - 如果认证成功，对话框将关闭，Swagger UI页面右上角的"Authorize"按钮会显示锁定状态
+
+5. **验证认证状态**：
+   - 成功认证后，右上角的"Authorize"按钮应显示为锁定状态
+   - 尝试访问一个需要认证的端点，如`/api/v1/users/me`，验证是否能获取到数据
+
+6. **注销**：
+   - 如果需要切换用户或注销，再次点击"Authorize"按钮
+   - 点击"Logout"按钮注销当前认证
+
+### 认证故障排除
+
+当遇到认证问题时，可以尝试以下方法：
+
+1. **检查凭据**：确保用户名和密码正确
+2. **检查API服务状态**：确认后端服务正常运行
+3. **查看请求/响应详情**：
+   - 发送请求后，展开"Responses"部分
+   - 检查"Curl"标签页，查看完整的请求细节
+   - 检查"Response body"了解错误详情
+4. **清除浏览器缓存**：有时候浏览器缓存可能导致认证问题
+5. **使用隐私浏览模式**：避免Cookie或缓存干扰
+
 ### 示例：创建新用户
 
 1. 找到 `/api/v1/users/` POST端点
@@ -53,6 +99,16 @@ Swagger UI是一个交互式的API文档工具，它不仅展示了API的详细�
 ```
 4. 点击"Execute"
 5. 查看响应结果和状态码
+
+### 示例：获取认证Token
+
+1. 找到 `/api/v1/login/access-token` POST端点
+2. 点击"Try it out"
+3. 在Form Data部分填写:
+   - username: 你的邮箱
+   - password: 你的密码
+4. 点击"Execute"
+5. 成功后，响应中会包含access_token，可以复制此token用于其他API调用
 
 ## 使用ReDoc查看API文档
 
@@ -96,7 +152,7 @@ Apifox是一个更强大的API开发工具，它集成了API设计、测试、�
 
 1. 在Apifox中，点击左侧导航栏的"导入"按钮
 2. 选择"导入数据 > OpenAPI(Swagger)"
-3. 输入你的OpenAPI URL: `http://localhost:8000/openapi.json`
+3. 输入你的OpenAPI URL: `http://localhost:8000/api/v1/openapi.json`
 4. 点击"导入"按钮
 
 ### 创建环境变量
@@ -108,6 +164,76 @@ Apifox是一个更强大的API开发工具，它集成了API设计、测试、�
    - `BASE_URL`: `http://localhost:8000`
    - `TOKEN`: 你的认证令牌（可以稍后更新）
 5. 点击"保存"
+
+### 在Apifox中设置认证
+
+Apifox提供了多种方式处理API认证，以下是设置OAuth2认证的详细步骤：
+
+1. **获取访问令牌**：
+   - 找到`/api/v1/login/access-token`接口
+   - 在请求体中填写用户名和密码
+   - 发送请求获取access_token
+
+2. **存储令牌为环境变量**：
+   - 成功获取token后，点击右侧的"提取变量"按钮
+   - 选择"提取响应内容到变量"
+   - 添加提取规则：
+     - 字段名称：access_token
+     - 提取方式：JSONPath
+     - 表达式：$.access_token
+     - 目标变量：TOKEN
+   - 点击"保存"
+
+3. **设置全局认证**：
+   - 点击左侧的"项目设置"
+   - 选择"认证设置"选项卡
+   - 点击"添加认证"
+   - 选择"Bearer Token"类型
+   - 令牌值填写：`{{TOKEN}}`
+   - 勾选"作为项目全局认证"
+   - 点击"保存"
+
+4. **针对特定API设置认证**：
+   - 如果某些API需要特殊认证，可以在编辑API时
+   - 点击"认证"选项卡
+   - 选择合适的认证方式并设置
+
+5. **自动刷新令牌**：
+   - 创建前置脚本来检查token是否过期
+   - 如果过期，自动调用登录API获取新token
+   - 脚本示例：
+   ```javascript
+   // 检查token是否存在或过期
+   if (!pm.environment.get("TOKEN") || isTokenExpired()) {
+     // 调用登录API获取新token
+     pm.sendRequest({
+       url: pm.environment.get("BASE_URL") + "/api/v1/login/access-token",
+       method: 'POST',
+       header: {
+         'Content-Type': 'application/x-www-form-urlencoded'
+       },
+       body: {
+         mode: 'urlencoded',
+         urlencoded: [
+           {key: "username", value: "your-email@example.com"},
+           {key: "password", value: "your-password"}
+         ]
+       }
+     }, function (err, res) {
+       if (err) {
+         console.error(err);
+       } else {
+         var responseJson = res.json();
+         pm.environment.set("TOKEN", responseJson.access_token);
+       }
+     });
+   }
+   
+   function isTokenExpired() {
+     // 实现token过期检查逻辑
+     return false; // 根据实际情况返回true/false
+   }
+   ```
 
 ### 测试API端点
 
@@ -193,5 +319,24 @@ Apifox是一个更强大的API开发工具，它集成了API设计、测试、�
    - 不要在共享文档或测试报告中包含敏感信息
    - 使用环境变量管理密钥和令牌
    - 定期更新测试认证凭据
+
+5. **高级技巧**：
+   - **数据驱动测试**：使用Apifox的数据集功能，从Excel或CSV文件导入测试数据
+   - **混沌测试**：故意发送畸形数据或边界值，测试API的健壮性
+   - **性能基准**：建立API响应时间基准，监控性能变化
+   - **并发测试**：模拟多用户同时访问API的场景
+   - **模拟延迟**：使用Apifox的Mock功能模拟网络延迟和不稳定性
+
+6. **团队协作**：
+   - 使用Apifox的团队功能共享API定义和测试用例
+   - 建立标准测试流程和认证方法
+   - 版本控制测试场景，与代码版本保持一致
+   - 集成测试结果到团队通知渠道（如Slack、企业微信等）
+
+7. **常见问题解决**：
+   - **CORS问题**：API测试中遇到跨域问题时，可通过设置代理服务器解决
+   - **身份验证失败**：保存登录响应中的所有相关信息（token、刷新token、过期时间等）
+   - **请求超时**：对于长时间运行的API，适当增加超时设置
+   - **重定向处理**：配置工具自动跟随HTTP重定向，或根据需要禁用它
 
 通过遵循这些最佳实践和使用合适的工具，你可以建立一个高效、全面的API测试流程，确保你的应用接口可靠、安全且性能优异。
