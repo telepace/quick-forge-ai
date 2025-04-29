@@ -7,6 +7,18 @@ import { NextraContentWrapper } from '@/app/[lang]/_components/NextraStyleFix'
 
 export const generateStaticParams = generateStaticParamsFor('mdxPath')
 
+/**
+ * Generates metadata for a given page based on provided properties.
+ *
+ * @async
+ * @param {PageProps} props - The properties of the page including parameters and language information.
+ * @returns {Promise<Metadata>} A promise that resolves to an object containing the title and description of the page.
+ *
+ * This function determines whether the provided path corresponds to a home page or not.
+ * If it is, metadata from a dictionary is used. For other paths, it attempts to import the
+ * metadata from the corresponding mdx file. In case of an error during this process,
+ * default metadata indicating that the page was not found is returned.
+ */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const params = await props.params
 
@@ -45,6 +57,16 @@ type PageProps = Readonly<{
   }>
 }>
 
+/**
+ * The default function that handles rendering of pages based on language and path parameters.
+ *
+ * @async
+ * @function Page
+ * @param {PageProps} props - An object containing properties for the page component.
+ * @returns {JSX.Element | void} - A JSX element representing the rendered page or void if an error occurs.
+ *
+ * @throws Will throw an error and redirect to '404' if there is a failure in loading the MDX content.
+ */
 export default async function Page(props: PageProps) {
   const params = await props.params
 
