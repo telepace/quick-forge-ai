@@ -9,6 +9,16 @@ export interface BlogButtonProps {
   className?: string
 }
 
+/**
+ * React functional component representing a blog button.
+ *
+ * @param {BlogButtonProps} props - The properties for the BlogButton component.
+ * @param {string} [props.className=''] - Optional class name to be applied to the button.
+ *
+ * @returns {JSX.Element} A React JSX element representing the blog button.
+ *
+ * @throws {Error} If the 'lang' parameter cannot be retrieved from the URL parameters.
+ */
 export const BlogButton: React.FC<BlogButtonProps> = ({ className = '' }) => {
   const { lang } = useParams() as { lang: string }
   
