@@ -1,0 +1,635 @@
+# Secondary Development Guide
+
+The Quick Forge AI project is designed as a highly extensible system that can be customized and extended according to different business requirements. This guide provides detailed steps and best practices for secondary development of the project.
+
+## 1. Data Model Extensions
+
+Extending data models in `models.py` according to business requirements is the most fundamental way of extension.
+
+### Example: Creating a New Model
+
+```python
+# Add a new model in models.py
+class YourNewModel(SQLModel, table=True):  
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)  
+    name: str = Field(min_length=1, max_length=255)  
+    description: str | None = Field(default=None, max_length=255)  
+    # Add relationship fields  
+    owner_id: uuid.UUID = Field(foreign_key="user.id")  
+    owner: User | None = Relationship(back_populates="your_new_models")
+```
+
+You also need to add the corresponding reverse relationship in the User model:
+
+```python
+class User(UserBase, table=True):  
+    # Existing fields...  
+    your_new_models: list["YourNewModel"] = Relationship(back_populates="owner")
+```
+
+### Creating Database Migrations
+
+After adding a new model, you need to create database migration scripts:
+
+```bash
+# Run in the backend directory
+cd backend
+alembic revision --autogenerate -m "Add YourNewModel"
+alembic upgrade head
+```
+
+## 2. API Extensions
+
+### Creating a New Route Module
+
+Create a new route module `your_new_module.py` in `backend/app/api/routes/`:
+
+```python
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlmodel import Session, select
+from typing import List
+
+from app.api import deps
+from app.models import YourNewModel, User
+from app.schemas import YourNewModelCreate, YourNewModelRead, YourNewModelUpdate
+
+router = APIRouter(prefix="/your-new-modules", tags=["your-new-modules"])
+
+@router.get("/", response_model=List[YourNewModelRead])
+def get_your_new_modules(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    skip: int = 0,
+    limit: int = 100,
+):
+    # Implement logic to get the list
+    query = select(YourNewModel).offset(skip).limit(limit)
+    return db.exec(query).all()
+
+@router.post("/", response_model=YourNewModelRead)
+def create_your_new_module(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    item_in: YourNewModelCreate,
+):
+    # Implement creation logic
+    db_obj = YourNewModel(**item_in.dict(), owner_id=current_user.id)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+# Add more endpoints...
+```
+
+### Registering the New Route in the Main Router
+
+Register the new route in `api/main.py`:
+
+```python
+from app.api.routes import items, login, users, your_new_module  
+  
+api_router = APIRouter()  
+api_router.include_router(login.router)  
+api_router.include_router(users.router)  
+# Add new route  
+api_router.include_router(your_new_module.router)
+```
+
+## 3. Frontend Extensions
+
+### Adding a New Route Page
+
+Add a new page component in the `frontend/src/routes/` directory:
+
+```tsx
+// frontend/src/routes/YourNewModulePage.tsx
+import React from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { api } from '../client/core/api';
+
+export default function YourNewModulePage() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['yourNewModules'],
+    queryFn: () => api.yourNewModules.getYourNewModules(),
+  });
+
+  // Implement more functionality...
+  
+  return (
+    <div>
+      <h1>Your New Module</h1>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error loading data</p>
+      ) : (
+        // Render data
+        <ul>
+          {data?.map(item => (
+            <li key={item.id}>{item.name}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+### Updating Route Configuration
+
+Add the new page to the route configuration:
+
+```tsx
+// In the appropriate route configuration file
+import YourNewModulePage from './YourNewModulePage';
+
+// Add to route configuration
+const routes = [
+  // Existing routes...
+  {
+    path: '/your-new-modules',
+    element: <YourNewModulePage />,
+    // Can add permission control
+    loader: protectedLoader,
+  }
+];
+```
+
+### Adding Navigation Menu
+
+Add a new link in the navigation component:
+
+```tsx
+<NavLink to="/your-new-modules">
+  Your New Module
+</NavLink>
+```
+
+## 4. Authentication and Authorization Extensions
+
+The project already has built-in JWT authentication and user management, but you can extend this:
+
+### Role-Based Access Control
+
+Extend the user model by adding a role field:
+
+```python
+class User(UserBase, table=True):
+    # Existing fields...
+    role: str = Field(default="user")  # Can be "user", "admin", "manager", etc.
+```
+
+Create a permission check dependency:
+
+```python
+def get_current_admin_user(
+    current_user: User = Depends(deps.get_current_active_user),
+) -> User:
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions",
+        )
+    return current_user
+```
+
+### OAuth2 and Third-Party Login Integration
+
+You can integrate third-party logins like Google, GitHub, etc.:
+
+```python
+# Add to auth.py
+@router.get("/login/google")
+async def login_google():
+    # Implement Google OAuth login logic
+    ...
+
+@router.get("/login/github")
+async def login_github():
+    # Implement GitHub OAuth login logic
+    ...
+```
+
+## 5. Business Function Extensions
+
+### Advanced Search and Filtering
+
+Implement more complex query functionality:
+
+```python
+@router.get("/search/", response_model=List[YourNewModelRead])
+def search_your_new_modules(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    keyword: str = None,
+    category: str = None,
+    start_date: date = None,
+    end_date: date = None,
+    skip: int = 0,
+    limit: int = 100,
+):
+    query = select(YourNewModel)
+    
+    # Apply various filters
+    if keyword:
+        query = query.where(YourNewModel.name.contains(keyword) | 
+                           YourNewModel.description.contains(keyword))
+    if category:
+        query = query.where(YourNewModel.category == category)
+    if start_date:
+        query = query.where(YourNewModel.created_at >= start_date)
+    if end_date:
+        query = query.where(YourNewModel.created_at <= end_date)
+        
+    query = query.offset(skip).limit(limit)
+    return db.exec(query).all()
+```
+
+### File Upload Management
+
+Add file upload and management functionality:
+
+```python
+from fastapi import UploadFile, File
+import os
+import uuid
+
+@router.post("/upload/", response_model=dict)
+async def upload_file(
+    *,
+    file: UploadFile = File(...),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    # Create upload directory
+    upload_dir = f"uploads/{current_user.id}"
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    # Save file
+    file_extension = os.path.splitext(file.filename)[1]
+    file_name = f"{uuid.uuid4()}{file_extension}"
+    file_path = os.path.join(upload_dir, file_name)
+    
+    with open(file_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+    
+    # Return file information
+    return {
+        "filename": file.filename,
+        "stored_filename": file_name,
+        "content_type": file.content_type,
+        "file_path": file_path,
+    }
+```
+
+### Real-time Notification System
+
+Integrate WebSockets to implement real-time notifications:
+
+```python
+from fastapi import WebSocket, WebSocketDisconnect
+
+class NotificationManager:
+    def __init__(self):
+        self.active_connections: dict = {}
+
+    async def connect(self, websocket: WebSocket, user_id: str):
+        await websocket.accept()
+        if user_id not in self.active_connections:
+            self.active_connections[user_id] = []
+        self.active_connections[user_id].append(websocket)
+
+    def disconnect(self, websocket: WebSocket, user_id: str):
+        if user_id in self.active_connections:
+            self.active_connections[user_id].remove(websocket)
+
+    async def send_notification(self, user_id: str, message: dict):
+        if user_id in self.active_connections:
+            for connection in self.active_connections[user_id]:
+                await connection.send_json(message)
+
+notification_manager = NotificationManager()
+
+@router.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await notification_manager.connect(websocket, user_id)
+    try:
+        while True:
+            # Can receive client messages
+            data = await websocket.receive_text()
+            # Process messages...
+    except WebSocketDisconnect:
+        notification_manager.disconnect(websocket, user_id)
+```
+
+## 6. Technical Architecture Extensions
+
+### Cache Integration
+
+Use Redis to improve performance:
+
+```python
+# Install dependencies
+# pip install redis
+
+from redis import Redis
+from functools import lru_cache
+
+@lru_cache()
+def get_redis_client() -> Redis:
+    return Redis(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        password=settings.REDIS_PASSWORD,
+        db=settings.REDIS_DB,
+        decode_responses=True,
+    )
+
+# Use in API
+@router.get("/cached-data")
+def get_cached_data(
+    redis: Redis = Depends(get_redis_client),
+):
+    # Try to get from cache
+    cache_key = "some_data_key"
+    cached_data = redis.get(cache_key)
+    
+    if cached_data:
+        return json.loads(cached_data)
+    
+    # Cache miss, get new data
+    data = get_expensive_data()
+    
+    # Store in cache, set expiration time
+    redis.set(cache_key, json.dumps(data), ex=3600)  # 1 hour expiration
+    
+    return data
+```
+
+### Background Task Processing
+
+Implement background tasks using Celery:
+
+```python
+# Install dependencies
+# pip install celery
+
+from celery import Celery
+
+# Create Celery instance
+celery_app = Celery(
+    "worker",
+    broker=settings.CELERY_BROKER_URL,
+    backend=settings.CELERY_RESULT_BACKEND,
+)
+
+# Define task
+@celery_app.task
+def process_large_data(data_id: str):
+    # Perform time-consuming operations
+    # ...
+    return {"status": "completed", "data_id": data_id}
+
+# Use in API
+@router.post("/process-data/{data_id}")
+def start_data_processing(
+    data_id: str,
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    # Start background task
+    task = process_large_data.delay(data_id)
+    
+    return {"task_id": task.id, "status": "processing"}
+
+@router.get("/tasks/{task_id}")
+def get_task_status(
+    task_id: str,
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    # Get task status
+    task = process_large_data.AsyncResult(task_id)
+    
+    if task.ready():
+        return {"status": task.status, "result": task.result}
+    return {"status": task.status}
+```
+
+### Full-Text Search Integration
+
+Integrate Elasticsearch for full-text search:
+
+```python
+# Install dependencies
+# pip install elasticsearch
+
+from elasticsearch import Elasticsearch
+
+def get_es_client():
+    return Elasticsearch([settings.ELASTICSEARCH_URL])
+
+# Index documents
+def index_document(doc_id, document):
+    es = get_es_client()
+    return es.index(index="your_index", id=doc_id, document=document)
+
+# Search documents
+@router.get("/search")
+def search_documents(
+    query: str,
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    es = get_es_client()
+    result = es.search(
+        index="your_index",
+        body={
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["title", "content", "tags"]
+                }
+            }
+        }
+    )
+    
+    return result["hits"]["hits"]
+```
+
+## 7. Deployment and Operations Extensions
+
+### Monitoring System Integration
+
+Integrate Prometheus and Grafana monitoring systems:
+
+```python
+# Install dependencies
+# pip install prometheus-fastapi-instrumentator
+
+from prometheus_fastapi_instrumentator import Instrumentator
+
+# Add to main application
+def create_app():
+    app = FastAPI(title=settings.PROJECT_NAME)
+    
+    # Set up Prometheus monitoring
+    Instrumentator().instrument(app).expose(app)
+    
+    # Other application settings...
+    
+    return app
+```
+
+### Log Management
+
+Configure structured logging:
+
+```python
+import logging
+import json
+from datetime import datetime
+
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        log_record = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno,
+        }
+        
+        if hasattr(record, "props"):
+            log_record.update(record.props)
+            
+        return json.dumps(log_record)
+
+# Configure logging
+def setup_logging():
+    handler = logging.StreamHandler()
+    handler.setFormatter(JSONFormatter())
+    
+    logger = logging.getLogger("app")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    
+    return logger
+
+# Use logging
+logger = setup_logging()
+
+@router.get("/items/{item_id}")
+def get_item(item_id: str):
+    logger.info(
+        "Get item", 
+        extra={"props": {"item_id": item_id, "user_id": current_user.id}}
+    )
+    # Processing logic...
+```
+
+### Automated Testing Extensions
+
+Extend the testing framework to add more test types:
+
+```python
+# Integration test example
+def test_create_and_read_item():
+    # Create test client
+    client = TestClient(app)
+    
+    # 1. Login to get token
+    login_data = {
+        "username": "test@example.com",
+        "password": "testpassword",
+    }
+    response = client.post("/api/login", json=login_data)
+    tokens = response.json()
+    
+    # 2. Create new item with token
+    headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+    item_data = {"name": "Test Item", "description": "Test Description"}
+    response = client.post("/api/items/", json=item_data, headers=headers)
+    
+    assert response.status_code == 200
+    created_item = response.json()
+    
+    # 3. Verify that the created item can be read
+    response = client.get(f"/api/items/{created_item['id']}", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["name"] == "Test Item"
+```
+
+### Container Orchestration
+
+Extend from Docker Compose to Kubernetes:
+
+```yaml
+# Example Kubernetes deployment configuration (deployment.yaml)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: your-app-backend
+  labels:
+    app: your-app
+    component: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: your-app
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: your-app
+        component: backend
+    spec:
+      containers:
+      - name: backend
+        image: your-registry/your-app-backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: your-app-secrets
+              key: database-url
+        # More environment variables...
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+```
+
+## Summary
+
+This guide provides multiple directions and examples for secondary development on the Quick Forge AI framework. Based on your specific business requirements, you can selectively adopt these extension solutions, or combine multiple approaches to create complex application systems.
+
+During the extension process, it is recommended to follow these principles:
+
+1. **Progressive extension**: First implement core functionality, then gradually add advanced features
+2. **Maintain compatibility**: Ensure extensions do not break existing functionality
+3. **Follow project standards**: Maintain consistency in code style and architecture
+4. **Write tests**: Write comprehensive tests for new functionality
+5. **Document**: Update documentation in a timely manner, record extension design decisions and usage methods
+
+Through reasonable extensions, Quick Forge AI can meet various requirements from simple applications to complex enterprise-level systems. 

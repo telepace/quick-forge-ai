@@ -160,9 +160,9 @@ export default async function RootLayout({ children, params }: Props) {
             {children}
           </Layout>
         </ThemeProvider>
+        <GoogleAnalytics gaId="G-VCR6017LB8" />
+        <BaiduTrack />
       </body>
-      <GoogleAnalytics gaId="G-VCR6017LB8" />
-      <BaiduTrack />
     </html>
   )
 }

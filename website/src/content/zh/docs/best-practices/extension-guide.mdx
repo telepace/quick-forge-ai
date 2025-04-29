@@ -1,0 +1,635 @@
+# 二次开发扩展指南
+
+快速驱动AI（Quick Forge AI）项目设计为高度可扩展的系统，可以根据不同业务需求进行定制和扩展。本指南提供了项目二次开发的详细步骤和最佳实践。
+
+## 1. 数据模型扩展
+
+在 `models.py` 中根据业务需求扩展数据模型是最基础的扩展方式。
+
+### 示例：创建新模型
+
+```python
+# 在 models.py 中添加新模型
+class YourNewModel(SQLModel, table=True):  
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)  
+    name: str = Field(min_length=1, max_length=255)  
+    description: str | None = Field(default=None, max_length=255)  
+    # 添加关系字段  
+    owner_id: uuid.UUID = Field(foreign_key="user.id")  
+    owner: User | None = Relationship(back_populates="your_new_models")
+```
+
+同时需要在 User 模型中添加相应的反向关系：
+
+```python
+class User(UserBase, table=True):  
+    # 现有字段...  
+    your_new_models: list["YourNewModel"] = Relationship(back_populates="owner")
+```
+
+### 创建数据库迁移
+
+添加新模型后，需要创建数据库迁移脚本：
+
+```bash
+# 在后端目录运行
+cd backend
+alembic revision --autogenerate -m "Add YourNewModel"
+alembic upgrade head
+```
+
+## 2. API 扩展
+
+### 创建新的路由模块
+
+在 `backend/app/api/routes/` 下创建新的路由模块 `your_new_module.py`：
+
+```python
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlmodel import Session, select
+from typing import List
+
+from app.api import deps
+from app.models import YourNewModel, User
+from app.schemas import YourNewModelCreate, YourNewModelRead, YourNewModelUpdate
+
+router = APIRouter(prefix="/your-new-modules", tags=["your-new-modules"])
+
+@router.get("/", response_model=List[YourNewModelRead])
+def get_your_new_modules(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    skip: int = 0,
+    limit: int = 100,
+):
+    # 实现获取列表的逻辑
+    query = select(YourNewModel).offset(skip).limit(limit)
+    return db.exec(query).all()
+
+@router.post("/", response_model=YourNewModelRead)
+def create_your_new_module(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    item_in: YourNewModelCreate,
+):
+    # 实现创建逻辑
+    db_obj = YourNewModel(**item_in.dict(), owner_id=current_user.id)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+# 添加更多的端点...
+```
+
+### 在主路由文件中注册新路由
+
+在 `api/main.py` 中注册新路由：
+
+```python
+from app.api.routes import items, login, users, your_new_module  
+  
+api_router = APIRouter()  
+api_router.include_router(login.router)  
+api_router.include_router(users.router)  
+# 添加新路由  
+api_router.include_router(your_new_module.router)
+```
+
+## 3. 前端扩展
+
+### 添加新的路由页面
+
+在 `frontend/src/routes/` 目录下添加新页面组件：
+
+```tsx
+// frontend/src/routes/YourNewModulePage.tsx
+import React from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { api } from '../client/core/api';
+
+export default function YourNewModulePage() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['yourNewModules'],
+    queryFn: () => api.yourNewModules.getYourNewModules(),
+  });
+
+  // 实现更多功能...
+  
+  return (
+    <div>
+      <h1>您的新模块</h1>
+      {isLoading ? (
+        <p>加载中...</p>
+      ) : error ? (
+        <p>加载出错</p>
+      ) : (
+        // 渲染数据
+        <ul>
+          {data?.map(item => (
+            <li key={item.id}>{item.name}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+### 更新路由配置
+
+在路由配置中添加新页面：
+
+```tsx
+// 在相应的路由配置文件中
+import YourNewModulePage from './YourNewModulePage';
+
+// 添加到路由配置
+const routes = [
+  // 现有路由...
+  {
+    path: '/your-new-modules',
+    element: <YourNewModulePage />,
+    // 可以添加权限控制
+    loader: protectedLoader,
+  }
+];
+```
+
+### 添加导航菜单
+
+在导航组件中添加新链接：
+
+```tsx
+<NavLink to="/your-new-modules">
+  您的新模块
+</NavLink>
+```
+
+## 4. 身份验证与授权扩展
+
+项目已内置 JWT 认证和用户管理，但你可以基于此进行扩展：
+
+### 基于角色的权限控制
+
+扩展用户模型添加角色字段：
+
+```python
+class User(UserBase, table=True):
+    # 现有字段...
+    role: str = Field(default="user")  # 可以是 "user", "admin", "manager" 等
+```
+
+创建权限检查依赖项：
+
+```python
+def get_current_admin_user(
+    current_user: User = Depends(deps.get_current_active_user),
+) -> User:
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="权限不足",
+        )
+    return current_user
+```
+
+### OAuth2 与第三方登录集成
+
+可以集成 Google、GitHub 等第三方登录：
+
+```python
+# 在 auth.py 中添加
+@router.get("/login/google")
+async def login_google():
+    # 实现 Google OAuth 登录逻辑
+    ...
+
+@router.get("/login/github")
+async def login_github():
+    # 实现 GitHub OAuth 登录逻辑
+    ...
+```
+
+## 5. 业务功能扩展
+
+### 高级搜索和过滤
+
+实现更复杂的查询功能：
+
+```python
+@router.get("/search/", response_model=List[YourNewModelRead])
+def search_your_new_modules(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    keyword: str = None,
+    category: str = None,
+    start_date: date = None,
+    end_date: date = None,
+    skip: int = 0,
+    limit: int = 100,
+):
+    query = select(YourNewModel)
+    
+    # 应用各种过滤条件
+    if keyword:
+        query = query.where(YourNewModel.name.contains(keyword) | 
+                           YourNewModel.description.contains(keyword))
+    if category:
+        query = query.where(YourNewModel.category == category)
+    if start_date:
+        query = query.where(YourNewModel.created_at >= start_date)
+    if end_date:
+        query = query.where(YourNewModel.created_at <= end_date)
+        
+    query = query.offset(skip).limit(limit)
+    return db.exec(query).all()
+```
+
+### 文件上传管理
+
+添加文件上传和管理功能：
+
+```python
+from fastapi import UploadFile, File
+import os
+import uuid
+
+@router.post("/upload/", response_model=dict)
+async def upload_file(
+    *,
+    file: UploadFile = File(...),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    # 创建上传目录
+    upload_dir = f"uploads/{current_user.id}"
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    # 保存文件
+    file_extension = os.path.splitext(file.filename)[1]
+    file_name = f"{uuid.uuid4()}{file_extension}"
+    file_path = os.path.join(upload_dir, file_name)
+    
+    with open(file_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+    
+    # 返回文件信息
+    return {
+        "filename": file.filename,
+        "stored_filename": file_name,
+        "content_type": file.content_type,
+        "file_path": file_path,
+    }
+```
+
+### 实时通知系统
+
+集成 WebSocket 实现实时通知：
+
+```python
+from fastapi import WebSocket, WebSocketDisconnect
+
+class NotificationManager:
+    def __init__(self):
+        self.active_connections: dict = {}
+
+    async def connect(self, websocket: WebSocket, user_id: str):
+        await websocket.accept()
+        if user_id not in self.active_connections:
+            self.active_connections[user_id] = []
+        self.active_connections[user_id].append(websocket)
+
+    def disconnect(self, websocket: WebSocket, user_id: str):
+        if user_id in self.active_connections:
+            self.active_connections[user_id].remove(websocket)
+
+    async def send_notification(self, user_id: str, message: dict):
+        if user_id in self.active_connections:
+            for connection in self.active_connections[user_id]:
+                await connection.send_json(message)
+
+notification_manager = NotificationManager()
+
+@router.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await notification_manager.connect(websocket, user_id)
+    try:
+        while True:
+            # 可以接收客户端消息
+            data = await websocket.receive_text()
+            # 处理消息...
+    except WebSocketDisconnect:
+        notification_manager.disconnect(websocket, user_id)
+```
+
+## 6. 技术架构扩展
+
+### 缓存层集成
+
+使用 Redis 提高性能：
+
+```python
+# 安装依赖
+# pip install redis
+
+from redis import Redis
+from functools import lru_cache
+
+@lru_cache()
+def get_redis_client() -> Redis:
+    return Redis(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        password=settings.REDIS_PASSWORD,
+        db=settings.REDIS_DB,
+        decode_responses=True,
+    )
+
+# 在API中使用
+@router.get("/cached-data")
+def get_cached_data(
+    redis: Redis = Depends(get_redis_client),
+):
+    # 尝试从缓存获取
+    cache_key = "some_data_key"
+    cached_data = redis.get(cache_key)
+    
+    if cached_data:
+        return json.loads(cached_data)
+    
+    # 缓存未命中，获取新数据
+    data = get_expensive_data()
+    
+    # 存入缓存，设置过期时间
+    redis.set(cache_key, json.dumps(data), ex=3600)  # 1小时过期
+    
+    return data
+```
+
+### 后台任务处理
+
+使用 Celery 实现后台任务：
+
+```python
+# 安装依赖
+# pip install celery
+
+from celery import Celery
+
+# 创建 Celery 实例
+celery_app = Celery(
+    "worker",
+    broker=settings.CELERY_BROKER_URL,
+    backend=settings.CELERY_RESULT_BACKEND,
+)
+
+# 定义任务
+@celery_app.task
+def process_large_data(data_id: str):
+    # 执行耗时操作
+    # ...
+    return {"status": "completed", "data_id": data_id}
+
+# 在API中使用
+@router.post("/process-data/{data_id}")
+def start_data_processing(
+    data_id: str,
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    # 启动后台任务
+    task = process_large_data.delay(data_id)
+    
+    return {"task_id": task.id, "status": "processing"}
+
+@router.get("/tasks/{task_id}")
+def get_task_status(
+    task_id: str,
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    # 获取任务状态
+    task = process_large_data.AsyncResult(task_id)
+    
+    if task.ready():
+        return {"status": task.status, "result": task.result}
+    return {"status": task.status}
+```
+
+### 全文搜索集成
+
+集成 Elasticsearch 实现全文搜索：
+
+```python
+# 安装依赖
+# pip install elasticsearch
+
+from elasticsearch import Elasticsearch
+
+def get_es_client():
+    return Elasticsearch([settings.ELASTICSEARCH_URL])
+
+# 索引文档
+def index_document(doc_id, document):
+    es = get_es_client()
+    return es.index(index="your_index", id=doc_id, document=document)
+
+# 搜索文档
+@router.get("/search")
+def search_documents(
+    query: str,
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    es = get_es_client()
+    result = es.search(
+        index="your_index",
+        body={
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "fields": ["title", "content", "tags"]
+                }
+            }
+        }
+    )
+    
+    return result["hits"]["hits"]
+```
+
+## 7. 部署和运维扩展
+
+### 监控系统集成
+
+集成 Prometheus 和 Grafana 监控系统：
+
+```python
+# 安装依赖
+# pip install prometheus-fastapi-instrumentator
+
+from prometheus_fastapi_instrumentator import Instrumentator
+
+# 在主应用中添加
+def create_app():
+    app = FastAPI(title=settings.PROJECT_NAME)
+    
+    # 设置 Prometheus 监控
+    Instrumentator().instrument(app).expose(app)
+    
+    # 其他应用设置...
+    
+    return app
+```
+
+### 日志管理
+
+配置结构化日志：
+
+```python
+import logging
+import json
+from datetime import datetime
+
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        log_record = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno,
+        }
+        
+        if hasattr(record, "props"):
+            log_record.update(record.props)
+            
+        return json.dumps(log_record)
+
+# 配置日志
+def setup_logging():
+    handler = logging.StreamHandler()
+    handler.setFormatter(JSONFormatter())
+    
+    logger = logging.getLogger("app")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    
+    return logger
+
+# 使用日志
+logger = setup_logging()
+
+@router.get("/items/{item_id}")
+def get_item(item_id: str):
+    logger.info(
+        "获取项目", 
+        extra={"props": {"item_id": item_id, "user_id": current_user.id}}
+    )
+    # 处理逻辑...
+```
+
+### 自动化测试扩展
+
+扩展测试框架添加更多测试类型：
+
+```python
+# 集成测试示例
+def test_create_and_read_item():
+    # 创建测试客户端
+    client = TestClient(app)
+    
+    # 1. 登录获取令牌
+    login_data = {
+        "username": "test@example.com",
+        "password": "testpassword",
+    }
+    response = client.post("/api/login", json=login_data)
+    tokens = response.json()
+    
+    # 2. 用令牌创建新项目
+    headers = {"Authorization": f"Bearer {tokens['access_token']}"}
+    item_data = {"name": "Test Item", "description": "Test Description"}
+    response = client.post("/api/items/", json=item_data, headers=headers)
+    
+    assert response.status_code == 200
+    created_item = response.json()
+    
+    # 3. 验证可以读取创建的项目
+    response = client.get(f"/api/items/{created_item['id']}", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["name"] == "Test Item"
+```
+
+### 容器编排
+
+从 Docker Compose 扩展到 Kubernetes:
+
+```yaml
+# 示例 Kubernetes 部署配置 (deployment.yaml)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: your-app-backend
+  labels:
+    app: your-app
+    component: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: your-app
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: your-app
+        component: backend
+    spec:
+      containers:
+      - name: backend
+        image: your-registry/your-app-backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: your-app-secrets
+              key: database-url
+        # 更多环境变量...
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+```
+
+## 总结
+
+本指南提供了在 Quick Forge AI 框架上进行二次开发的多个方向和示例。根据你的具体业务需求，可以选择性地采用这些扩展方案，也可以结合多种方案创建复杂的应用系统。
+
+在扩展过程中，建议遵循以下原则：
+
+1. **渐进式扩展**：先实现核心功能，再逐步添加高级特性
+2. **保持兼容性**：确保扩展不破坏现有功能
+3. **遵循项目规范**：保持代码风格和架构一致性
+4. **编写测试**：为新功能编写充分的测试
+5. **文档记录**：及时更新文档，记录扩展的设计决策和使用方法
+
+通过合理的扩展，Quick Forge AI 可以满足从简单应用到复杂企业级系统的各种需求。 
