@@ -3,7 +3,7 @@ import { TitleBadge } from '@/components/TitleBadge'
 
 export default {
   index: {
-    type: 'page',
+    title: '首页',
     display: 'hidden',
     theme: {
       timestamp: false,
@@ -12,15 +12,17 @@ export default {
     },
   },
   introduction: {
-    type: 'page',
+    title: '介绍',
     theme: {
       navbar: true,
       toc: false,
     },
   },
+  blog: {
+    title: '📝 博客',
+  },
   docs: {
     title: '📦 示例代码',
-    type: 'page',
   },
   upgrade: {
     title: (
@@ -29,6 +31,5 @@ export default {
         <TitleBadge />
       </span>
     ),
-    type: 'page',
   },
 } satisfies MetaRecord

@@ -2,6 +2,7 @@ import type { MetaRecord } from 'nextra'
 
 export default {
   index: 'Introduction',
+  'features-and-release-notes': 'Features and Release Notes',
   'getting-started': 'Getting Started',
   backend: 'Backend Development',
   frontend: 'Frontend Development',

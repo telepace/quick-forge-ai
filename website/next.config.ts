@@ -3,7 +3,8 @@ import path from 'path'
 
 const withNextra = createWithNextra({
   defaultShowCopyCode: true,
-  unstable_shouldAddLocaleToLinks: true,
+  staticImage: true,
+  unstable_shouldAddLocaleToLinks: false,
 })
 
 
@@ -34,4 +35,11 @@ export default withNextra({
     }
     return config
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:3000', 'localhost:3001', 'localhost:3002', 'localhost:3003', 'localhost:3004', 'localhost:3005', 'localhost:3006', 'localhost:3007']
+    },
+    scrollRestoration: true,
+    esmExternals: true
+  }
 })

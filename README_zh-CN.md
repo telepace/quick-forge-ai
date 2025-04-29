@@ -41,6 +41,82 @@ QuickForge AI是一个生产级全栈模板，结合了FastAPI (Python)和TypeSc
   <img src="./images/technical-war.svg" alt="技术栈比较图" />
 </p>
 
+### 架构图
+
+**系统架构**
+
+```mermaid
+graph TD
+    %% 定义客户端
+    client[Client<br/>Web Browser]
+
+    %% 定义部署环境子图
+    subgraph dep_env [Deployment Environment]
+        %% 定义代理
+        proxy[Traefik Proxy]
+
+        %% 定义前端容器子图
+        subgraph frontend_cont [Frontend Container]
+            direction TB
+            frontend_app[React Application]
+            openapi_client[Generated OpenAPI Client]
+            frontend_app --> openapi_client;
+        end
+
+        %% 定义后端容器子图
+        subgraph backend_cont [Backend Container]
+            direction TB
+            backend_app[FastAPI Application]
+            orm[SQLModel ORM]
+            backend_app --> orm;
+        end
+
+        %% 定义迁移容器子图
+        subgraph migration_cont [Migration Container]
+            direction TB
+            prestart[Prestart Script]
+            alembic[Alembic Migrations]
+        end
+
+        %% 定义附加服务子图
+        subgraph additional_serv [Additional Services]
+            direction TB
+            adminer[Adminer<br/>Database Management]
+            mailcatcher[MailCatcher<br/>Email Testing]
+        end
+
+        %% 定义数据库容器子图
+        subgraph db_cont [Database Container]
+            db[PostgreSQL Database]
+        end
+
+        %% 定义部署环境内部连接
+        proxy --> frontend_cont;
+        proxy --> backend_cont;
+        openapi_client --> backend_app;
+        orm --> db;
+        migration_cont --> db;
+        adminer --> db;
+        backend_app --> mailcatcher;
+    end
+
+    %% 定义外部连接
+    client --> proxy;
+
+    %% 样式 (可选，增加可读性)
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,rx:5,ry:5;
+    classDef container fill:#e6f7ff,stroke:#91d5ff,stroke-width:1px,rx:5,ry:5;
+    classDef app fill:#d9f7be,stroke:#b7eb8f,stroke-width:1px,rx:5,ry:5;
+    classDef db fill:#fffbe6,stroke:#ffe58f,stroke-width:1px,rx:5,ry:5;
+    classDef service fill:#fff0f6,stroke:#ffadd2,stroke-width:1px,rx:5,ry:5;
+
+    class client,proxy default;
+    class frontend_cont,backend_cont,migration_cont,db_cont container;
+    class frontend_app,openapi_client,backend_app,orm,prestart,alembic app;
+    class adminer,mailcatcher service;
+    class db db;
+```
+
 
 ### 后端
 - FastAPI用于高性能API端点
@@ -51,6 +127,82 @@ QuickForge AI是一个生产级全栈模板，结合了FastAPI (Python)和TypeSc
 - Pytest用于测试
 - Poetry用于依赖管理
 
+```mermaid
+graph TD
+    %% 定义顶层应用
+    fastapi_app[FastAPI Application]
+
+    %% 定义FastAPI实例
+    fastapi_instance[FastAPI App Instance]
+    fastapi_app --> fastapi_instance;
+
+    %% 定义API路由子图
+    subgraph api_routes [API Routes]
+        direction LR
+        login_router[Login Router<br/>/login]
+        users_router[Users Router<br/>/users]
+        items_router[Items Router<br/>/items]
+        utils_router[Utils Router<br/>/utils]
+    end
+    fastapi_instance --> api_routes;
+
+    %% 定义设置
+    settings[Settings<br/>Core Configuration]
+
+    %% 定义数据层子图
+    subgraph data_layer [Data Layer]
+        direction TB
+        crud[CRUD Operations]
+        sql_models[SQLModel Models]
+        alembic[Alembic Migrations]
+        crud --> sql_models;
+    end
+
+    %% 定义核心系统子图
+    subgraph core_systems [Core Systems]
+        direction TB
+        jwt[JWT Authentication]
+        email[Email Utilities]
+        di[Dependency Injection]
+        db_conn[Database Connection]
+        jwt --> db_conn;
+        email --> db_conn;
+        di --> db_conn;
+    end
+
+    %% 定义连接
+    fastapi_instance --> settings;
+    settings --> crud;
+    login_router --> crud;
+    users_router --> crud;
+    items_router --> crud;
+    utils_router --> email;
+    login_router --> jwt;
+    users_router --> jwt;
+    items_router --> jwt;
+    login_router --> di;
+    users_router --> di;
+    items_router --> di;
+    utils_router --> di;
+    sql_models --> db_conn;
+    alembic --> db_conn;
+
+
+    %% 样式 (可选，增加可读性)
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,rx:5,ry:5;
+    classDef subgraph fill:#f0f0f0,stroke:#ccc,stroke-width:1px,rx:5,ry:5;
+    classDef important fill:#e6f7ff,stroke:#91d5ff,stroke-width:1px,rx:5,ry:5;
+    classDef data fill:#fffbe6,stroke:#ffe58f,stroke-width:1px,rx:5,ry:5;
+    classDef core fill:#d9f7be,stroke:#b7eb8f,stroke-width:1px,rx:5,ry:5;
+
+    class fastapi_app,fastapi_instance important;
+    class api_routes,data_layer,core_systems subgraph;
+    class login_router,users_router,items_router,utils_router,settings default;
+    class crud,sql_models,alembic data;
+    class jwt,email,di,db_conn core;
+```
+
+
 ### 前端
 - TypeScript提供类型安全
 - React和hooks用于UI组件
@@ -60,6 +212,75 @@ QuickForge AI是一个生产级全栈模板，结合了FastAPI (Python)和TypeSc
 - Jest和React Testing Library用于测试
 - Playwright用于端到端测试
 - pnpm用于包管理
+
+```mermaid
+graph TD
+    %% 定义顶层应用
+    react_app[React Application]
+
+    %% 定义应用入口点
+    entry_point[Application Entry Point]
+    react_app --> entry_point;
+
+    %% 定义 Providers 子图
+    subgraph providers_sg [Providers]
+        direction LR
+        chakra[Chakra UI Provider]
+        tanstack_query[TanStack Query Provider]
+        tanstack_router[TanStack Router Provider]
+    end
+    entry_point --> providers_sg;
+
+    %% 定义 Routes 子图
+    subgraph routes_sg [Routes]
+        direction LR
+        public_routes[Public Routes<br/>Login, Signup, etc.]
+        private_routes[Private Routes<br/>Dashboard, Users, Items]
+    end
+    providers_sg --> routes_sg;
+
+    %% 定义 Components 子图
+    subgraph components_sg [Components]
+        direction LR
+        ui_comp[UI Components<br/>Forms, Tables, etc.]
+        layout_comp[Layout Components<br/>Sidebar, Navbar]
+    end
+
+    %% 定义 API Integration 子图
+    subgraph api_int_sg [API Integration]
+        direction TB
+        auth_module[Authentication Module]
+        openapi_client[Generated OpenAPI Client]
+        auth_module --> openapi_client;
+    end
+
+    %% 定义连接
+    public_routes --> ui_comp;
+    public_routes --> layout_comp;
+    private_routes --> ui_comp;
+    private_routes --> layout_comp;
+    private_routes --> api_int_sg;
+    ui_comp --> openapi_client;
+
+
+    %% 样式 (可选，增加可读性)
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px,rx:5,ry:5;
+    classDef subgraph fill:#f0f0f0,stroke:#ccc,stroke-width:1px,rx:5,ry:5;
+    classDef entry fill:#e6f7ff,stroke:#91d5ff,stroke-width:1px,rx:5,ry:5;
+    classDef provider fill:#fffbe6,stroke:#ffe58f,stroke-width:1px,rx:5,ry:5;
+    classDef route fill:#d9f7be,stroke:#b7eb8f,stroke-width:1px,rx:5,ry:5;
+    classDef component fill:#fff0f6,stroke:#ffadd2,stroke-width:1px,rx:5,ry:5;
+    classDef api fill:#f6ffed,stroke:#d9f7be,stroke-width:1px,rx:5,ry:5;
+
+
+    class react_app default;
+    class entry_point entry;
+    class providers_sg,routes_sg,components_sg,api_int_sg subgraph;
+    class chakra,tanstack_query,tanstack_router provider;
+    class public_routes,private_routes route;
+    class ui_comp,layout_comp component;
+    class auth_module,openapi_client api;
+```
 
 ### DevOps和工具
 - GitHub Actions用于CI/CD
@@ -249,8 +470,7 @@ QuickForge AI使集成各种AI服务变得简单：
 + [独立开发者工具站（Awesome Independent developer tools）](https://github.com/yaolifeng0629/Awesome-independent-tools)
 + [1000UserGuide：对独立开发者和创业者来说，找到前1000个早期用户太关键了。这里精心整理了300多个国内外渠道，适合独立开发者和创业者推广产品的渠道。](https://github.com/naxiaoduo/1000UserGuide)
 + [中国独立开发者项目列表](https://github.com/1c7/chinese-independent-developer)
-
-
++ [独立开发者必备技能及现代工具 & 分别的上手指导](https://nsddd.top/zh/posts/ai-projects/independent-developer/)
 
 
 ## 📄 许可证

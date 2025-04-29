@@ -1,0 +1,156 @@
+---
+title: Sentry集成
+description: 如何在应用程序中设置和配置Sentry进行错误跟踪
+---
+
+# Sentry集成
+
+## 简介
+
+[Sentry](https://sentry.io/)是一个错误跟踪和性能监控平台，可以帮助您识别和修复应用程序中的问题。本指南将引导您在Quick Forge AI项目中设置Sentry。
+
+本项目的后端已经集成了Sentry，这意味着您只需要配置您的DSN就可以开始跟踪错误。
+
+## 前提条件
+
+- 一个Sentry账户（您可以[免费注册](https://sentry.io/signup/)）
+- 一个已部署的Quick Forge AI应用程序或本地开发环境
+
+## 设置Sentry
+
+### 1. 创建Sentry项目
+
+1. 登录您的[Sentry账户](https://sentry.io/auth/login/)
+2. 点击"Create Project"创建一个新项目
+3. 选择"Python"作为平台
+4. 为您的项目命名（例如，"quick-forge-backend"）
+5. 按照设置步骤创建您的项目
+
+### 2. 获取您的DSN
+
+创建项目后，Sentry将为您提供一个数据源名称(DSN)。这是Sentry用来将事件与您的项目关联的唯一标识符。
+
+1. 导航至 Settings → Projects → [您的项目] → Client Keys (DSN)
+2. 复制DSN值，它看起来应该像：`https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@xxxxxxx.ingest.sentry.io/xxxxxxx`
+
+### 3. 配置您的应用程序
+
+#### 环境变量
+
+将您的Sentry DSN添加到环境变量中：
+
+1. 在本地开发环境中，将DSN添加到您的`.env`文件：
+
+```bash
+SENTRY_DSN=https://your-dsn-here@xxxxxxx.ingest.sentry.io/xxxxxxx
+```
+
+2. 对于生产部署，确保在部署配置中设置了`SENTRY_DSN`环境变量。
+
+#### Docker Compose
+
+`docker-compose.yml`文件已经包含了`SENTRY_DSN`环境变量，它将从您的`.env`文件中获取：
+
+```yaml
+services:
+  backend:
+    environment:
+      - SENTRY_DSN=${SENTRY_DSN}
+```
+
+#### Kubernetes/Helm部署
+
+对于Helm部署，更新`values.yaml`或`values.prod.yaml`文件：
+
+```yaml
+backend:
+  env:
+    SENTRY_DSN: "your-sentry-dsn"
+```
+
+## Sentry如何初始化
+
+如果设置了`SENTRY_DSN`环境变量且环境不是"local"，应用程序将自动初始化Sentry。这在`backend/app/main.py`中处理：
+
+```python
+import sentry_sdk
+from fastapi import FastAPI
+from app.core.config import settings
+
+if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
+    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
+```
+
+这意味着：
+- 只有当您提供DSN时，Sentry才会启用
+- 默认情况下，Sentry在本地开发中禁用（以避免发送开发错误）
+- 您可以通过将环境设置为"local"以外的值在本地开发中启用它
+
+## 测试您的Sentry集成
+
+要验证您的Sentry集成是否正常工作：
+
+1. 使用设置了`SENTRY_DSN`环境变量部署您的应用程序
+2. 在您的应用程序中生成一个错误（仅用于测试目的）
+3. 检查您的Sentry仪表板，查看是否捕获了错误
+
+以下是在FastAPI端点中生成测试错误的简单方法：
+
+```python
+@app.get("/test-sentry")
+def test_sentry():
+    try:
+        1 / 0  # 这将导致除以零错误
+    except Exception as e:
+        # 这将把错误发送到Sentry
+        raise e
+    return {"message": "这个端点应该会引发一个错误"}
+```
+
+## 最佳实践
+
+### 环境分离
+
+确保为不同的环境（开发、暂存、生产）创建单独的Sentry项目，以保持错误跟踪的组织性。
+
+### 上下文信息
+
+您可以通过向Sentry事件添加上下文来增强错误报告：
+
+```python
+import sentry_sdk
+
+# 添加用户上下文
+sentry_sdk.set_user({"id": "12345", "email": "user@example.com"})
+
+# 添加自定义标签
+sentry_sdk.set_tag("transaction_id", "123456789")
+
+# 添加额外数据
+sentry_sdk.set_extra("order_details", {"amount": 100, "currency": "USD"})
+```
+
+### 性能监控
+
+Sentry还提供性能监控功能。您可以通过在初始化时设置`enable_tracing=True`（模板中已经完成）并向应用程序的特定部分添加性能监控代码来配置此功能。
+
+## 故障排除
+
+### 事件未被捕获
+
+如果您的事件没有显示在Sentry中：
+
+1. 验证您的DSN是否正确
+2. 检查您的应用程序环境是否设置为"local"
+3. 确保您的应用程序有互联网访问权限，可以将事件发送到Sentry
+4. 查找应用程序日志中与Sentry初始化相关的任何错误
+
+### 速率限制
+
+如果您使用的是免费Sentry计划，请注意可以发送的事件数量有限制。配置您的集成以优先处理最重要的错误。
+
+## 结论
+
+Sentry是一个强大的工具，用于跟踪和监控应用程序中的错误。通过本指南中概述的配置，您应该能够开始捕获错误并提高Quick Forge AI应用程序的可靠性。
+
+有关更高级的功能和配置选项，请参考[Python官方Sentry文档](https://docs.sentry.io/platforms/python/)。 
