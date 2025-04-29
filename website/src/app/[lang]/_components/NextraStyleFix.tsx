@@ -3,12 +3,20 @@
 import { useEffect } from 'react'
 
 /**
- * 这个组件用于修复Nextra样式水合问题
- * 通过在客户端渲染时移除可能导致冲突的样式元素
+ * 这个函数用于修复Nextra样式水合问题。
+ * 它通过在客户端渲染时移除可能导致冲突的样式元素来实现这一目标。
+ *
+ * @returns {null} - 该函数不返回任何值，始终返回null。
  */
 export function NextraStyleFix() {
   useEffect(() => {
     // 处理可能存在的样式冲突
+    /**
+     * Handles the removal of specific style tags from the document.
+     *
+     * This function searches for all `<style>` elements in the document and removes those
+     * that contain either 'body {transition:' or 'body[unresolved]' in their text content.
+     */
     const handleStyleFix = () => {
       // 查找包含body transition的样式标签并移除
       document.querySelectorAll('style').forEach(styleEl => {
@@ -42,6 +50,15 @@ export function NextraStyleFix() {
   return null
 }
 
+/**
+ * A React functional component that wraps content with specific styling and layout for documentation purposes.
+ *
+ * @param {React.ReactNode} children - The child components or elements to be rendered within the wrapper.
+ * @param {any} [toc] - An optional table of contents data, which can be used to render a sidebar or other navigational elements.
+ * @param {any} [metadata] - Optional metadata related to the content, which could include author information, creation date, etc.
+ *
+ * @returns {JSX.Element} A JSX element representing the styled and laid-out content container.
+ */
 export const NextraContentWrapper: React.FC<{
   children: React.ReactNode,
   toc?: any,
