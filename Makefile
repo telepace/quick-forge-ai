@@ -78,13 +78,13 @@ dev:
 .PHONY: backend-install
 backend-install:
 	@echo "===========> Installing backend dependencies"
-	@cd $(BACKEND_DIR) && $(PIP) install -r requirements.txt
+	@cd $(BACKEND_DIR) && $(PIP) install -r .
 
 ## backend-build: Build backend
 .PHONY: backend-build
-backend-build: backend-install
+backend-build:
 	@echo "===========> Building backend"
-	@cd $(BACKEND_DIR) && $(PYTHON) -m app
+	@cd $(BACKEND_DIR) && fastapi dev app/main.py
 
 ## backend-test: Run backend tests
 .PHONY: backend-test
