@@ -73,17 +73,30 @@ docker-compose exec db pg_dump -U postgres -d app > database_backup.sql
 psql "postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres" < database_backup.sql
 ```
 
-### 第 5 步: 配置 Quick Forge AI
+### 第 5 步: 配置 Quick Forge AI 使用 Supabase
 
-他们使用配置助手切换到 Supabase：
+他们只需在 `.env` 文件中添加 Supabase 连接 URL：
 
 ```bash
-make configure-db
+# 在 .env 文件中添加 Supabase 连接 URL
+SUPABASE_URL=postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres
 ```
 
-当提示时，他们选择了选项 2 用于 Supabase 并输入了他们的连接 URL。
+系统自动检测到 `SUPABASE_URL` 变量的存在，并切换到使用 Supabase 作为数据库。
 
-### 第 6 步: 在测试环境中测试
+### 第 6 步: 在 Supabase 上运行数据库迁移
+
+为确保他们的数据库模式正确设置，他们对 Supabase 运行了迁移：
+
+```bash
+# 进入后端容器
+docker-compose exec backend bash
+
+# 对 Supabase 应用迁移
+alembic upgrade head
+```
+
+### 第 7 步: 在测试环境中测试
 
 在部署到生产环境之前，他们：
 
@@ -91,16 +104,13 @@ make configure-db
 2. 运行全面测试以确保所有功能正常工作
 3. 测量性能以确保它达到或超过之前的设置
 
-### 第 7 步: 生产环境部署
+### 第 8 步: 生产环境部署
 
 在确认一切在测试环境中正常工作后，他们更新了生产环境：
 
 ```bash
-# 在生产环境中更新环境变量
-USE_SUPABASE=true
+# 在生产环境中只需更新以下环境变量：
 SUPABASE_URL=postgresql://postgres:password@db.abcdefghijkl.supabase.co:5432/postgres
-USE_POSTGRES_SERVICE=none
-USE_POSTGRES_PRESTART_SERVICE=none
 
 # 重启生产服务
 docker-compose down
@@ -129,18 +139,19 @@ docker-compose up -d
 
 ```
 # .env 文件 (敏感值已替换)
-USE_SUPABASE=true
 SUPABASE_URL=postgresql://postgres:********@db.abcdefghijkl.supabase.co:5432/postgres
-USE_POSTGRES_SERVICE=none
-USE_POSTGRES_PRESTART_SERVICE=none
 
 # 添加 Supabase 特定优化
 PGSSLMODE=require
 PGCONNECT_TIMEOUT=15
 ```
 
+## 必要时切换回来
+
+Quick Forge AI 新的自动数据库检测的一个优势是，如果需要，他们可以通过简单地删除 `SUPABASE_URL` 环境变量并确保配置了他们的 PostgreSQL 设置，轻松切换回 PostgreSQL。
+
 ## 结论
 
 从直接 PostgreSQL 迁移到 Supabase 使团队能够更专注于应用程序的功能，而不是数据库管理。内置的可扩展性、安全功能和减少的运营开销使其成为不断发展的应用程序的绝佳选择。
 
-Quick Forge AI 灵活的数据库配置选项使这种迁移变得简单，允许团队在不改变应用程序代码的情况下切换数据库选项。 
+Quick Forge AI 的自动数据库检测使这种迁移变得简单，允许团队在不改变应用程序代码的情况下切换数据库选项。 
