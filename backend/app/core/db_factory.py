@@ -7,7 +7,13 @@ from app.core.config import settings
 logger = logging.getLogger("app.db_factory")
 
 def get_engine_args() -> Dict[str, Any]:
-    """根据数据库类型返回引擎参数"""
+    """根据数据库类型返回引擎参数。
+    
+    该函数根据配置中的数据库类型返回相应的连接参数。目前支持Supabase数据库，并根据不同的连接池模式（session或transaction）添加特定的参数。未来可以根据环境添加其他参数。
+    
+    Returns:
+        Dict[str, Any]: 包含连接参数的字典，键为"connect_args"，值为具体的连接参数设置。
+    """
     connect_args = {}
     
     # Supabase 特定的连接参数
@@ -36,10 +42,15 @@ def get_engine_args() -> Dict[str, Any]:
 
 
 def get_db_url() -> str:
-    """
-    根据配置获取数据库URL，并自动处理端口问题
-    """
     # 先获取基础URL
+    """根据配置获取数据库URL，并自动处理端口问题。
+    
+    该函数首先从配置中获取基础的SQLAlchemy数据库URI。对于Supabase数据库，如果未指定端口号， 则根据连接池模式自动选择合适的端口（默认为6543用于事务模式，5432用于会话模式）。然后，它替换
+    URL中的主机部分以包含正确的端口号，并返回处理后的URL。
+    
+    Returns:
+        str: 处理后的数据库URL。
+    """
     url = str(settings.SQLALCHEMY_DATABASE_URI)
     
     # 对于Supabase，确保端口与连接池模式匹配
@@ -62,7 +73,13 @@ def get_db_url() -> str:
 
 
 def create_db_engine():
-    """创建并返回数据库引擎"""
+    """创建并返回一个配置好的数据库引擎。
+    
+    该函数首先获取数据库引擎的参数，然后添加连接池的相关配置。 接着，它获取正确的数据库URL，并使用这些参数创建和返回数据库引擎。
+    
+    Returns:
+        sqlalchemy.engine.Engine: 配置好的数据库引擎实例。
+    """
     engine_args = get_engine_args()
     
     # 添加连接池配置
