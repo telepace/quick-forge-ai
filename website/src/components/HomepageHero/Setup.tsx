@@ -13,6 +13,12 @@ import { motion } from 'framer-motion'
 
 interface Props {
 }
+/**
+ * Renders the hero section of the application with various UI components.
+ *
+ * @param {Props} props - The properties passed to the component.
+ * @returns {JSX.Element} - A JSX element representing the hero section.
+ */
 export function SetupHero(props: Props) {
   const { t, currentLocale } = useLocale()
   const { lang } = useParams() as { lang: string }

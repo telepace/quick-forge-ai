@@ -14,8 +14,11 @@ interface NextraLinkProps {
 }
 
 /**
- * 自定义链接组件，用于解决Nextra中动态路由的问题
- * 这个组件会检测动态路由格式并使用正确的链接形式
+ * 自定义链接组件，用于解决Nextra中动态路由的问题。
+ * 这个组件会检测动态路由格式并使用正确的链接形式。
+ *
+ * @param {NextraLinkProps} props - 组件的属性。
+ * @returns {JSX.Element} 渲染后的链接元素。
  */
 export default function NextraLink({ href, children, ...props }: NextraLinkProps) {
   const params = useParams()

@@ -19,6 +19,12 @@ interface Props {
   params: Promise<{ lang: I18nLangKeys }>
 }
 
+/**
+ * The main layout component for the application that handles rendering the root HTML structure.
+ *
+ * @param {Props} props - The properties passed to the RootLayout component.
+ * @returns {JSX.Element} - A React JSX element representing the root HTML structure with localized content.
+ */
 export default async function RootLayout({ children, params }: Props) {
   const { lang } = await params
   await getDictionary(lang)
