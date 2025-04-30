@@ -12,11 +12,13 @@ except ImportError:
 
 
 def get_supabase_client() -> Optional[Client]:
-    """
-    Get the Supabase client instance
+    """Get the Supabase client instance.
     
-    If the configuration is set to use Supabase and the supabase library is imported, it returns a configured client
-    Otherwise, it returns None
+    This function checks if the configuration is set to use Supabase and if the supabase library is imported. If both
+    conditions are met, it returns a configured Supabase client. Otherwise, it returns None.
+    
+    Returns:
+        Optional[Client]: A configured Supabase client instance or None if the conditions are not met.
     """
     if not SUPABASE_AVAILABLE:
         return None
