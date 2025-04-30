@@ -3,14 +3,14 @@
 import { useEffect } from 'react'
 
 /**
- * 这个函数用于修复Nextra样式水合问题。
- * 它通过在客户端渲染时移除可能导致冲突的样式元素来实现这一目标。
+ * This function is used to fix the Nextra style hydration issue.
+ * It achieves this by removing style elements that may cause conflicts during client-side rendering.
  *
- * @returns {null} - 该函数不返回任何值，始终返回null。
+ * @returns {null} - This function does not return any value, always returns null.
  */
 export function NextraStyleFix() {
   useEffect(() => {
-    // 处理可能存在的样式冲突
+    // Handle potential style conflicts
     /**
      * Handles the removal of specific style tags from the document.
      *
@@ -18,7 +18,7 @@ export function NextraStyleFix() {
      * that contain either 'body {transition:' or 'body[unresolved]' in their text content.
      */
     const handleStyleFix = () => {
-      // 查找包含body transition的样式标签并移除
+      // Find and remove style tags containing body transition
       document.querySelectorAll('style').forEach(styleEl => {
         if (styleEl.textContent?.includes('body {transition:') || 
             styleEl.textContent?.includes('body[unresolved]')) {
@@ -27,10 +27,10 @@ export function NextraStyleFix() {
       })
     }
     
-    // 执行清理
+    // Execute cleanup
     handleStyleFix()
     
-    // 对于动态加载的样式，可以设置一个观察器
+    // For dynamically loaded styles, an observer can be set
     const observer = new MutationObserver((mutations) => {
       mutations.forEach(mutation => {
         if (mutation.addedNodes.length) {

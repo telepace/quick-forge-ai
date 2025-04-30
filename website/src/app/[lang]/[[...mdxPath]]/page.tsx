@@ -22,10 +22,10 @@ export const generateStaticParams = generateStaticParamsFor('mdxPath')
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const params = await props.params
 
-  // 确定是否为有效的主页路径（根路径或 /home）
+  // Determine if it is a valid home page path (root path or /home)
   const isHomePagePath = !params.mdxPath || params.mdxPath.length === 0 || (params.mdxPath.length === 1 && params.mdxPath[0] === 'home')
 
-  // 如果是主页路径，则使用字典中的元数据
+  // If it is a home page path, use metadata from the dictionary
   if (isHomePagePath) {
     const dict = await getDictionary(params.lang)
     return {
@@ -34,7 +34,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     }
   }
 
-  // 对于非主页路径，处理实际的 mdxPath
+  // For non-home page paths, process the actual mdxPath
   const mdxPath = params.mdxPath!
 
   try {
@@ -70,15 +70,15 @@ type PageProps = Readonly<{
 export default async function Page(props: PageProps) {
   const params = await props.params
 
-  // 确保语言代码有效，否则重定向到英文
+  // Ensure the language code is valid, otherwise redirect to English
   if (params.lang !== 'en' && params.lang !== 'zh') {
     redirect('/en')
   }
 
-  // 检查是否为根路径（首页）
+  // Check if it is a root path (home page)
   const isHomePage = !params.mdxPath || params.mdxPath.length === 0
 
-  // 如果是首页，渲染首页组件
+  // If it is a home page, render the home page component
   if (isHomePage) {
     const dict = await getDictionary(params.lang)
 
@@ -112,12 +112,12 @@ export default async function Page(props: PageProps) {
     )
   }
 
-  // 统一路径处理
+  // Unified path processing
   const mdxPath = Array.isArray(params.mdxPath) && params.mdxPath.length > 0
     ? [...params.mdxPath]
     : ['index']
 
-  // 处理'home'特殊路径 - 重定向到根路径
+  // Handle 'home' special path - redirect to root path
   if (mdxPath.length === 1 && mdxPath[0] === 'home') {
     return redirect(`/${params.lang}`)
   }
@@ -128,7 +128,7 @@ export default async function Page(props: PageProps) {
     const result = await importPage(mdxPath, params.lang)
     const { default: MDXContent, toc, metadata } = result
 
-    // 传递解析的路径到 MDXContent 参数
+    // Pass the parsed path to the MDXContent parameter
     const pageParams = { ...await props.params, mdxPath }
 
     return (
@@ -138,7 +138,7 @@ export default async function Page(props: PageProps) {
     )
   }
   catch (error) {
-    // 如果从Nextra导入失败，尝试直接加载内容
+    // If importing from Nextra fails, try to load the content directly
     console.error('Error loading page:', error)
     notFound()
   }

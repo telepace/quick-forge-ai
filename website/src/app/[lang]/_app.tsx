@@ -5,14 +5,14 @@ import { ThemeProvider } from 'next-themes'
 import { useEffect } from 'react'
 
 /**
- * 全局App组件，处理Nextra样式水合和加载问题。
+ * Global App component, handling Nextra style hydration and loading issues.
  *
- * @param {AppProps} props - 组件的属性对象，包含Component和pageProps。
+ * @param {AppProps} props - The component's property object, containing Component and pageProps.
  */
 export default function App({ Component, pageProps }: AppProps) {
-  // 处理页面加载时的样式修复
+  // Handle style fixes during page loading
   useEffect(() => {
-    // 移除任何影响水合的样式
+    // Remove any styles that affect hydration
     /**
      * Removes styles from the document that contain specific CSS properties.
      * This function targets and removes `<style>` elements containing transitions on the body or unresolved state.
@@ -28,10 +28,10 @@ export default function App({ Component, pageProps }: AppProps) {
       })
     }
     
-    // 执行清理
+    // Execute cleanup
     cleanupStyles()
     
-    // 设置观察器持续监控样式注入
+    // Set up an observer to continuously monitor style injections
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.addedNodes.length) {

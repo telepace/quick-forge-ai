@@ -1,4 +1,4 @@
-name: 文档构建与部署
+name: Document Build and Deployment
 
 on:
   push:
@@ -13,12 +13,12 @@ jobs:
   redirect-to-docker-build:
     runs-on: ubuntu-latest
     steps:
-      - name: 触发 docker-build 工作流
+      - name: Trigger docker-build workflow
         run: |
-          echo "文档构建已迁移到 docker-build.yml 工作流中"
-          echo "正在触发 docker-build 工作流..."
+          echo "Document build has been migrated to the docker-build.yml workflow"
+          echo "Triggering docker-build workflow..."
           
-      - name: 触发工作流
+      - name: Trigger workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: docker-build.yml
