@@ -19,7 +19,10 @@ engine = create_db_engine()
 
 
 def print_db_connection_info():
-    """打印数据库连接信息"""
+    """打印数据库连接信息。
+    
+    这个函数会输出当前应用程序的数据库连接配置，包括数据库URL、类型以及其他相关的配置信息。 在打印URL时，会隐藏密码部分以确保安全性。此外，如果数据库类型为`supabase`， 还会输出Supabase特定的配置信息，如池模式和端口号。
+    """
     url = str(settings.SQLALCHEMY_DATABASE_URI)
     
     # 屏蔽密码信息，保证安全
@@ -46,6 +49,17 @@ def print_db_connection_info():
 
 def init_db(session: Session) -> None:
     # 打印数据库连接信息
+    """Initialize the database with necessary settings and default data.
+    
+    This function performs the following tasks: 1. Prints the database connection information. 2. Checks if a superuser
+    exists in the database. If not, it creates one using the provided settings.
+    
+    Args:
+        session (Session): A database session object to interact with the database.
+    
+    Returns:
+        None: The function does not return any value.
+    """
     print_db_connection_info()
     
     # Tables should be created with Alembic migrations
