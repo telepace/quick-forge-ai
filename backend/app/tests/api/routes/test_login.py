@@ -105,6 +105,15 @@ def test_reset_password(client: TestClient, db: Session) -> None:
 def test_reset_password_invalid_token(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
+    """Test the password reset endpoint with an invalid token.
+    
+    This function sends a POST request to the password reset endpoint with an invalid token and verifies that the response
+    status code is 400 and the detail message is "Invalid token".
+    
+    Args:
+        client (TestClient): An instance of the test client for making requests.
+        superuser_token_headers (dict[str, str]): A dictionary containing headers for authentication.
+    """
     data = {"new_password": "quickforgeai", "token": "invalid"}
     r = client.post(
         f"{settings.API_V1_STR}/reset-password/",
