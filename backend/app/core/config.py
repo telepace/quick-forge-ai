@@ -143,6 +143,16 @@ class Settings(BaseSettings):
     EMAIL_TEST_USER: EmailStr = "test@example.com"
     FIRST_SUPERUSER: EmailStr = "admin@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "admin"
+    
+    # PostHog Configuration
+    POSTHOG_API_KEY: str | None = None
+    POSTHOG_HOST: str = "https://app.posthog.com"  
+    POSTHOG_CAPTURE_PERSONAL_INFO: bool = False
+    
+    @computed_field  # type: ignore[prop-decorator]  
+    @property  
+    def posthog_enabled(self) -> bool:  
+        return bool(self.POSTHOG_API_KEY and self.ENVIRONMENT != "local")
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "quickforgeai":

@@ -22,6 +22,7 @@ dependencies = [
     "sentry-sdk[fastapi]<2.0.0,>=1.40.6",
     "pyjwt<3.0.0,>=2.8.0",
     "supabase<2.0.0,>=1.2.0",
+    "posthog<3.0.0,>=2.4.0",
 ]
 
 [tool.uv]
