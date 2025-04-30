@@ -1,5 +1,13 @@
 import Link from 'next/link'
 
+/**
+ * A React functional component that renders a 404 Not Found page.
+ *
+ * This component displays a user-friendly message indicating that the requested page could not be found.
+ * It provides options for users to navigate back to the home page or browse the documentation.
+ *
+ * @returns {JSX.Element} The JSX element representing the 404 Not Found page.
+ */
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">

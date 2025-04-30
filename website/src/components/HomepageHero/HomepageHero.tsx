@@ -13,6 +13,9 @@ interface HomepageHeroProps {
   lang: string;
 }
 
+/**
+ * Interface representing the props for the Homepage Hero component.
+ */
 export const HomepageHero: React.FC<HomepageHeroProps> = ({
   title,
   subtitle,

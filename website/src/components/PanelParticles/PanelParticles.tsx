@@ -12,6 +12,13 @@ interface Particle {
   opacity: number;
 }
 
+/**
+ * A React functional component that renders a canvas with animated particles.
+ * The particles bounce off the edges of the canvas and are connected by lines if they are close enough.
+ * The particle colors and line opacities adjust based on the current theme (dark or light).
+ *
+ * @returns {JSX.Element} A React element containing the canvas.
+ */
 export const PanelParticles: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme } = useTheme();
@@ -24,6 +31,13 @@ export const PanelParticles: React.FC = () => {
     if (!ctx) return;
     
     // Set canvas dimensions to match parent
+    /**
+     * Resizes the canvas element to match its parent's dimensions.
+     *
+     * This function retrieves the parent element of the canvas and sets the canvas's width and height
+     * to be equal to the client width and height of the parent, respectively. If the canvas does not have a parent,
+     * this function has no effect.
+     */
     const resizeCanvas = () => {
       const parent = canvas.parentElement;
       if (parent) {
@@ -51,6 +65,13 @@ export const PanelParticles: React.FC = () => {
     }
     
     // Animation loop
+    /**
+     * Animate function to update and render particles on the canvas.
+     *
+     * This function clears the canvas, updates the position of each particle,
+     * handles edge collisions, draws the particles, and connects nearby particles with lines.
+     * It then calls itself recursively using `requestAnimationFrame` for continuous animation.
+     */
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
