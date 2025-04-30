@@ -1,7 +1,7 @@
 """
-Supabase 存储服务
+Supabase Storage Service
 
-此模块提供了与 Supabase Storage 交互的功能，仅在配置了 Supabase 时可用。
+This module provides functionality for interacting with Supabase Storage, only available when Supabase is configured.
 """
 from typing import Optional, BinaryIO, List, Dict, Any
 from pathlib import Path
@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 class SupabaseStorageService:
-    """Supabase 存储服务，用于管理文件上传和下载"""
+    """Supabase Storage Service for managing file uploads and downloads"""
     
     @staticmethod
     def is_available() -> bool:
-        """检查 Supabase 存储服务是否可用"""
+        """Check if the Supabase Storage Service is available"""
         return SUPABASE_AVAILABLE and settings.DATABASE_TYPE == "supabase" and supabase_client is not None
     
     @staticmethod
@@ -30,20 +30,20 @@ class SupabaseStorageService:
         metadata: Optional[Dict[str, Any]] = None
     ) -> Optional[Dict[str, Any]]:
         """
-        上传文件到 Supabase Storage
+        Upload a file to Supabase Storage
         
         Args:
-            bucket_name: Supabase 存储桶名称
-            file_path: 文件在存储桶中的路径/名称
-            file: 要上传的文件对象
-            content_type: 文件内容类型
-            metadata: 可选的文件元数据
+            bucket_name: Supabase storage bucket name
+            file_path: File path within the storage bucket
+            file: File object to be uploaded
+            content_type: File content type
+            metadata: Optional file metadata
             
         Returns:
-            上传结果或 None（如果 Supabase 不可用）
+            Upload result or None (if Supabase is not available)
         """
         if not SupabaseStorageService.is_available() or not supabase_client:
-            logger.warning("Supabase Storage 不可用，无法上传文件")
+            logger.warning("Supabase Storage is not available, cannot upload file")
             return None
             
         try:
@@ -60,75 +60,75 @@ class SupabaseStorageService:
             )
             return result
         except Exception as e:
-            logger.error(f"上传文件到 Supabase 失败: {str(e)}")
+            logger.error(f"Failed to upload file to Supabase: {str(e)}")
             return None
     
     @staticmethod
     def get_public_url(bucket_name: str, file_path: str) -> Optional[str]:
         """
-        获取文件的公共访问 URL
+        Get the public access URL for a file
         
         Args:
-            bucket_name: 存储桶名称
-            file_path: 文件路径
+            bucket_name: Storage bucket name
+            file_path: File path
             
         Returns:
-            公共 URL 或 None（如果 Supabase 不可用）
+            Public URL or None (if Supabase is not available)
         """
         if not SupabaseStorageService.is_available() or not supabase_client:
-            logger.warning("Supabase Storage 不可用，无法获取公共 URL")
+            logger.warning("Supabase Storage is not available, cannot get public URL")
             return None
             
         try:
             return supabase_client.storage.from_(bucket_name).get_public_url(file_path)
         except Exception as e:
-            logger.error(f"获取 Supabase 公共 URL 失败: {str(e)}")
+            logger.error(f"Failed to get Supabase public URL: {str(e)}")
             return None
     
     @staticmethod
     def download_file(bucket_name: str, file_path: str, destination: Path) -> bool:
         """
-        从 Supabase Storage 下载文件
+        Download a file from Supabase Storage
         
         Args:
-            bucket_name: 存储桶名称
-            file_path: 文件路径
-            destination: 目标本地路径
+            bucket_name: Storage bucket name
+            file_path: File path
+            destination: Destination local path
             
         Returns:
-            下载是否成功
+            Whether the download was successful
         """
         if not SupabaseStorageService.is_available() or not supabase_client:
-            logger.warning("Supabase Storage 不可用，无法下载文件")
+            logger.warning("Supabase Storage is not available, cannot download file")
             return False
             
         try:
-            # 下载文件内容
+            # Download file content
             response = supabase_client.storage.from_(bucket_name).download(file_path)
             
-            # 写入到目标路径
+            # Write to destination path
             with open(destination, 'wb') as f:
                 f.write(response)
                 
             return True
         except Exception as e:
-            logger.error(f"从 Supabase 下载文件失败: {str(e)}")
+            logger.error(f"Failed to download file from Supabase: {str(e)}")
             return False
     
     @staticmethod
     def list_files(bucket_name: str, path: Optional[str] = None) -> Optional[List[Dict[str, Any]]]:
         """
-        列出存储桶中的文件
+        List files in a storage bucket
         
         Args:
-            bucket_name: 存储桶名称
-            path: 可选的路径前缀
+            bucket_name: Storage bucket name
+            path: Optional path prefix
             
         Returns:
-            文件列表或 None（如果 Supabase 不可用）
+            File list or None (if Supabase is not available)
         """
         if not SupabaseStorageService.is_available() or not supabase_client:
-            logger.warning("Supabase Storage 不可用，无法列出文件")
+            logger.warning("Supabase Storage is not available, cannot list files")
             return None
             
         try:
@@ -138,27 +138,27 @@ class SupabaseStorageService:
                 
             return supabase_client.storage.from_(bucket_name).list(**options)
         except Exception as e:
-            logger.error(f"列出 Supabase 文件失败: {str(e)}")
+            logger.error(f"Failed to list Supabase files: {str(e)}")
             return None
             
     @staticmethod
     def delete_file(bucket_name: str, file_paths: List[str]) -> Optional[Dict[str, Any]]:
         """
-        删除 Supabase Storage 中的文件
+        Delete files from Supabase Storage
         
         Args:
-            bucket_name: 存储桶名称
-            file_paths: 要删除的文件路径列表
+            bucket_name: Storage bucket name
+            file_paths: List of file paths to delete
             
         Returns:
-            删除结果或 None（如果 Supabase 不可用）
+            Deletion result or None (if Supabase is not available)
         """
         if not SupabaseStorageService.is_available() or not supabase_client:
-            logger.warning("Supabase Storage 不可用，无法删除文件")
+            logger.warning("Supabase Storage is not available, cannot delete file")
             return None
             
         try:
             return supabase_client.storage.from_(bucket_name).remove(file_paths)
         except Exception as e:
-            logger.error(f"删除 Supabase 文件失败: {str(e)}")
+            logger.error(f"Failed to delete Supabase file: {str(e)}")
             return None 

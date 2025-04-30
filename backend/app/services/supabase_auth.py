@@ -1,7 +1,7 @@
 """
-Supabase 认证服务
+Supabase Authentication Service
 
-此模块提供了与 Supabase Auth 交互的功能，仅在配置了 Supabase 时可用。
+This module provides functionality for interacting with Supabase Auth, only available when Supabase is configured.
 """
 from typing import Optional, Dict, Any, List
 import logging
@@ -13,28 +13,28 @@ logger = logging.getLogger(__name__)
 
 
 class SupabaseAuthService:
-    """Supabase 认证服务，用于处理用户认证相关功能"""
+    """Supabase Authentication Service, for handling user authentication related functions"""
     
     @staticmethod
     def is_available() -> bool:
-        """检查 Supabase 认证服务是否可用"""
+        """Check if the Supabase Authentication Service is available"""
         return SUPABASE_AVAILABLE and settings.DATABASE_TYPE == "supabase" and supabase_client is not None
     
     @staticmethod
     def sign_up(email: str, password: str, additional_data: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
         """
-        在 Supabase 中注册新用户
+        Sign up a new user in Supabase
         
         Args:
-            email: 用户电子邮件
-            password: 用户密码
-            additional_data: 可选的额外用户数据
+            email: User email
+            password: User password
+            additional_data: Optional additional user data
             
         Returns:
-            注册结果或 None（如果 Supabase 不可用）
+            Sign up result or None (if Supabase is not available)
         """
         if not SupabaseAuthService.is_available() or not supabase_client:
-            logger.warning("Supabase Auth 不可用，无法注册用户")
+            logger.warning("Supabase Auth is not available, cannot sign up user")
             return None
             
         try:
@@ -44,68 +44,68 @@ class SupabaseAuthService:
                 
             return supabase_client.auth.sign_up(data)
         except Exception as e:
-            logger.error(f"Supabase 用户注册失败: {str(e)}")
+            logger.error(f"Supabase user sign up failed: {str(e)}")
             return None
     
     @staticmethod
     def sign_in(email: str, password: str) -> Optional[Dict[str, Any]]:
         """
-        Supabase 用户登录
+        Supabase user login
         
         Args:
-            email: 用户电子邮件
-            password: 用户密码
+            email: User email
+            password: User password
             
         Returns:
-            登录结果或 None（如果 Supabase 不可用）
+            Login result or None (if Supabase is not available)
         """
         if not SupabaseAuthService.is_available() or not supabase_client:
-            logger.warning("Supabase Auth 不可用，无法登录用户")
+            logger.warning("Supabase Auth is not available, cannot login user")
             return None
             
         try:
             return supabase_client.auth.sign_in_with_password({"email": email, "password": password})
         except Exception as e:
-            logger.error(f"Supabase 用户登录失败: {str(e)}")
+            logger.error(f"Supabase user login failed: {str(e)}")
             return None
     
     @staticmethod
     def get_user(token: str) -> Optional[Dict[str, Any]]:
         """
-        获取 Supabase 用户信息
+        Get Supabase user information
         
         Args:
-            token: 用户会话令牌
+            token: User session token
             
         Returns:
-            用户数据或 None（如果 Supabase 不可用或验证失败）
+            User data or None (if Supabase is not available or validation fails)
         """
         if not SupabaseAuthService.is_available() or not supabase_client:
-            logger.warning("Supabase Auth 不可用，无法获取用户")
+            logger.warning("Supabase Auth is not available, cannot get user")
             return None
             
         try:
-            # 设置访问令牌
+            # Set access token
             supabase_client.auth.set_session(token)
-            # 获取用户
+            # Get user
             return supabase_client.auth.get_user()
         except Exception as e:
-            logger.error(f"获取 Supabase 用户失败: {str(e)}")
+            logger.error(f"Getting Supabase user failed: {str(e)}")
             return None
     
     @staticmethod
     def sign_out(token: Optional[str] = None) -> bool:
         """
-        退出 Supabase 用户登录
+        Sign out Supabase user login
         
         Args:
-            token: 可选的用户会话令牌，如果提供则先设置会话
+            token: Optional user session token, if provided, sets the session first
             
         Returns:
-            操作是否成功
+            Operation success
         """
         if not SupabaseAuthService.is_available() or not supabase_client:
-            logger.warning("Supabase Auth 不可用，无法退出登录")
+            logger.warning("Supabase Auth is not available, cannot sign out")
             return False
             
         try:
@@ -115,45 +115,45 @@ class SupabaseAuthService:
             supabase_client.auth.sign_out()
             return True
         except Exception as e:
-            logger.error(f"Supabase 用户退出登录失败: {str(e)}")
+            logger.error(f"Supabase user sign out failed: {str(e)}")
             return False
     
     @staticmethod
     def reset_password(email: str) -> bool:
         """
-        发送密码重置邮件
+        Send password reset email
         
         Args:
-            email: 用户电子邮件
+            email: User email
             
         Returns:
-            操作是否成功
+            Operation success
         """
         if not SupabaseAuthService.is_available() or not supabase_client:
-            logger.warning("Supabase Auth 不可用，无法重置密码")
+            logger.warning("Supabase Auth is not available, cannot reset password")
             return False
             
         try:
             supabase_client.auth.reset_password_for_email(email)
             return True
         except Exception as e:
-            logger.error(f"Supabase 密码重置失败: {str(e)}")
+            logger.error(f"Supabase password reset failed: {str(e)}")
             return False
     
     @staticmethod
     def update_user(user_data: Dict[str, Any], token: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
-        更新 Supabase 用户数据
+        Update Supabase user data
         
         Args:
-            user_data: 新的用户数据
-            token: 可选的用户会话令牌，如果提供则先设置会话
+            user_data: New user data
+            token: Optional user session token, if provided, sets the session first
             
         Returns:
-            更新结果或 None（如果 Supabase 不可用）
+            Update result or None (if Supabase is not available)
         """
         if not SupabaseAuthService.is_available() or not supabase_client:
-            logger.warning("Supabase Auth 不可用，无法更新用户")
+            logger.warning("Supabase Auth is not available, cannot update user")
             return None
             
         try:
@@ -162,5 +162,5 @@ class SupabaseAuthService:
                 
             return supabase_client.auth.update_user(user_data)
         except Exception as e:
-            logger.error(f"更新 Supabase 用户失败: {str(e)}")
+            logger.error(f"Updating Supabase user failed: {str(e)}")
             return None 

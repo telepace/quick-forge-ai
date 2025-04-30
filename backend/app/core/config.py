@@ -17,7 +17,7 @@ from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
 
-# 设置logger
+# Set up logger
 logger = logging.getLogger("app.config")
 
 def parse_cors(v: Any) -> list[str] | str:
@@ -29,11 +29,11 @@ def parse_cors(v: Any) -> list[str] | str:
 
 
 class Settings(BaseSettings):
-    # 使用 ClassVar 标识这不是模型字段
+    # Use ClassVar to indicate this is not a model field
     env_file_path: ClassVar[str] = os.environ.get("ENV_FILE", "../.env")
     
     model_config = SettingsConfigDict(
-        # 使用动态的环境文件路径
+        # Use dynamic environment file path
         env_file=env_file_path,
         env_ignore_empty=True,
         extra="ignore",
@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     # Database configuration
     DATABASE_TYPE: Literal["postgres", "supabase"] = "postgres"
     
-    # Supabase configuration - 这些在使用 postgres 数据库类型时不会被使用
+    # Supabase configuration - these will not be used when using postgres database type
     SUPABASE_URL: str | None = None
     SUPABASE_API_KEY: str | None = None
     SUPABASE_JWT_SECRET: str | None = None
@@ -74,11 +74,11 @@ class Settings(BaseSettings):
     SUPABASE_DB_USER: str | None = None
     SUPABASE_DB_PASSWORD: str | None = None
     SUPABASE_DB_NAME: str | None = None
-    # 连接池模式配置 - 支持 session 和 transaction 两种模式
+    # Connection pool mode configuration - supports session and transaction modes
     SUPABASE_DB_POOL_MODE: Literal["session", "transaction"] = "session"
 
     # Direct PostgreSQL connection settings
-    # 设置默认值连接到本地数据库
+    # Set default values to connect to the local database
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str = "postgres"
@@ -88,16 +88,16 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
-        # 根据数据库类型返回不同的连接 URI
+        # Return different connection URI based on database type
         if self.DATABASE_TYPE == "supabase" and self.SUPABASE_DB_HOST:
-            # 使用 Supabase 的 PostgreSQL 连接（直接连接）
-            # 根据连接池模式选择端口
+            # Use Supabase's PostgreSQL connection (direct connection)
+            # Choose port based on connection pool mode
             port = self.SUPABASE_DB_PORT or (
                 6543 if self.SUPABASE_DB_POOL_MODE == "transaction" else 5432
             )
             
-            # 记录使用的端口
-            logger.debug(f"使用 {self.SUPABASE_DB_POOL_MODE} 模式连接 Supabase，端口: {port}")
+            # Log the port used
+            logger.debug(f"Using {self.SUPABASE_DB_POOL_MODE} mode to connect to Supabase, port: {port}")
             
             return MultiHostUrl.build(
                 scheme="postgresql+psycopg",
@@ -108,7 +108,7 @@ class Settings(BaseSettings):
                 path=self.SUPABASE_DB_NAME or "",
             )
         else:
-            # 使用标准 PostgreSQL 连接
+            # Use standard PostgreSQL connection
             return MultiHostUrl.build(
                 scheme="postgresql+psycopg",
                 username=self.POSTGRES_USER,
@@ -158,7 +158,7 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _enforce_non_default_secrets(self) -> Self:
         self._check_default_secret("SECRET_KEY", self.SECRET_KEY)
-        # 根据数据库类型检查相应密码
+        # Check the corresponding password based on the database type
         if self.DATABASE_TYPE == "postgres":
             self._check_default_secret("POSTGRES_PASSWORD", self.POSTGRES_PASSWORD)
         elif self.DATABASE_TYPE == "supabase" and self.SUPABASE_DB_PASSWORD:
@@ -168,17 +168,17 @@ class Settings(BaseSettings):
             "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
         )
         
-        # 记录数据库配置信息
+        # Log database configuration information
         if self.DATABASE_TYPE == "supabase":
-            logger.info(f"使用 Supabase 连接池模式: {self.SUPABASE_DB_POOL_MODE}")
+            logger.info(f"Using Supabase connection pool mode: {self.SUPABASE_DB_POOL_MODE}")
             
-            # 检查端口与连接池模式是否匹配
+            # Check if the port matches the connection pool mode
             if self.SUPABASE_DB_PORT:
                 expected_port = 6543 if self.SUPABASE_DB_POOL_MODE == "transaction" else 5432
                 if self.SUPABASE_DB_PORT != expected_port:
                     logger.warning(
-                        f"Supabase 端口 ({self.SUPABASE_DB_PORT}) 与连接池模式 ({self.SUPABASE_DB_POOL_MODE}) 不匹配。"
-                        f"建议为 {self.SUPABASE_DB_POOL_MODE} 模式使用端口 {expected_port}"
+                        f"Supabase port ({self.SUPABASE_DB_PORT}) does not match the connection pool mode ({self.SUPABASE_DB_POOL_MODE})."
+                        f"Recommended port for {self.SUPABASE_DB_POOL_MODE} mode is {expected_port}"
                     )
 
         return self

@@ -35,7 +35,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def get_supabase() -> Generator[Optional[Client], None, None]:
-    """提供 Supabase 客户端实例（如果可用）"""
+    """Provides a Supabase client instance (if available)"""
     client = get_supabase_client() if SUPABASE_AVAILABLE else None
     yield client
 

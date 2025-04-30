@@ -2,23 +2,23 @@ import React from 'react'
 import { useParams } from 'next/navigation'
 import NextraLink from './components/NextraLink'
 
-// 完整的Nextra主题配置
+// Complete Nextra theme configuration
 const config = {
-  // 自定义使用我们的链接组件
+  // Customize to use our link component
   components: {
     a: NextraLink
   },
-  // 配置项目信息  
+  // Configure project information
   docsRepositoryBase: 'https://github.com/telepace/quick-forge-ai',
-  // 处理Head标签中的元信息
+  // Handle metadata in the Head tag
   useNextSeoProps() {
     return {
       titleTemplate: '%s – Quick Forge AI'
     }
   },
-  // 首选项图标
+  // Preferred icon
   faviconGlyph: '📘',
-  // 重要：处理动态路由链接，避免[lang]格式的链接
+  // Important: Handle dynamic route links, avoiding [lang] format links
   logo: () => {
     const params = useParams()
     const lang = params?.lang || 'zh'
@@ -29,13 +29,13 @@ const config = {
       </span>
     )
   },
-  // 搜索功能配置
+  // Search function configuration
   search: {
-    placeholder: '搜索文档...'
+    placeholder: 'Search documents...'
   },
-  // 页脚配置
+  // Footer configuration
   footer: {
-    text: `© ${new Date().getFullYear()} Quick Forge AI - 使用Nextra构建`
+    text: `© ${new Date().getFullYear()} Quick Forge AI - Built with Nextra`
   }
 }
 

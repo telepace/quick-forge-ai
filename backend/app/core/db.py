@@ -6,10 +6,10 @@ from app.core.config import settings
 from app.models import User, UserCreate
 from app.core.db_factory import create_db_engine
 
-# 获取logger
+# Get the logger
 logger = logging.getLogger("app.db")
 
-# 使用db_factory创建引擎
+# Use db_factory to create the engine
 engine = create_db_engine()
 
 
@@ -19,21 +19,21 @@ engine = create_db_engine()
 
 
 def print_db_connection_info():
-    """打印数据库连接信息"""
+    """Print database connection information"""
     url = str(settings.SQLALCHEMY_DATABASE_URI)
     
-    # 屏蔽密码信息，保证安全
+    # Hide password information for security
     safe_url = url
     if "@" in url:
-        # 找到用户名密码部分并替换密码为 ****
+        # Find the username and password part and replace the password with ****
         userpass_part = url.split("@")[0]
         if ":" in userpass_part:
             username = userpass_part.split("://")[1].split(":")[0]
             safe_url = url.replace(userpass_part, f"{url.split('://')[0]}://{username}:****")
     
-    # 打印相关配置信息
+    # Print related configuration information
     logger.info("-" * 50)
-    logger.info("数据库连接信息:")
+    logger.info("Database Connection Information:")
     logger.info(f"Database URL: {safe_url}")
     logger.info(f"Database Type: {settings.DATABASE_TYPE}")
     
@@ -45,7 +45,7 @@ def print_db_connection_info():
 
 
 def init_db(session: Session) -> None:
-    # 打印数据库连接信息
+    # Print database connection information
     print_db_connection_info()
     
     # Tables should be created with Alembic migrations

@@ -3,33 +3,33 @@ from sqlmodel import create_engine
 import logging
 from app.core.config import settings
 
-# 获取logger
+# Get the logger
 logger = logging.getLogger("app.db_factory")
 
 def get_engine_args() -> Dict[str, Any]:
-    """根据数据库类型返回引擎参数"""
+    """Returns engine arguments based on the database type"""
     connect_args = {}
     
-    # Supabase 特定的连接参数
+    # Supabase specific connection arguments
     if settings.DATABASE_TYPE == "supabase":
-        # 为Supabase连接池添加参数
+        # Add parameters for the Supabase connection pool
         connect_args["options"] = f"-c search_path=public -c statement_timeout=60000"
         
-        # 根据连接池模式(pool_mode)添加其他参数
+        # Add other parameters based on the pool mode (pool_mode)
         pool_mode = getattr(settings, "SUPABASE_DB_POOL_MODE", "session")
         if pool_mode == "session":
-            # session模式下的优化参数
+            # Optimization parameters for session mode
             connect_args["keepalives"] = 1
             connect_args["keepalives_idle"] = 30
             connect_args["keepalives_interval"] = 10
             connect_args["keepalives_count"] = 5
         elif pool_mode == "transaction":
-            # transaction模式下不支持prepare语句
-            connect_args["prepare_threshold"] = 0  # 禁用prepare语句
+            # Transaction mode does not support prepare statements
+            connect_args["prepare_threshold"] = 0  # Disable prepare statements
     
-    # 可以根据环境添加其他参数
+    # Additional parameters can be added based on the environment
     if settings.ENVIRONMENT == "local":
-        # 开发环境可能需要的参数
+        # Parameters that may be needed in the development environment
         pass
     
     return {"connect_args": connect_args}
@@ -37,43 +37,43 @@ def get_engine_args() -> Dict[str, Any]:
 
 def get_db_url() -> str:
     """
-    根据配置获取数据库URL，并自动处理端口问题
+    Gets the database URL based on the configuration and automatically handles port issues
     """
-    # 先获取基础URL
+    # First, get the base URL
     url = str(settings.SQLALCHEMY_DATABASE_URI)
     
-    # 对于Supabase，确保端口与连接池模式匹配
+    # For Supabase, ensure the port matches the connection pool mode
     if settings.DATABASE_TYPE == "supabase" and not settings.SUPABASE_DB_PORT:
-        # 如果未指定端口，根据连接池模式自动选择
+        # If no port is specified, automatically select based on the connection pool mode
         pool_mode = getattr(settings, "SUPABASE_DB_POOL_MODE", "session")
         default_port = 6543 if pool_mode == "transaction" else 5432
         
-        # 替换URL中的端口
-        # 找到主机部分
+        # Replace the port in the URL
+        # Find the host part
         host_part = url.split("@")[1].split("/")[0]
         if ":" in host_part:
-            # 有端口号，替换它
+            # There is a port number, replace it
             old_host = host_part
             new_host = f"{host_part.split(':')[0]}:{default_port}"
             url = url.replace(old_host, new_host)
-            logger.info(f"自动根据连接池模式({pool_mode})选择端口: {default_port}")
+            logger.info(f"Automatically selected port: {default_port} based on connection pool mode ({pool_mode})")
     
     return url
 
 
 def create_db_engine():
-    """创建并返回数据库引擎"""
+    """Creates and returns the database engine"""
     engine_args = get_engine_args()
     
-    # 添加连接池配置
+    # Add connection pool configuration
     engine_args.update({
-        "pool_pre_ping": True,  # 连接前ping确保连接可用
-        "pool_recycle": 300,    # 连接在池中最大生存时间(秒)
-        "pool_size": 5,         # 连接池大小
-        "max_overflow": 10      # 连接池溢出时允许创建的额外连接数
+        "pool_pre_ping": True,  # Ping before connection to ensure connection is usable
+        "pool_recycle": 300,    # Maximum lifetime of a connection in the pool (seconds)
+        "pool_size": 5,         # Connection pool size
+        "max_overflow": 10      # Number of additional connections allowed to be created when the pool overflows
     })
     
-    # 获取正确的数据库URL
+    # Get the correct database URL
     url = get_db_url()
     
     return create_engine(
@@ -82,5 +82,5 @@ def create_db_engine():
     )
 
 
-# 创建引擎实例
+# Create engine instance
 engine = create_db_engine() 

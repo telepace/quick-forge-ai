@@ -1,6 +1,6 @@
 export default {
   index: {
-    title: "后端开发",
-    type: "page",
+    title: '后端开发',
+    type: 'page',
   },
 } 

@@ -6,17 +6,17 @@ try:
     SUPABASE_AVAILABLE = True
 except ImportError:
     SUPABASE_AVAILABLE = False
-    # 定义一个空的类型，以避免类型检查错误
+    # Define an empty type to avoid type checking errors
     class Client:
         pass
 
 
 def get_supabase_client() -> Optional[Client]:
     """
-    获取 Supabase 客户端实例
+    Get the Supabase client instance
     
-    如果配置为使用 Supabase 并且导入了 supabase 库，则返回一个配置好的客户端
-    否则返回 None
+    If the configuration is set to use Supabase and the supabase library is imported, it returns a configured client
+    Otherwise, it returns None
     """
     if not SUPABASE_AVAILABLE:
         return None
@@ -27,12 +27,12 @@ def get_supabase_client() -> Optional[Client]:
     if not settings.SUPABASE_URL or not settings.SUPABASE_API_KEY:
         return None
         
-    # 创建并返回 Supabase 客户端
+    # Create and return the Supabase client
     return create_client(
         settings.SUPABASE_URL,
         settings.SUPABASE_API_KEY
     )
     
 
-# 可选：提供预初始化的客户端实例
+# Optionally: Provide a pre-initialized client instance
 supabase_client = get_supabase_client() if SUPABASE_AVAILABLE else None 

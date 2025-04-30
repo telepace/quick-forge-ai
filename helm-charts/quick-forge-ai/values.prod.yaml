@@ -21,13 +21,11 @@ global:
     FIRST_SUPERUSER: admin@example.com
     FIRST_SUPERUSER_PASSWORD: "CHANGE_ME"
     
-    # 邮件设置
     SMTP_HOST: "smtp.example.com"
     SMTP_USER: "info@example.com"
     SMTP_PASSWORD: "CHANGE_ME"
     EMAILS_FROM_EMAIL: "info@example.com"
     
-    # Sentry 设置
     SENTRY_DSN: "CHANGE_ME"
 
 backend:

@@ -1,5 +1,5 @@
 """
-服务模块
+Service Module
 
-此模块包含应用程序的各种服务，包括 Supabase 相关服务。
+This module includes various services of the application, including services related to Supabase.
 """
