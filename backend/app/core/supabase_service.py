@@ -12,11 +12,12 @@ except ImportError:
 
 
 def get_supabase_client() -> Optional[Client]:
-    """
-    获取 Supabase 客户端实例
+    """获取 Supabase 客户端实例。
     
-    如果配置为使用 Supabase 并且导入了 supabase 库，则返回一个配置好的客户端
-    否则返回 None
+    此函数检查配置是否为使用 Supabase，并且已导入 supabase 库。如果满足条件，返回一个配置好的 Supabase 客户端实例；否则返回 None。
+    
+    Returns:
+        Optional[Client]: 配置好的 Supabase 客户端实例或 None。
     """
     if not SUPABASE_AVAILABLE:
         return None
