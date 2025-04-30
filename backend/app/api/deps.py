@@ -22,6 +22,14 @@ except ImportError:
     class Client:
         pass
     def get_supabase_client() -> None:
+        """Get a Supabase client instance.
+        
+        This function returns an initialized Supabase client object. The returned client can be used to interact with the
+        Supabase API.
+        
+        Returns:
+            None: This function does not return any value.
+        """
         return None
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -35,7 +43,14 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def get_supabase() -> Generator[Optional[Client], None, None]:
-    """提供 Supabase 客户端实例（如果可用）"""
+    """Provides a Supabase client instance if available.
+    
+    This function checks whether the Supabase client is available based on the global constant SUPABASE_AVAILABLE. If
+    available, it yields the Supabase client instance; otherwise, it yields None.
+    
+    Yields:
+        Generator[Optional[Client], None, None]: A generator that yields either a Supabase client instance or None.
+    """
     client = get_supabase_client() if SUPABASE_AVAILABLE else None
     yield client
 
