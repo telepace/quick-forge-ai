@@ -3,8 +3,7 @@
 import { useEffect } from 'react'
 
 /**
- * This function is used to fix the Nextra style hydration issue.
- * It achieves this by removing style elements that may cause conflicts during client-side rendering.
+ * Fixes the Nextra style hydration issue by removing specific style elements that may cause conflicts during client-side rendering.
  *
  * @returns {null} - This function does not return any value, always returns null.
  */
