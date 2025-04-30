@@ -52,7 +52,11 @@ def get_url():
 
 
 def print_db_info():
-    """打印数据库连接信息"""
+    """打印数据库连接信息。
+    
+    这个函数会从配置中获取数据库URL，并屏蔽其中的密码信息以确保安全。然后，它会打印出数据库连接的相关配置信息，
+    包括数据库类型、主机地址、端口、用户名和数据库名称等。如果数据库类型是Supabase，还会额外打印出Supabase特定的配置。 最后，如果存在连接参数，也会一并打印出来。
+    """
     url = get_url()
     
     # 屏蔽密码信息，保证安全
@@ -94,15 +98,10 @@ def print_db_info():
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
+    
+    This function configures the Alembic migration context with just a database URL, rather than creating an engine.
+    Although using an engine is also acceptable, skipping its creation means that no DBAPI needs to be available. Calls to
+    `context.execute()` within this function will emit the given SQL string to the script output.
     """
     url = get_url()
     
@@ -118,13 +117,13 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    """Run migrations in 'online' mode.
-
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
     # 打印数据库连接信息
+    """Run migrations in 'online' mode.
+    
+    This function sets up an SQLAlchemy engine and connection to execute database migrations. It first prints the database
+    connection information, then configures the database URL, retrieves engine-specific arguments, creates a NullPool engine
+    with the appropriate connection arguments, and finally runs the migrations within a transaction context.
+    """
     print_db_info()
     
     configuration = config.get_section(config.config_ini_section)
