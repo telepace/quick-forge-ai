@@ -60,7 +60,7 @@ export USERNAME=admin
 * Create an environment variable with the password for HTTP Basic Auth, e.g.:
 
 ```bash
-export PASSWORD=changethis
+export PASSWORD=quickforgeai
 ```
 
 * Use openssl to generate the "hashed" version of the password for HTTP Basic Auth and store it in an environment variable:
@@ -153,7 +153,7 @@ There are some environment variables only used by GitHub Actions that you can co
 
 ### Generate secret keys
 
-Some environment variables in the `.env` file have a default value of `changethis`.
+Some environment variables in the `.env` file have a default value of `quickforgeai`.
 
 You have to change them with a secret key, to generate secret keys you can run the following command:
 

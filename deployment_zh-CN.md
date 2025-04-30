@@ -60,7 +60,7 @@ export USERNAME=admin
 * 创建一个环境变量，用于HTTP Basic Auth的密码，例如：
 
 ```bash
-export PASSWORD=changethis
+export PASSWORD=quickforgeai
 ```
 
 * 使用openssl生成HTTP Basic Auth密码的“哈希”版本，并将其存储在一个环境变量中：
@@ -153,7 +153,7 @@ export DOMAIN=fastapi-project.example.com
 
 ### 生成秘密密钥
 
-`.env`文件中的一些环境变量的默认值为`changethis`。
+`.env`文件中的一些环境变量的默认值为`quickforgeai`。
 
 您需要用秘密密钥替换它们，生成秘密密钥可以运行以下命令：
 
