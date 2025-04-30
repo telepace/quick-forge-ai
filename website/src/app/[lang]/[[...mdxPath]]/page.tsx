@@ -61,7 +61,6 @@ type PageProps = Readonly<{
  * The default function that handles rendering of pages based on language and path parameters.
  *
  * @async
- * @function Page
  * @param {PageProps} props - An object containing properties for the page component.
  * @returns {JSX.Element | void} - A JSX element representing the rendered page or void if an error occurs.
  *
