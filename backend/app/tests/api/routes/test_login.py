@@ -105,7 +105,7 @@ def test_reset_password(client: TestClient, db: Session) -> None:
 def test_reset_password_invalid_token(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:
-    data = {"new_password": "changethis", "token": "invalid"}
+    data = {"new_password": "quickforgeai", "token": "invalid"}
     r = client.post(
         f"{settings.API_V1_STR}/reset-password/",
         headers=superuser_token_headers,

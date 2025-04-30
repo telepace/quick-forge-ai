@@ -14,7 +14,7 @@ secret_key:
     'The secret key for the project, used for security,
     stored in .env, you can generate one with:
     python -c "import secrets; print(secrets.token_urlsafe(32))"'
-  default: changethis
+  default: quickforgeai
 
 first_superuser:
   type: str
@@ -24,7 +24,7 @@ first_superuser:
 first_superuser_password:
   type: str
   help: The password of the first superuser (in .env)
-  default: changethis
+  default: quickforgeai
 
 smtp_host:
   type: str
@@ -52,7 +52,7 @@ postgres_password:
     'The password for the PostgreSQL database, stored in .env,
     you can generate one with:
     python -c "import secrets; print(secrets.token_urlsafe(32))"'
-  default: changethis
+  default: quickforgeai
 
 sentry_dsn:
   type: str
