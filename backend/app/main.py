@@ -1,12 +1,12 @@
-import sentry_sdk
 import posthog
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
-from app.core.config import settings
 from app.api.middlewares.posthog import PostHogMiddleware
+from app.core.config import settings
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:

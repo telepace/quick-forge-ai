@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from typing import Annotated, Optional
+from typing import Annotated, Any, TypeVar
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -13,16 +13,19 @@ from app.core.config import settings
 from app.core.db_factory import engine
 from app.models import TokenPayload, User
 
+# 定义类型变量
+SupabaseClient = TypeVar("SupabaseClient")
+
 try:
-    from supabase import Client
     from app.core.supabase_service import get_supabase_client
+
     SUPABASE_AVAILABLE = True
 except ImportError:
     SUPABASE_AVAILABLE = False
-    class Client:
-        pass
-    def get_supabase_client() -> None:
+
+    def get_supabase_client() -> Any | None:
         return None
+
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -42,7 +45,7 @@ def get_supabase() -> Generator[Optional[Client], None, None]:
 
 SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
-SupabaseDep = Annotated[Optional[Client], Depends(get_supabase)]
+SupabaseDep = Annotated[Any | None, Depends(get_supabase)]
 
 
 def get_current_user(session: SessionDep, token: TokenDep) -> User:
