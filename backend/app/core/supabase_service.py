@@ -16,7 +16,7 @@ except ImportError:
 def get_supabase_client() -> Any | None:
     """
     Get the Supabase client instance
-    
+
     If the configuration is set to use Supabase and the supabase library is imported, it returns a configured client
     Otherwise, it returns None
     """

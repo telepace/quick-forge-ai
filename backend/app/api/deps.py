@@ -37,8 +37,15 @@ def get_db() -> Generator[Session, None, None]:
         yield session
 
 
-def get_supabase() -> Generator[Optional[Client], None, None]:
-    """Provides a Supabase client instance (if available)"""
+def get_supabase() -> Generator[SupabaseClient | None, None, None]:
+    """Provides a Supabase client instance (if available).
+
+    This function checks if the SUPABASE_AVAILABLE flag is set to True. If it is, it initializes and yields a Supabase
+    client instance; otherwise, it yields None.
+
+    Yields:
+        SupabaseClient | None: A Supabase client instance if available, otherwise None.
+    """
     client = get_supabase_client() if SUPABASE_AVAILABLE else None
     yield client
 

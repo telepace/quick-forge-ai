@@ -9,8 +9,16 @@ from app.core.config import settings
 # Get the logger
 logger = logging.getLogger("app.db_factory")
 
-def get_engine_args() -> Dict[str, Any]:
-    """Returns engine arguments based on the database type"""
+
+def get_engine_args() -> dict[str, Any]:
+    """Returns engine arguments based on the database type.
+
+    This function generates connection arguments tailored to different database types, particularly Supabase. It sets
+    specific options and parameters depending on the pool mode and environment settings.
+
+    Returns:
+        dict[str, Any]: A dictionary containing the connection arguments for the engine.
+    """
     connect_args = {}
 
     # Supabase specific connection arguments
@@ -43,6 +51,15 @@ def get_db_url() -> str:
     Gets the database URL based on the configuration and automatically handles port issues
     """
     # First, get the base URL
+    """Gets the database URL based on the configuration and automatically handles port issues.
+
+    This function retrieves the base database URL from the settings and checks if it is intended for Supabase. If so, it
+    ensures that the correct port is specified in the URL. The default port is selected based on the connection pool mode:
+    6543 for "transaction" mode and 5432 for "session" or any other mode.
+
+    Returns:
+        str: The database URL with the correctly configured port if applicable.
+    """
     url = str(settings.SQLALCHEMY_DATABASE_URI)
 
     # For Supabase, ensure the port matches the connection pool mode
@@ -68,10 +85,10 @@ def get_db_url() -> str:
 
 def create_db_engine() -> AnyType:
     """Creates and returns a configured database engine.
-    
+
     This function retrieves the necessary arguments for creating the database engine, configures connection pooling
     parameters, constructs the database URL, and then creates and returns the engine.
-    
+
     Returns:
         sqlalchemy.engine.Engine: The configured database engine.
     """
