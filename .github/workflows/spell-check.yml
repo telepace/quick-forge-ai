@@ -25,7 +25,7 @@ jobs:
         uses: crate-ci/typos@v1
         with:
           config: _typos.toml
-          write_changes: false
+          write_changes: true
 
       - name: Test Configuration
         if: ${{ always() }}
@@ -38,3 +38,12 @@ jobs:
             echo "❌ Configuration file not found"
             exit 1
           fi
+
+      - name: Commit Spell Check Changes
+        if: ${{ success() && github.event_name == 'pull_request' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: fix typos [skip ci]"
+          commit_user_name: "Typos Bot"
+          commit_user_email: "bot@noreply.github.com"
+          file_pattern: "**/*.md **/*.yml **/*.yaml **/*.js **/*.ts **/*.tsx **/*.jsx **/*.py **/*.java **/*.go **/*.rs **/*.c **/*.cpp **/*.h"
