@@ -50,7 +50,9 @@ extend-ignore-identifiers-re = [
   "\\bUUID\\b",
   "\\bJWT\\b",
   # Ignore specific format URLs and paths
-  "\\bhttps?://[\\w\\.-]+(/[\\w\\.-]+)*\\b"
+  "\\bhttps?://[\\w\\.-]+(/[\\w\\.-]+)*\\b",
+  # Ignore GitHub workflow specific terms
+  "\\bworkflow_dispatch\\b"
 ]
 
 # Custom words to ignore
@@ -74,6 +76,18 @@ swc = "swc"
 reactjs = "reactjs"
 backend = "backend"
 frontend = "frontend"
+# CI/CD and GitHub related terms
+snorkell = "snorkell"
+penify = "penify"
+docgen = "docgen"
+docwf = "docwf"
+tmate = "tmate"
+npx = "npx"
+uv = "uv"
+playwright = "playwright"
+dorny = "dorny"
+mxschmitt = "mxschmitt"
+astral = "astral"
 
 # Use custom settings for Markdown files
 [type.markdown]
@@ -84,4 +98,9 @@ check-file = true
 # Use custom settings for code files
 [type.code]
 extend-glob = ["*.py", "*.js", "*.ts", "*.tsx", "*.jsx", "*.java", "*.go", "*.rs", "*.c", "*.cpp", "*.h"]
+check-file = true
+
+# YAML files specific settings (including GitHub workflows)
+[type.yaml]
+extend-glob = ["*.yml", "*.yaml"]
 check-file = true 
