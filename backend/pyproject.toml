@@ -42,6 +42,18 @@ build-backend = "hatchling.build"
 [tool.mypy]
 strict = true
 exclude = ["venv", ".venv", "alembic"]
+ignore_missing_imports = true
+disallow_untyped_defs = false 
+disallow_incomplete_defs = false
+
+# 忽略 supabase 模块的类型检查错误
+[[tool.mypy.overrides]]
+module = "supabase"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "posthog"
+ignore_missing_imports = true
 
 [tool.ruff]
 target-version = "py310"

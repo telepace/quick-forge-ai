@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-import emails  # type: ignore
+import emails
 import jwt
 from jinja2 import Template
 from jwt.exceptions import InvalidTokenError
@@ -120,4 +120,4 @@ def verify_password_reset_token(token: str) -> str | None:
         )
         return str(decoded_token["sub"])
     except InvalidTokenError:
-        return None 
+        return None
