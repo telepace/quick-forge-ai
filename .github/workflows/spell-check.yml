@@ -24,17 +24,9 @@ jobs:
       - name: Run Spell Check
         uses: crate-ci/typos@v1
         with:
-          files: |
-            **/*.md
-            docs/**/*.md
-            **.py
-            **.js
-            **.ts
-            **.tsx
-            README.md
           config: _typos.toml
           write_changes: false
-          
+
       - name: Test Configuration
         if: ${{ always() }}
         run: |
