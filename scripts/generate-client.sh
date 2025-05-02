@@ -50,11 +50,11 @@ pip list | grep sentry || echo "sentry_sdk not found in pip list"
 pip list | grep posthog || echo "posthog not found in pip list"
 
 # 检查是否安装了sentry_sdk
-python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || {
+python -c "import sentry_sdk; print('sentry_sdk installed successfully')" || {
   echo "❌ sentry_sdk is not installed or not accessible"
   echo "🔍 Attempting again with explicit pip install..."
   python -m pip install --verbose --no-cache-dir sentry_sdk
-  python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || {
+  python -c "import sentry_sdk; print('sentry_sdk installed successfully')" || {
     echo "❌ Still cannot import sentry_sdk after reinstall"
     exit 1
   }

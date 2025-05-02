@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Copy example env file
+        run: cp .env.example .env
       - name: Install Doppler CLI
         uses: dopplerhq/cli-action@v3
       - name: Setup Doppler
