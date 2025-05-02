@@ -56,12 +56,14 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           uv sync
-          # 使用pip确保sentry_sdk被安装
-          pip install sentry_sdk
+          # 使用pip确保sentry_sdk和posthog被安装
+          pip install sentry_sdk posthog
           # 检查安装的依赖
           pip list | grep sentry
+          pip list | grep posthog
           # 尝试直接导入测试
           python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || echo "Failed to import sentry_sdk"
+          python -c "import posthog; print('posthog available')" || echo "Failed to import posthog"
         working-directory: backend
 
       # 4. Run Generation Script with Error Handling
@@ -70,8 +72,8 @@ jobs:
         # or just run the script directly if VIRTUAL_ENV isn't strictly necessary
         # for the script itself (it might just need python)
         run: |
-          # 在执行脚本前先安装sentry_sdk
-          pip install sentry_sdk
+          # 在执行脚本前先安装sentry_sdk和posthog
+          pip install sentry_sdk posthog
           bash scripts/generate-client.sh || {
             echo "❌ Failed to run generate-client.sh script."
             exit 1
@@ -83,6 +85,8 @@ jobs:
           POSTGRES_PASSWORD: just-for-generating-client-openapi
           FIRST_SUPERUSER_PASSWORD: just-for-generating-client-openapi
           SENTRY_DSN: ""
+          POSTHOG_API_KEY: ""
+          POSTHOG_HOST: ""
           # VIRTUAL_ENV might not be needed if uv sync --system is used
           # VIRTUAL_ENV: backend/.venv
 
