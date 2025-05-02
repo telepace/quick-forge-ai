@@ -11,22 +11,50 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
 echo "🔨 Generating OpenAPI client..."
+echo "📍 Script directory: $SCRIPT_DIR"
+echo "📍 Project root: $PROJECT_ROOT"
+echo "📍 Current directory: $(pwd)"
+
+# 显示Python环境信息
+echo "🐍 Python environment:"
+which python || echo "Python command not found"
+python --version || echo "Python version command failed"
+echo "🔍 Python path: $PYTHONPATH"
+echo "🔍 Python executable: $(which python)"
+
+# 在进入backend目录之前，确保安装必要的依赖
+echo "📦 Installing required dependencies..."
+python -m pip install --no-cache-dir sentry_sdk || {
+  echo "⚠️ Warning: Failed to install sentry_sdk with python -m pip"
+  echo "⚠️ Trying with pip directly..."
+  pip install --no-cache-dir sentry_sdk || {
+    echo "❌ Failed to install sentry_sdk"
+    exit 1
+  }
+}
 
 # Enter the backend directory and generate OpenAPI JSON
 cd "$PROJECT_ROOT/backend"
+echo "📍 Changed to backend directory: $(pwd)"
 
 # 检查依赖项是否安装
 echo "📦 Checking for required dependencies..."
-python -c "import sys; print('Python version:', sys.version)" || {
+python -c "import sys; print('Python version:', sys.version); print('Path:', sys.path)" || {
   echo "❌ Python is not available"
   exit 1
 }
 
+# 列出已安装的包
+echo "📦 Installed packages:"
+pip list | grep sentry
+
 # 检查是否安装了sentry_sdk
-python -c "import pkg_resources; pkg_resources.require('sentry_sdk')" || {
-  echo "⚠️ Warning: sentry_sdk is not installed, attempting to install it..."
-  pip install sentry_sdk || {
-    echo "❌ Failed to install sentry_sdk"
+python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || {
+  echo "❌ sentry_sdk is not installed or not accessible"
+  echo "🔍 Attempting again with explicit pip install..."
+  python -m pip install --verbose --no-cache-dir sentry_sdk
+  python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || {
+    echo "❌ Still cannot import sentry_sdk after reinstall"
     exit 1
   }
 }
@@ -46,6 +74,7 @@ if [ -f "$PROJECT_ROOT/openapi.json" ]; then
   echo "📦 Moving to frontend directory and generating client..."
   mv "$PROJECT_ROOT/openapi.json" "$PROJECT_ROOT/frontend/"
   cd "$PROJECT_ROOT/frontend"
+  echo "📍 Changed to frontend directory: $(pwd)"
   
   npm run generate-client || {
     echo "❌ Failed to generate client"
