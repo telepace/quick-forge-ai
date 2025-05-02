@@ -18,6 +18,9 @@ jobs:
     steps:
     - uses: actions/labeler@v5
       if: ${{ github.event.action != 'labeled' && github.event.action != 'unlabeled' }}
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        configuration-path: .github/labeler.yml
     - run: echo "Done adding labels"
   # Run this after labeler applied labels
   check-labels:
@@ -30,4 +33,4 @@ jobs:
       - uses: docker://agilepathway/pull-request-label-checker:latest
         with:
           one_of: breaking,security,feature,bug,refactor,upgrade,docs,lang-all,internal,enhancement
-          repo_token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
