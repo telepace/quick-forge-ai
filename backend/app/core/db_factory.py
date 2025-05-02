@@ -36,7 +36,7 @@ def get_engine_args() -> dict[str, Any]:
             connect_args["keepalives_count"] = "5"
         elif pool_mode == "transaction":
             # Transaction mode does not support prepare statements
-            connect_args["prepare_threshold"] = 0  # Disable prepare statements
+            connect_args["prepare_threshold"] = "0"  # Disable prepare statements
 
     # Additional parameters can be added based on the environment
     if settings.ENVIRONMENT == "local":
