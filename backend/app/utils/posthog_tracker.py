@@ -1,37 +1,39 @@
-from fastapi import Request
-from app.core.config import settings
+from typing import Any
+
 import posthog
-from typing import Any, Dict, Optional
+
+from app.core.config import settings
+
 
 class PostHogTracker:
     @staticmethod
     def capture_event(
         event_name: str,
-        user_id: Optional[str] = None,
-        properties: Optional[Dict[str, Any]] = None,
-        context: Optional[Dict[str, Any]] = None,
+        user_id: str | None = None,
+        properties: dict[str, Any] | None = None,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """捕获 PostHog 事件"""
         if not settings.posthog_enabled:
             return
-            
+
         posthog.capture(
-            distinct_id=user_id,
+            distinct_id=user_id or "anonymous",
             event=event_name,
             properties=properties or {},
             context=context or {},
         )
-        
+
     @staticmethod
     def identify_user(
         user_id: str,
-        properties: Optional[Dict[str, Any]] = None,
+        properties: dict[str, Any] | None = None,
     ) -> None:
         """标识用户"""
         if not settings.posthog_enabled:
             return
-            
+
         posthog.identify(
             distinct_id=user_id,
             properties=properties or {},
-        ) 
+        )

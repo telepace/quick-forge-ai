@@ -3,7 +3,7 @@ name: Playwright Tests
 on:
   push:
     branches:
-    - master
+    - main
   pull_request:
     types:
     - opened
@@ -71,11 +71,27 @@ jobs:
     - run: uv run bash scripts/generate-client.sh
       env:
         VIRTUAL_ENV: backend/.venv
-    - run: docker compose build
-    - run: docker compose down -v --remove-orphans
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install Doppler CLI
+      uses: dopplerhq/cli-action@v3
+    - name: Setup Doppler
+      run: doppler setup --silent --project quick-forge-ai --config stg
+      env:
+        DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+    - run: doppler run -- docker compose build
+      env:
+        DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+    - run: doppler run -- docker compose down -v --remove-orphans
+      env:
+        DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
     - name: Run Playwright tests
-      run: docker compose run --rm playwright npx playwright test --fail-on-flaky-tests --trace=retain-on-failure --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
-    - run: docker compose down -v --remove-orphans
+      run: doppler run -- docker compose run --rm playwright npx playwright test --fail-on-flaky-tests --trace=retain-on-failure --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      env:
+        DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+    - run: doppler run -- docker compose down -v --remove-orphans
+      env:
+        DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
     - name: Upload blob report to GitHub Actions Artifacts
       if: ${{ !cancelled() }}
       uses: actions/upload-artifact@v4
@@ -118,7 +134,7 @@ jobs:
         include-hidden-files: true
 
   # https://github.com/marketplace/actions/alls-green#why
-  alls-green-playwright:  # This job does nothing and is only used for the branch protection
+  all-green-playwright:  # This job does nothing and is only used for the branch protection
     if: always()
     needs:
       - test-playwright

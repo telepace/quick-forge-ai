@@ -10,7 +10,7 @@ description: Gitflow Workflow Rules. These rules should be applied when performi
 
 ## Main Branches
 
-### main (or master)
+### main (or main)
 - Contains production-ready code
 - Never commit directly to main
 - Only accepts merges from:

@@ -30,4 +30,4 @@ jobs:
       - uses: docker://agilepathway/pull-request-label-checker:latest
         with:
           one_of: breaking,security,feature,bug,refactor,upgrade,docs,lang-all,internal
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ secrets.BOT_GITHUB_TOKEN }}
