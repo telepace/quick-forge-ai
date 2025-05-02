@@ -19,7 +19,7 @@ const Appearance = () => {
               setTheme(details.value)
             }
           }}
-          value={theme || 'system'}
+          value={theme || "system"}
           colorPalette="teal"
         >
           <Stack>
