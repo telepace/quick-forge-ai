@@ -42,7 +42,7 @@ jobs:
         with:
           static_site_generator: next
           # Point to the Next.js project directory relative to the repo root
-          generator_config_file: ./website/next.config.mjs # Ensure this path is correct
+          generator_config_file: ./website/next.config.ts # Ensure this path is correct
           # Optional: Set base_path explicitly if needed, e.g., /your-repo-name
           # base_path: /${{ github.event.repository.name }}
 
@@ -88,6 +88,9 @@ jobs:
 
   # Deployment job remains the same
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
