@@ -24,11 +24,11 @@ echo "🔍 Python executable: $(which python)"
 
 # 在进入backend目录之前，确保安装必要的依赖
 echo "📦 Installing required dependencies..."
-python -m pip install --no-cache-dir sentry_sdk || {
-  echo "⚠️ Warning: Failed to install sentry_sdk with python -m pip"
+python -m pip install --no-cache-dir sentry_sdk posthog || {
+  echo "⚠️ Warning: Failed to install dependencies with python -m pip"
   echo "⚠️ Trying with pip directly..."
-  pip install --no-cache-dir sentry_sdk || {
-    echo "❌ Failed to install sentry_sdk"
+  pip install --no-cache-dir sentry_sdk posthog || {
+    echo "❌ Failed to install dependencies"
     exit 1
   }
 }
@@ -46,7 +46,8 @@ python -c "import sys; print('Python version:', sys.version); print('Path:', sys
 
 # 列出已安装的包
 echo "📦 Installed packages:"
-pip list | grep sentry
+pip list | grep sentry || echo "sentry_sdk not found in pip list"
+pip list | grep posthog || echo "posthog not found in pip list"
 
 # 检查是否安装了sentry_sdk
 python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || {
@@ -55,6 +56,17 @@ python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version_
   python -m pip install --verbose --no-cache-dir sentry_sdk
   python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || {
     echo "❌ Still cannot import sentry_sdk after reinstall"
+    exit 1
+  }
+}
+
+# 检查是否安装了posthog
+python -c "import posthog; print('posthog imported successfully')" || {
+  echo "❌ posthog is not installed or not accessible"
+  echo "🔍 Attempting again with explicit pip install..."
+  python -m pip install --verbose --no-cache-dir posthog
+  python -c "import posthog; print('posthog imported successfully')" || {
+    echo "❌ Still cannot import posthog after reinstall"
     exit 1
   }
 }
