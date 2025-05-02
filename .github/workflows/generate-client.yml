@@ -52,12 +52,13 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      # --- CHANGE HERE ---
-      # Removed --system flag as it caused an error
+      # 安装所有后端依赖项
       - name: Install Backend Dependencies
-        run: uv sync # Install dependencies using uv
+        run: |
+          uv sync
+          # 确保sentry_sdk被安装
+          uv pip install sentry_sdk
         working-directory: backend
-      # --- END CHANGE ---
 
       # 4. Run Generation Script with Error Handling
       - name: Generate Client
@@ -70,13 +71,12 @@ jobs:
             exit 1
           }
         env:
-          # Pass necessary env vars; ensure they are secure if sensitive
-          # Using dummy values might be okay if the backend doesn't *really*
-          # need a live DB connection just to generate the OpenAPI spec.
+          # 提供所有必需的环境变量，包括SENTRY_DSN设置为空字符串
           ENVIRONMENT: production
           SECRET_KEY: just-for-generating-client-openapi
           POSTGRES_PASSWORD: just-for-generating-client-openapi
           FIRST_SUPERUSER_PASSWORD: just-for-generating-client-openapi
+          SENTRY_DSN: ""
           # VIRTUAL_ENV might not be needed if uv sync --system is used
           # VIRTUAL_ENV: backend/.venv
 
