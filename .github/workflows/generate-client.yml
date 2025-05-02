@@ -52,9 +52,12 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      # --- CHANGE HERE ---
+      # Removed --system flag as it caused an error
       - name: Install Backend Dependencies
-        run: uv sync --system # Install into the system Python managed by setup-python
+        run: uv sync # Install dependencies using uv
         working-directory: backend
+      # --- END CHANGE ---
 
       # 4. Run Generation Script with Error Handling
       - name: Generate Client
