@@ -27,9 +27,10 @@ jobs:
       - name: Install Doppler CLI
         uses: dopplerhq/cli-action@v3
       - name: Setup Doppler
-        run: doppler setup --silent --project quick-forge-ai --config dev
+        run: doppler setup --silent --project quick-forge-ai --config stg
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
       - run: doppler run -- docker compose down -v --remove-orphans
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
