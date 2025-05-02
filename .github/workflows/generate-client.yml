@@ -1,61 +1,125 @@
+# .github/workflows/generate-client.yml
 name: Generate Client
 
 on:
   pull_request:
     types:
-    - opened
-    - synchronize
+      - opened
+      - synchronize
+  push: # Also consider running on push to main/master to ensure consistency
+    branches:
+      - main # Or your default branch
+
+permissions:
+  contents: write # Needed for pushing commits on same-repo events
 
 jobs:
   generate-client:
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
     steps:
-    # For PRs from forks
-    - uses: actions/checkout@v4
-    # For PRs from the same repo
-    - uses: actions/checkout@v4
-      if: ( github.event_name != 'pull_request' || github.secret_source == 'Actions' )
-      with:
-        ref: ${{ github.head_ref }}
-        token: ${{ secrets.FULL_STACK_FASTAPI_TEMPLATE_REPO_TOKEN }}
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
-    - name: Install uv
-      uses: astral-sh/setup-uv@v6
-      with:
-        version: "0.4.15"
-        enable-cache: true
-    - name: Install dependencies
-      run: npm ci
-      working-directory: frontend
-    - run: uv sync
-      working-directory: backend
-    - run: uv run bash scripts/generate-client.sh
-      env:
-        VIRTUAL_ENV: backend/.venv
-        ENVIRONMENT: production
-        SECRET_KEY: just-for-generating-client
-        POSTGRES_PASSWORD: just-for-generating-client
-        FIRST_SUPERUSER_PASSWORD: just-for-generating-client
-    - name: Add changes to git
-      run: |
-        git config --local user.email "github-actions@github.com"
-        git config --local user.name "github-actions"
-        git add frontend/src/client
-    # Same repo PRs
-    - name: Push changes
-      if: ( github.event_name != 'pull_request' || github.secret_source == 'Actions' )
-      run: |
-        git diff --staged --quiet || git commit -m "✨ Autogenerate frontend client"
-        git push
-    # Fork PRs
-    - name: Check changes
-      if: ( github.event_name == 'pull_request' && github.secret_source != 'Actions' )
-      run: |
-        git diff --staged --quiet || (echo "Changes detected in generated client, run scripts/generate-client.sh and commit the changes" && exit 1)
+      # 1. Checkout Code - Single step handles both fork and same-repo PRs/pushes
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        # Fetch depth 0 is needed for accurate diff/commit history if required elsewhere
+        # For pushing back, fetch the specific ref for same-repo PRs
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && github.head_ref || '' }}
+          # Use a PAT for same-repo events if you need to trigger other workflows
+          # Standard GITHUB_TOKEN is often sufficient for basic pushes
+          # token: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && secrets.YOUR_PAT_OR_GITHUB_TOKEN || '' }}
+
+      # 2. Setup Environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm' # Enable npm caching
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install uv (Python Package Installer)
+        uses: astral-sh/setup-uv@v1 # Use v1 for stable release
+        with:
+          # version: "0.4.15" # Specifying version is optional, can use latest stable
+          enable-cache: true
+
+      # 3. Install Dependencies
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install Backend Dependencies
+        run: uv sync --system # Install into the system Python managed by setup-python
+        working-directory: backend
+
+      # 4. Run Generation Script with Error Handling
+      - name: Generate Client
+        # Use `uv run` to execute within the backend context if needed,
+        # or just run the script directly if VIRTUAL_ENV isn't strictly necessary
+        # for the script itself (it might just need python)
+        run: |
+          bash scripts/generate-client.sh || {
+            echo "❌ Failed to run generate-client.sh script."
+            exit 1
+          }
+        env:
+          # Pass necessary env vars; ensure they are secure if sensitive
+          # Using dummy values might be okay if the backend doesn't *really*
+          # need a live DB connection just to generate the OpenAPI spec.
+          ENVIRONMENT: production
+          SECRET_KEY: just-for-generating-client-openapi
+          POSTGRES_PASSWORD: just-for-generating-client-openapi
+          FIRST_SUPERUSER_PASSWORD: just-for-generating-client-openapi
+          # VIRTUAL_ENV might not be needed if uv sync --system is used
+          # VIRTUAL_ENV: backend/.venv
+
+      # 5. Configure Git User
+      - name: Configure Git User
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      # 6. Stage Generated Files
+      - name: Stage Generated Client Files
+        run: git add frontend/src/client # Adjust path if needed
+
+      # 7. Handle Changes for Same-Repo Events (Push/PR from same repo)
+      - name: Commit and Push Changes (Same Repo)
+        # Run only if it's NOT a PR from a fork
+        if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+        run: |
+          # Check if there are staged changes
+          if ! git diff --staged --quiet; then
+            echo "✅ Changes detected in generated client. Committing and pushing..."
+            # Pull before pushing to avoid conflicts if possible (optional)
+            # git pull --ff-only origin ${{ github.head_ref || github.ref_name }}
+            git commit -m "ci: ✨ Autogenerate frontend client"
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          else
+            echo "✅ No changes detected in generated client."
+          fi
+        env:
+          # GITHUB_TOKEN has write permissions for same-repo events by default
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use a PAT if you need to trigger subsequent workflows:
+          # GITHUB_TOKEN: ${{ secrets.YOUR_PAT_WITH_WRITE_ACCESS }}
+
+      # 8. Handle Changes for Fork PRs (Warn, Don't Fail)
+      - name: Check for Uncommitted Changes (Fork PRs)
+        # Run only if it IS a PR from a fork
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          # Check if there are staged changes that were generated
+          if ! git diff --staged --quiet; then
+            echo "⚠️ Changes detected in generated client."
+            echo "➡️ Please run 'bash scripts/generate-client.sh' locally and commit the changes to this PR."
+            # Optionally, use GitHub annotations for better visibility in the PR
+            echo "::warning title=Generated Client Changes Detected::Please run 'bash scripts/generate-client.sh' locally and commit the changes to this PR."
+            # DO NOT exit 1 - Allow the workflow to continue
+          else
+            echo "✅ No changes detected in generated client."
+          fi
