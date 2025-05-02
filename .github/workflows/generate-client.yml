@@ -6,7 +6,7 @@ on:
     types:
       - opened
       - synchronize
-  push: # Also consider running on push to main/master to ensure consistency
+  push: # Also consider running on push to main/main to ensure consistency
     branches:
       - main # Or your default branch
 
