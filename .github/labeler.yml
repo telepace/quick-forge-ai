@@ -1,25 +1,34 @@
-docs:
-  - all:
-    - changed-files:
-      - any-glob-to-any-file:
-        - '**/*.md'
-      - all-globs-to-all-files:
-        - '!frontend/**'
-        - '!backend/**'
-        - '!.github/**'
-        - '!scripts/**'
-        - '!.gitignore'
-        - '!.pre-commit-config.yaml'
+# 根据仓库结构添加标签规则
+frontend:
+  - frontend/**/*
 
+backend:
+  - backend/**/*
+
+website:
+  - website/**/*
+
+docs:
+  - docs/**/*
+
+workflows:
+  - .github/workflows/**/*
+
+helm-charts:
+  - helm-charts/**/*
+
+# 内部变更标签
 internal:
-  - all:
-    - changed-files:
-      - any-glob-to-any-file:
-        - .github/**
-        - scripts/**
-        - .gitignore
-        - .pre-commit-config.yaml
-      - all-globs-to-all-files:
-        - '!./**/*.md'
-        - '!frontend/**'
-        - '!backend/**'
+  - .github/**
+  - scripts/**
+  - .gitignore
+  - .pre-commit-config.yaml
+
+# 常见变更类型标签可在PR中手动添加
+# breaking
+# security
+# feature
+# bug
+# refactor
+# upgrade
+# enhancement

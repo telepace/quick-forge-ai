@@ -11,7 +11,7 @@ jobs:
     # if: github.repository_owner == 'telepace'
     runs-on:
       - self-hosted
-      - production
+      - staging
     env:
       ENVIRONMENT: production
       DOMAIN: ${{ secrets.DOMAIN_PRODUCTION }}
