@@ -1,6 +1,7 @@
 # 尝试导入posthog，如果无法导入则使用空的替代
 try:
     import posthog
+
     POSTHOG_AVAILABLE = True
 except ImportError:
     print("Warning: posthog not found, PostHog integration will be disabled")
@@ -9,6 +10,7 @@ except ImportError:
 # 尝试导入sentry_sdk，如果无法导入则使用空的替代
 try:
     import sentry_sdk
+
     SENTRY_AVAILABLE = True
 except ImportError:
     print("Warning: sentry_sdk not found, Sentry integration will be disabled")
