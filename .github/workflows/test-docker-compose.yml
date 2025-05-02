@@ -3,7 +3,7 @@ name: Test Docker Compose
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types:
       - opened
@@ -16,11 +16,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - run: docker compose build
-      - run: docker compose down -v --remove-orphans
-      - run: docker compose up -d --wait backend frontend adminer
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v3
+      - name: Setup Doppler
+        run: doppler setup --silent --project quick-forge-ai --config dev
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - run: doppler run -- docker compose build
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - run: doppler run -- docker compose down -v --remove-orphans
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - run: doppler run -- docker compose up -d --wait backend frontend adminer
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Test backend is up
         run: curl http://localhost:8000/api/v1/utils/health-check
       - name: Test frontend is up
         run: curl http://localhost:5173
-      - run: docker compose down -v --remove-orphans
+      - run: doppler run -- docker compose down -v --remove-orphans
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}

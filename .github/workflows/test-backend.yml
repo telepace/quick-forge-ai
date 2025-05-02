@@ -3,7 +3,7 @@ name: Test Backend
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types:
       - opened
@@ -24,15 +24,31 @@ jobs:
         with:
           version: "0.4.15"
           enable-cache: true
-      - run: docker compose down -v --remove-orphans
-      - run: docker compose up -d db mailcatcher
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v3
+      - name: Setup Doppler
+        run: doppler setup --silent --project quick-forge-ai --config dev
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - run: doppler run -- docker compose down -v --remove-orphans
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - run: doppler run -- docker compose up -d db mailcatcher
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Migrate DB
-        run: uv run bash scripts/prestart.sh
+        run: doppler run -- uv run bash scripts/prestart.sh
         working-directory: backend
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Run tests
-        run: uv run bash scripts/tests-start.sh "Coverage for ${{ github.sha }}"
+        run: doppler run -- uv run bash scripts/tests-start.sh "Coverage for ${{ github.sha }}"
         working-directory: backend
-      - run: docker compose down -v --remove-orphans
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - run: doppler run -- docker compose down -v --remove-orphans
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Store coverage files
         uses: actions/upload-artifact@v4
         with:

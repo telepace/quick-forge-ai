@@ -341,3 +341,46 @@ In your `.env` file, set:
 ```
 SUPABASE_URL=postgresql://postgres:your-password@db.abcdefghijkl.supabase.co:5432/postgres
 ```
+
+## Development Workflows
+
+This project provides optimized scripts and Makefile targets for common development tasks.
+
+### Backend Development
+
+- `make backend-install` - Install backend dependencies
+- `make backend-run` - Run backend locally with hot reload
+- `make backend-format` - Format backend code with ruff
+- `make backend-lint` - Run linters (mypy, ruff) on backend code
+- `make backend-test` - Run all backend tests with coverage
+- `make backend-test-specific` - Run a specific backend test
+- `make backend-coverage-report` - Open the HTML coverage report
+- `make backend-prestart` - Run backend prestart initialization
+- `make backend-migration` - Create a new database migration
+- `make backend-migrate` - Run database migrations
+- `make backend-downgrade` - Downgrade database to previous migration
+- `make backend-shell` - Start a Python shell with app context
+- `make backend-db-shell` - Connect to database with psql
+
+### Frontend Development
+
+- `make frontend-install` - Install frontend dependencies
+- `make frontend-dev` - Run frontend development server
+- `make frontend-build` - Build frontend for production
+- `make frontend-test` - Run frontend tests
+- `make frontend-lint` - Run linters on frontend code
+
+### Docker Workflows
+
+- `make docker-build-all` - Build all Docker images
+- `make docker-push-all` - Build and push all Docker images
+- `make docker-deploy` - Deploy to Docker Swarm
+- `make docker-test` - Run tests in Docker
+- `make docker-test-local` - Run tests in local Docker environment
+
+### Other Utilities
+
+- `make generate-client` - Generate OpenAPI client for frontend
+- `make format` - Format code in all components
+- `make lint` - Run linters on all components
+- `make clean` - Clean build artifacts

@@ -78,7 +78,7 @@ dev:
 .PHONY: backend-install
 backend-install:
 	@echo "===========> Installing backend dependencies"
-	@cd $(BACKEND_DIR) && $(PIP) install -r .
+	@cd $(BACKEND_DIR) && uv sync
 
 ## backend-build: Build backend
 .PHONY: backend
@@ -86,24 +86,42 @@ backend:
 	@echo "===========> Building backend"
 	@cd $(BACKEND_DIR) && fastapi dev app/main.py
 
-## backend-test: Run backend tests
+## backend-test: Run backend tests with coverage
 .PHONY: backend-test
 backend-test: backend-install
-	@echo "===========> Running backend tests"
-	@cd $(BACKEND_DIR) && $(PYTEST) $(PYTEST_ARGS)
+	@echo "===========> Running backend tests with coverage"
+	@bash $(BACKEND_DIR)/scripts/test.sh
+
+## backend-test-specific: Run specific backend test
+.PHONY: backend-test-specific
+backend-test-specific: backend-install
+	@echo "===========> Running specific backend test"
+	@read -p "Test path (e.g., app/tests/api/test_users.py): " test_path; \
+	cd $(BACKEND_DIR) && $(PYTEST) "$$test_path" -v
 
 ## backend-lint: Run backend linters
 .PHONY: backend-lint
 backend-lint: backend-install
 	@echo "===========> Running backend linters"
-	@cd $(BACKEND_DIR) && ruff check .
-	@cd $(BACKEND_DIR) && mypy .
+	@cd $(BACKEND_DIR) && bash scripts/lint.sh
 
 ## backend-run: Run backend locally
 .PHONY: backend-run
 backend-run: backend-install
 	@echo "===========> Running backend"
 	@cd $(BACKEND_DIR) && uvicorn app.main:app --reload
+
+## backend-prestart: Run backend prestart initialization
+.PHONY: backend-prestart
+backend-prestart:
+	@echo "===========> Running backend prestart initialization"
+	@bash $(BACKEND_DIR)/scripts/prestart.sh
+
+## backend-coverage-report: Open backend coverage report
+.PHONY: backend-coverage-report
+backend-coverage-report:
+	@echo "===========> Opening backend coverage report"
+	@open $(BACKEND_DIR)/htmlcov/index.html 2>/dev/null || xdg-open $(BACKEND_DIR)/htmlcov/index.html 2>/dev/null || echo "Could not open coverage report automatically. Please open $(BACKEND_DIR)/htmlcov/index.html in a browser."
 
 ## frontend-install: Install frontend dependencies
 .PHONY: frontend-install
@@ -233,11 +251,15 @@ clean:
 	@find . -name ".pytest_cache" -delete
 	@find . -name ".coverage" -delete
 
+## backend-format: Format backend code
+.PHONY: backend-format
+backend-format:
+	@echo "===========> Formatting backend code"
+	@bash $(BACKEND_DIR)/scripts/format.sh
+
 ## format: Format code in all components
 .PHONY: format
-format:
-	@echo "===========> Formatting backend code"
-	@cd $(BACKEND_DIR) && ruff format .
+format: backend-format
 	@echo "===========> Formatting frontend code"
 	@cd $(FRONTEND_DIR) && $(NPM) run format
 
@@ -278,4 +300,77 @@ setup-git-hooks:
 install-pre-commit:
 	@echo "===========> Installing pre-commit"
 	@$(PIP) install pre-commit
-	@pre-commit install 
+	@pre-commit install
+
+## generate-client: Generate OpenAPI client
+.PHONY: generate-client
+generate-client:
+	@echo "===========> Generate OpenAPI client"
+	@bash $(ROOT_DIR)/scripts/generate-client.sh
+
+## docker-test: Run tests in Docker
+.PHONY: docker-test
+docker-test:
+	@echo "===========> Run tests in Docker"
+	@bash $(ROOT_DIR)/scripts/test.sh
+
+## docker-test-local: Run tests in local Docker
+.PHONY: docker-test-local
+docker-test-local:
+	@echo "===========> Run tests in local Docker"
+	@bash $(ROOT_DIR)/scripts/test-local.sh
+
+## docker-build: Build Docker images
+.PHONY: docker-build-all
+docker-build-all:
+	@echo "===========> Build all Docker images"
+	@TAG=$(VERSION) bash $(ROOT_DIR)/scripts/build.sh
+
+## docker-push: Build and push Docker images
+.PHONY: docker-push-all
+docker-push-all:
+	@echo "===========> Build and push all Docker images"
+	@TAG=$(VERSION) bash $(ROOT_DIR)/scripts/build-push.sh
+
+## docker-deploy: Deploy to Docker Swarm
+.PHONY: docker-deploy
+docker-deploy:
+	@echo "===========> Deploy to Docker Swarm"
+	@if [ -z "$(DOMAIN)" ] || [ -z "$(STACK_NAME)" ]; then \
+		echo "Error: Please set DOMAIN and STACK_NAME environment variables"; \
+		echo "Example: make docker-deploy DOMAIN=example.com STACK_NAME=myapp"; \
+		exit 1; \
+	fi
+	@DOMAIN=$(DOMAIN) STACK_NAME=$(STACK_NAME) TAG=$(VERSION) bash $(ROOT_DIR)/scripts/deploy.sh
+
+## backend-migration: Create a new database migration
+.PHONY: backend-migration
+backend-migration:
+	@echo "===========> Creating new database migration"
+	@read -p "Migration name: " name; \
+	cd $(BACKEND_DIR) && alembic revision --autogenerate -m "$$name"
+
+## backend-migrate: Run database migrations
+.PHONY: backend-migrate
+backend-migrate:
+	@echo "===========> Running database migrations"
+	@cd $(BACKEND_DIR) && alembic upgrade head
+
+## backend-downgrade: Downgrade database to previous migration
+.PHONY: backend-downgrade
+backend-downgrade:
+	@echo "===========> Downgrading database to previous migration"
+	@cd $(BACKEND_DIR) && alembic downgrade -1
+
+## backend-shell: Start a Python shell with app context
+.PHONY: backend-shell
+backend-shell: backend-install
+	@echo "===========> Starting Python shell with app context"
+	@cd $(BACKEND_DIR) && python -c "import app; print('App context loaded. Available modules: app')" && python
+
+## backend-db-shell: Connect to database with psql
+.PHONY: backend-db-shell
+backend-db-shell:
+	@echo "===========> Connecting to database"
+	@docker-compose exec db psql -U postgres -d app || \
+	 psql "$(shell cd $(BACKEND_DIR) && python -c "from app.core.config import settings; print(settings.SQLALCHEMY_DATABASE_URI)")" 

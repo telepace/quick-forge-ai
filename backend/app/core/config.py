@@ -1,8 +1,8 @@
+import logging
 import os
 import secrets
 import warnings
-import logging
-from typing import Annotated, Any, Literal, ClassVar
+from typing import Annotated, Any, ClassVar, Literal
 
 from pydantic import (
     AnyUrl,
@@ -20,6 +20,7 @@ from typing_extensions import Self
 # Set up logger
 logger = logging.getLogger("app.config")
 
+
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
         return [i.strip() for i in v.split(",")]
@@ -31,14 +32,14 @@ def parse_cors(v: Any) -> list[str] | str:
 class Settings(BaseSettings):
     # Use ClassVar to indicate this is not a model field
     env_file_path: ClassVar[str] = os.environ.get("ENV_FILE", "../.env")
-    
+
     model_config = SettingsConfigDict(
         # Use dynamic environment file path
         env_file=env_file_path,
         env_ignore_empty=True,
         extra="ignore",
     )
-    
+
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
@@ -62,12 +63,12 @@ class Settings(BaseSettings):
 
     # Database configuration
     DATABASE_TYPE: Literal["postgres", "supabase"] = "postgres"
-    
+
     # Supabase configuration - these will not be used when using postgres database type
     SUPABASE_URL: str | None = None
     SUPABASE_API_KEY: str | None = None
     SUPABASE_JWT_SECRET: str | None = None
-    
+
     # When using Supabase, we can still use the PostgreSQL connection directly
     SUPABASE_DB_HOST: str | None = None
     SUPABASE_DB_PORT: int | None = None
@@ -95,10 +96,12 @@ class Settings(BaseSettings):
             port = self.SUPABASE_DB_PORT or (
                 6543 if self.SUPABASE_DB_POOL_MODE == "transaction" else 5432
             )
-            
+
             # Log the port used
-            logger.debug(f"Using {self.SUPABASE_DB_POOL_MODE} mode to connect to Supabase, port: {port}")
-            
+            logger.debug(
+                f"Using {self.SUPABASE_DB_POOL_MODE} mode to connect to Supabase, port: {port}"
+            )
+
             return MultiHostUrl.build(
                 scheme="postgresql+psycopg",
                 username=self.SUPABASE_DB_USER or "",
@@ -143,15 +146,15 @@ class Settings(BaseSettings):
     EMAIL_TEST_USER: EmailStr = "test@example.com"
     FIRST_SUPERUSER: EmailStr = "admin@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "admin"
-    
+
     # PostHog Configuration
     POSTHOG_API_KEY: str | None = None
-    POSTHOG_HOST: str = "https://app.posthog.com"  
+    POSTHOG_HOST: str = "https://app.posthog.com"
     POSTHOG_CAPTURE_PERSONAL_INFO: bool = False
-    
-    @computed_field  # type: ignore[prop-decorator]  
-    @property  
-    def posthog_enabled(self) -> bool:  
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def posthog_enabled(self) -> bool:
         return bool(self.POSTHOG_API_KEY and self.ENVIRONMENT != "local")
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
@@ -172,19 +175,25 @@ class Settings(BaseSettings):
         if self.DATABASE_TYPE == "postgres":
             self._check_default_secret("POSTGRES_PASSWORD", self.POSTGRES_PASSWORD)
         elif self.DATABASE_TYPE == "supabase" and self.SUPABASE_DB_PASSWORD:
-            self._check_default_secret("SUPABASE_DB_PASSWORD", self.SUPABASE_DB_PASSWORD)
-        
+            self._check_default_secret(
+                "SUPABASE_DB_PASSWORD", self.SUPABASE_DB_PASSWORD
+            )
+
         self._check_default_secret(
             "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
         )
-        
+
         # Log database configuration information
         if self.DATABASE_TYPE == "supabase":
-            logger.info(f"Using Supabase connection pool mode: {self.SUPABASE_DB_POOL_MODE}")
-            
+            logger.info(
+                f"Using Supabase connection pool mode: {self.SUPABASE_DB_POOL_MODE}"
+            )
+
             # Check if the port matches the connection pool mode
             if self.SUPABASE_DB_PORT:
-                expected_port = 6543 if self.SUPABASE_DB_POOL_MODE == "transaction" else 5432
+                expected_port = (
+                    6543 if self.SUPABASE_DB_POOL_MODE == "transaction" else 5432
+                )
                 if self.SUPABASE_DB_PORT != expected_port:
                     logger.warning(
                         f"Supabase port ({self.SUPABASE_DB_PORT}) does not match the connection pool mode ({self.SUPABASE_DB_POOL_MODE})."
