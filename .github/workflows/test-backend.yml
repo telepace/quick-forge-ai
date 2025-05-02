@@ -24,6 +24,8 @@ jobs:
         with:
           version: "0.4.15"
           enable-cache: true
+      - name: Copy example env file
+        run: cp .env.example .env
       - name: Install Doppler CLI
         uses: dopplerhq/cli-action@v3
       - name: Setup Doppler
