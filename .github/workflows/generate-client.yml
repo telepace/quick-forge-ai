@@ -56,8 +56,12 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           uv sync
-          # 确保sentry_sdk被安装
-          uv pip install sentry_sdk
+          # 使用pip确保sentry_sdk被安装
+          pip install sentry_sdk
+          # 检查安装的依赖
+          pip list | grep sentry
+          # 尝试直接导入测试
+          python -c "import sentry_sdk; print('sentry_sdk version:', sentry_sdk.__version__)" || echo "Failed to import sentry_sdk"
         working-directory: backend
 
       # 4. Run Generation Script with Error Handling
@@ -66,6 +70,8 @@ jobs:
         # or just run the script directly if VIRTUAL_ENV isn't strictly necessary
         # for the script itself (it might just need python)
         run: |
+          # 在执行脚本前先安装sentry_sdk
+          pip install sentry_sdk
           bash scripts/generate-client.sh || {
             echo "❌ Failed to run generate-client.sh script."
             exit 1
