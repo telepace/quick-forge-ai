@@ -37,6 +37,6 @@
     }  
   },  
   "forwardPorts": [8000, 5173, 5432, 8080, 1080],  
-  "postCreateCommand": "[ ! -f .env ] && cp .env.example .env || echo '.env already exists'; pip install pre-commit && pre-commit install",  
+  "postStartCommand": "[ ! -f .env ] && cp .env.example .env || echo '.env already exists'; pip install pre-commit && pre-commit install",
   "remoteUser": "root"  
 }
