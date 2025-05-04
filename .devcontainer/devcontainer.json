@@ -1,17 +1,11 @@
 {  
   "name": "FastAPI Full Stack",  
-  "dockerComposeFile": [  
-    "../docker-compose.yml",  
-    "../docker-compose.override.yml",  
-    "docker-compose.yml"  
-  ],  
-  "service": "backend",  
-  "workspaceFolder": "/app",  
-  "initializeCommand": "cp .env.example .env",
+  "image": "mcr.microsoft.com/devcontainers/python:3.10",
+  "workspaceFolder": "/app",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
   "features": {  
-    "ghcr.io/devcontainers/features/python:1": { "version": "3.10" },  
-    "ghcr.io/itsmechlark/features/doppler:2": {},
-    "ghcr.io/devcontainers/features/node:1": { "version": "lts" }  
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" },
+    "ghcr.io/itsmechlark/features/doppler:2": {}
   },  
   "customizations": {  
     "vscode": {  
@@ -39,6 +33,6 @@
     }  
   },  
   "forwardPorts": [8000, 5173, 5432, 8080, 1080],  
-  "postStartCommand": "if [ ! -f .env ]; then cp .env.example .env; fi && uv sync",
+  "postCreateCommand": "if [ ! -f .env ]; then cp .env.example .env; fi && pip install uv && uv venv && . .venv/bin/activate && uv pip install -e '.[dev]' && uv sync",
   "remoteUser": "root"  
 }
