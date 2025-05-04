@@ -1,0 +1,441 @@
+name: quick-forge-ai
+services:
+  adminer:
+    depends_on:
+      db:
+        condition: service_started
+        required: true
+    environment:
+      ADMINER_DESIGN: pepa-linha-dark
+    image: adminer
+    labels:
+      traefik.constraint-label: traefik-public
+      traefik.docker.network: traefik-public
+      traefik.enable: "true"
+      traefik.http.routers.quick-forge-ai-adminer-http.entrypoints: http
+      traefik.http.routers.quick-forge-ai-adminer-http.middlewares: https-redirect
+      traefik.http.routers.quick-forge-ai-adminer-http.rule: Host(`adminer.localhost.nip.io`)
+      traefik.http.routers.quick-forge-ai-adminer-https.entrypoints: https
+      traefik.http.routers.quick-forge-ai-adminer-https.rule: Host(`adminer.localhost.nip.io`)
+      traefik.http.routers.quick-forge-ai-adminer-https.tls: "true"
+      traefik.http.routers.quick-forge-ai-adminer-https.tls.certresolver: le
+      traefik.http.services.quick-forge-ai-adminer.loadbalancer.server.port: "8080"
+    networks:
+      default: null
+      traefik-public: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8080"
+        protocol: tcp
+    restart: "no"
+  backend:
+    build:
+      context: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/backend
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/backend
+          action: sync
+          target: /app
+          ignore:
+            - ./backend/.venv
+            - .venv
+        - path: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/backend/pyproject.toml
+          action: rebuild
+    command:
+      - sleep
+      - infinity
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+        required: true
+      prestart:
+        condition: service_completed_successfully
+        required: true
+    environment:
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.nip.io
+      DATABASE_TYPE: supabase
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost.nip.io
+      EMAILS_FROM_EMAIL: noreply@example.com
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: admin@example.com
+      FIRST_SUPERUSER_PASSWORD: quickforgeai
+      FRONTEND_HOST: http://localhost:5173
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: quickforgeai
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: db
+      POSTGRES_USER: postgres
+      POSTHOG_API_KEY: your_api_key_here
+      POSTHOG_CAPTURE_PERSONAL_INFO: "False"
+      POSTHOG_HOST: https://app.posthog.com
+      PROJECT_NAME: Quick Forge AI
+      SECRET_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY1OTEzMTUsInN1YiI6IjRiNzU0NGEyLTVjZjEtNDYxMS1hMjUyLTJiOTg1MzRmMjFlYyJ9.n-lPvZma0bqDhaYrRGJ66xAjB_r_qaonshkEDnggvHw
+      SENTRY_DSN: https://929a5798ce32840027d741ad2f0094de@o4507569747722240.ingest.us.sentry.io/4509241137037312
+      SMTP_HOST: mailcatcher
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "1025"
+      SMTP_SSL: "False"
+      SMTP_TLS: "false"
+      SMTP_USER: ""
+      STACK_NAME: quick-forge-ai
+      SUPABASE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRldm9ybHNvZm1pbG9xcGRjc3lzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTgyMTg3OCwiZXhwIjoyMDYxMzk3ODc4fQ.vNlR6aQ4XDzZKHb5cmfGW_lXtH4e2bM8OdbmQFUYqnU
+      SUPABASE_DB_HOST: aws-0-us-west-1.pooler.supabase.com
+      SUPABASE_DB_NAME: postgres
+      SUPABASE_DB_PASSWORD: quickforgeai
+      SUPABASE_DB_POOL_MODE: session
+      SUPABASE_DB_PORT: "5432"
+      SUPABASE_DB_USER: postgres.tevorlsofmiloqpdcsys
+      SUPABASE_URL: https://tevorlsofmiloqpdcsys.supabase.co
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/api/v1/utils/health-check/
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    image: backend:latest
+    labels:
+      traefik.constraint-label: traefik-public
+      traefik.docker.network: traefik-public
+      traefik.enable: "true"
+      traefik.http.routers.quick-forge-ai-backend-http.entrypoints: http
+      traefik.http.routers.quick-forge-ai-backend-http.middlewares: https-redirect
+      traefik.http.routers.quick-forge-ai-backend-http.rule: Host(`api.localhost.nip.io`)
+      traefik.http.routers.quick-forge-ai-backend-https.entrypoints: https
+      traefik.http.routers.quick-forge-ai-backend-https.rule: Host(`api.localhost.nip.io`)
+      traefik.http.routers.quick-forge-ai-backend-https.tls: "true"
+      traefik.http.routers.quick-forge-ai-backend-https.tls.certresolver: le
+      traefik.http.services.quick-forge-ai-backend.loadbalancer.server.port: "8000"
+    networks:
+      default: null
+      traefik-public: null
+    ports:
+      - mode: ingress
+        target: 8000
+        published: "8000"
+        protocol: tcp
+    restart: "no"
+    volumes:
+      - type: bind
+        source: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/backend/htmlcov
+        target: /app/htmlcov
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /Users/xiongxinwei/data/open-source-project-learn
+        target: /app
+        bind:
+          create_host_path: true
+      - type: volume
+        source: backend-venv
+        target: /app/.venv
+        volume: {}
+      - type: bind
+        source: /Users/xiongxinwei/.ssh
+        target: /root/.ssh
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /Users/xiongxinwei/.gitconfig
+        target: /root/.gitconfig
+        read_only: true
+        bind:
+          create_host_path: true
+  db:
+    environment:
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.nip.io
+      DATABASE_TYPE: supabase
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost.nip.io
+      EMAILS_FROM_EMAIL: info@example.com
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: admin@example.com
+      FIRST_SUPERUSER_PASSWORD: quickforgeai
+      FRONTEND_HOST: http://localhost:5173
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: quickforgeai
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: 127.0.0.1
+      POSTGRES_USER: postgres
+      POSTHOG_API_KEY: your_api_key_here
+      POSTHOG_CAPTURE_PERSONAL_INFO: "False"
+      POSTHOG_HOST: https://app.posthog.com
+      PROJECT_NAME: Quick Forge AI
+      SECRET_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY1OTEzMTUsInN1YiI6IjRiNzU0NGEyLTVjZjEtNDYxMS1hMjUyLTJiOTg1MzRmMjFlYyJ9.n-lPvZma0bqDhaYrRGJ66xAjB_r_qaonshkEDnggvHw
+      SENTRY_DSN: https://929a5798ce32840027d741ad2f0094de@o4507569747722240.ingest.us.sentry.io/4509241137037312
+      SMTP_HOST: ""
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "587"
+      SMTP_SSL: "False"
+      SMTP_TLS: "True"
+      SMTP_USER: ""
+      STACK_NAME: quick-forge-ai
+      SUPABASE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRldm9ybHNvZm1pbG9xcGRjc3lzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTgyMTg3OCwiZXhwIjoyMDYxMzk3ODc4fQ.vNlR6aQ4XDzZKHb5cmfGW_lXtH4e2bM8OdbmQFUYqnU
+      SUPABASE_DB_HOST: aws-0-us-west-1.pooler.supabase.com
+      SUPABASE_DB_NAME: postgres
+      SUPABASE_DB_PASSWORD: quickforgeai
+      SUPABASE_DB_POOL_MODE: session
+      SUPABASE_DB_PORT: "5432"
+      SUPABASE_DB_USER: postgres.tevorlsofmiloqpdcsys
+      SUPABASE_URL: https://tevorlsofmiloqpdcsys.supabase.co
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres -d app
+      timeout: 10s
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    image: postgres:17
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+    restart: "no"
+    volumes:
+      - type: volume
+        source: app-db-data
+        target: /var/lib/postgresql/data/pgdata
+        volume: {}
+  frontend:
+    build:
+      context: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: development
+        VITE_API_URL: http://localhost:8000
+    command:
+      - sleep
+      - infinity
+    image: frontend:latest
+    labels:
+      traefik.constraint-label: traefik-public
+      traefik.docker.network: traefik-public
+      traefik.enable: "true"
+      traefik.http.routers.quick-forge-ai-frontend-http.entrypoints: http
+      traefik.http.routers.quick-forge-ai-frontend-http.middlewares: https-redirect
+      traefik.http.routers.quick-forge-ai-frontend-http.rule: Host(`dashboard.localhost.nip.io`)
+      traefik.http.routers.quick-forge-ai-frontend-https.entrypoints: https
+      traefik.http.routers.quick-forge-ai-frontend-https.rule: Host(`dashboard.localhost.nip.io`)
+      traefik.http.routers.quick-forge-ai-frontend-https.tls: "true"
+      traefik.http.routers.quick-forge-ai-frontend-https.tls.certresolver: le
+      traefik.http.services.quick-forge-ai-frontend.loadbalancer.server.port: "80"
+    networks:
+      default: null
+      traefik-public: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "5173"
+        protocol: tcp
+    restart: "no"
+    volumes:
+      - type: bind
+        source: /Users/xiongxinwei/data/open-source-project-learn/frontend
+        target: /app
+        bind:
+          create_host_path: true
+      - type: volume
+        source: frontend-node-modules
+        target: /app/node_modules
+        volume: {}
+  mailcatcher:
+    image: schickling/mailcatcher
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 1080
+        published: "1080"
+        protocol: tcp
+      - mode: ingress
+        target: 1025
+        published: "1025"
+        protocol: tcp
+  playwright:
+    build:
+      context: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/frontend
+      dockerfile: Dockerfile.playwright
+      args:
+        NODE_ENV: production
+        VITE_API_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_started
+        required: true
+      mailcatcher:
+        condition: service_started
+        required: true
+    environment:
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.nip.io
+      CI: ""
+      DATABASE_TYPE: supabase
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost.nip.io
+      EMAILS_FROM_EMAIL: info@example.com
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: admin@example.com
+      FIRST_SUPERUSER_PASSWORD: quickforgeai
+      FRONTEND_HOST: http://localhost:5173
+      MAILCATCHER_HOST: http://mailcatcher:1080
+      PLAYWRIGHT_HTML_HOST: 0.0.0.0
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: quickforgeai
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: 127.0.0.1
+      POSTGRES_USER: postgres
+      POSTHOG_API_KEY: your_api_key_here
+      POSTHOG_CAPTURE_PERSONAL_INFO: "False"
+      POSTHOG_HOST: https://app.posthog.com
+      PROJECT_NAME: Quick Forge AI
+      SECRET_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY1OTEzMTUsInN1YiI6IjRiNzU0NGEyLTVjZjEtNDYxMS1hMjUyLTJiOTg1MzRmMjFlYyJ9.n-lPvZma0bqDhaYrRGJ66xAjB_r_qaonshkEDnggvHw
+      SENTRY_DSN: https://929a5798ce32840027d741ad2f0094de@o4507569747722240.ingest.us.sentry.io/4509241137037312
+      SMTP_HOST: ""
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "587"
+      SMTP_SSL: "False"
+      SMTP_TLS: "True"
+      SMTP_USER: ""
+      STACK_NAME: quick-forge-ai
+      SUPABASE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRldm9ybHNvZm1pbG9xcGRjc3lzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTgyMTg3OCwiZXhwIjoyMDYxMzk3ODc4fQ.vNlR6aQ4XDzZKHb5cmfGW_lXtH4e2bM8OdbmQFUYqnU
+      SUPABASE_DB_HOST: aws-0-us-west-1.pooler.supabase.com
+      SUPABASE_DB_NAME: postgres
+      SUPABASE_DB_PASSWORD: quickforgeai
+      SUPABASE_DB_POOL_MODE: session
+      SUPABASE_DB_PORT: "5432"
+      SUPABASE_DB_USER: postgres.tevorlsofmiloqpdcsys
+      SUPABASE_URL: https://tevorlsofmiloqpdcsys.supabase.co
+      VITE_API_URL: http://backend:8000
+    ipc: host
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 9323
+        published: "9323"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/frontend/blob-report
+        target: /app/blob-report
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/frontend/test-results
+        target: /app/test-results
+        bind:
+          create_host_path: true
+  prestart:
+    build:
+      context: /Users/xiongxinwei/data/open-source-project-learn/quick-forge-ai/backend
+      dockerfile: Dockerfile
+    command:
+      - bash
+      - scripts/prestart.sh
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+        required: true
+    environment:
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.nip.io
+      DATABASE_TYPE: supabase
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost.nip.io
+      EMAILS_FROM_EMAIL: info@example.com
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: admin@example.com
+      FIRST_SUPERUSER_PASSWORD: quickforgeai
+      FRONTEND_HOST: http://localhost:5173
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: quickforgeai
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: db
+      POSTGRES_USER: postgres
+      POSTHOG_API_KEY: your_api_key_here
+      POSTHOG_CAPTURE_PERSONAL_INFO: "False"
+      POSTHOG_HOST: https://app.posthog.com
+      PROJECT_NAME: Quick Forge AI
+      SECRET_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY1OTEzMTUsInN1YiI6IjRiNzU0NGEyLTVjZjEtNDYxMS1hMjUyLTJiOTg1MzRmMjFlYyJ9.n-lPvZma0bqDhaYrRGJ66xAjB_r_qaonshkEDnggvHw
+      SENTRY_DSN: https://929a5798ce32840027d741ad2f0094de@o4507569747722240.ingest.us.sentry.io/4509241137037312
+      SMTP_HOST: ""
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "587"
+      SMTP_SSL: "False"
+      SMTP_TLS: "True"
+      SMTP_USER: ""
+      STACK_NAME: quick-forge-ai
+      SUPABASE_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRldm9ybHNvZm1pbG9xcGRjc3lzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTgyMTg3OCwiZXhwIjoyMDYxMzk3ODc4fQ.vNlR6aQ4XDzZKHb5cmfGW_lXtH4e2bM8OdbmQFUYqnU
+      SUPABASE_DB_HOST: aws-0-us-west-1.pooler.supabase.com
+      SUPABASE_DB_NAME: postgres
+      SUPABASE_DB_PASSWORD: quickforgeai
+      SUPABASE_DB_POOL_MODE: session
+      SUPABASE_DB_PORT: "5432"
+      SUPABASE_DB_USER: postgres.tevorlsofmiloqpdcsys
+      SUPABASE_URL: https://tevorlsofmiloqpdcsys.supabase.co
+    image: backend:latest
+    networks:
+      default: null
+      traefik-public: null
+  proxy:
+    command:
+      - --providers.docker
+      - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik-public`)
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --accesslog
+      - --log
+      - --log.level=DEBUG
+      - --api
+      - --api.insecure=true
+    image: traefik:3.0
+    labels:
+      traefik.constraint-label: traefik-public
+      traefik.enable: "true"
+      traefik.http.middlewares.https-redirect.contenttype.autodetect: "false"
+    networks:
+      default: null
+      traefik-public: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "80"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        published: "8090"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        bind:
+          create_host_path: true
+networks:
+  default:
+    name: quick-forge-ai_default
+  traefik-public:
+    name: quick-forge-ai_traefik-public
+volumes:
+  app-db-data:
+    name: quick-forge-ai_app-db-data
+  backend-venv:
+    name: quick-forge-ai_backend-venv
+  frontend-node-modules:
+    name: quick-forge-ai_frontend-node-modules
