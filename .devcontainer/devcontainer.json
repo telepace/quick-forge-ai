@@ -7,8 +7,10 @@
   ],  
   "service": "backend",  
   "workspaceFolder": "/app",  
+  "initializeCommand": "cp .env.example .env",
   "features": {  
     "ghcr.io/devcontainers/features/python:1": { "version": "3.10" },  
+    "ghcr.io/itsmechlark/features/doppler:2": {},
     "ghcr.io/devcontainers/features/node:1": { "version": "lts" }  
   },  
   "customizations": {  
@@ -37,6 +39,6 @@
     }  
   },  
   "forwardPorts": [8000, 5173, 5432, 8080, 1080],  
-  "postStartCommand": "[ ! -f .env ] && cp .env.example .env || echo '.env already exists'; pip install pre-commit && pre-commit install",
+  "postStartCommand": "if [ ! -f .env ]; then cp .env.example .env; fi && uv sync",
   "remoteUser": "root"  
 }
