@@ -56,6 +56,7 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           uv sync
+          source .venv/bin/activate
           pip install .
         working-directory: backend
 
@@ -78,7 +79,7 @@ jobs:
           POSTHOG_API_KEY: ""
           POSTHOG_HOST: ""
           # VIRTUAL_ENV might not be needed if uv sync --system is used
-          # VIRTUAL_ENV: backend/.venv
+          VIRTUAL_ENV: .venv
 
       # 5. Configure Git User
       - name: Configure Git User

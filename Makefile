@@ -63,7 +63,6 @@ DOCS_DIR := $(ROOT_DIR)/docs
 
 # ==============================================================================
 # Build targets
-
 ## all: Build all components
 .PHONY: all
 all: backend-build frontend-build website-build
@@ -84,13 +83,16 @@ backend-install:
 .PHONY: backend
 backend:
 	@echo "===========> Building backend"
-	@cd $(BACKEND_DIR) && fastapi dev app/main.py
+	@source backend/.venv/bin/activate && \
+	cd $(BACKEND_DIR) && fastapi dev app/main.py
 
 ## backend-test: Run backend tests with coverage
 .PHONY: backend-test
 backend-test: backend-install
 	@echo "===========> Running backend tests with coverage"
-	@bash $(BACKEND_DIR)/scripts/test.sh
+	@source $(BACKEND_DIR)/.venv/bin/activate && \
+	cd $(BACKEND_DIR) && \
+	bash scripts/test.sh
 
 ## backend-test-specific: Run specific backend test
 .PHONY: backend-test-specific
@@ -103,19 +105,24 @@ backend-test-specific: backend-install
 .PHONY: backend-lint
 backend-lint: backend-install
 	@echo "===========> Running backend linters"
-	@cd $(BACKEND_DIR) && bash scripts/lint.sh
+	@source $(BACKEND_DIR)/.venv/bin/activate && \
+	cd $(BACKEND_DIR) && \
+	bash scripts/lint.sh
 
 ## backend-run: Run backend locally
 .PHONY: backend-run
 backend-run: backend-install
 	@echo "===========> Running backend"
-	@cd $(BACKEND_DIR) && uvicorn app.main:app --reload
+	@echo "===========> Starting backend server with auto-reload"
+	@source $(BACKEND_DIR)/.venv/bin/activate && \
+	cd $(BACKEND_DIR) && \
+	uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 ## backend-prestart: Run backend prestart initialization
 .PHONY: backend-prestart
 backend-prestart:
 	@echo "===========> Running backend prestart initialization"
-	@bash $(BACKEND_DIR)/scripts/prestart.sh
+	@source $(BACKEND_DIR)/.venv/bin/activate && $(BACKEND_DIR)/scripts/prestart.sh
 
 ## backend-coverage-report: Open backend coverage report
 .PHONY: backend-coverage-report
@@ -255,7 +262,7 @@ clean:
 .PHONY: backend-format
 backend-format:
 	@echo "===========> Formatting backend code"
-	@bash $(BACKEND_DIR)/scripts/format.sh
+	@source $(BACKEND_DIR)/.venv/bin/activate && $(BACKEND_DIR)/scripts/format.sh
 
 ## format: Format code in all components
 .PHONY: format
@@ -306,7 +313,7 @@ install-pre-commit:
 .PHONY: generate-client
 generate-client:
 	@echo "===========> Generate OpenAPI client"
-	@bash $(ROOT_DIR)/scripts/generate-client.sh
+	@source $(BACKEND_DIR)/.venv/bin/activate && $(ROOT_DIR)/scripts/generate-client.sh
 
 ## docker-test: Run tests in Docker
 .PHONY: docker-test

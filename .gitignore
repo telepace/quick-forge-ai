@@ -491,4 +491,4 @@ sketch
 
 # Local development files
 .qodo
-.qodo/*
+.qodo/*_pagefind/
