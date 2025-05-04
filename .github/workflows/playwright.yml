@@ -79,6 +79,8 @@ jobs:
       run: doppler setup --silent --project quick-forge-ai --config stg
       env:
         DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+    - name: Copy .env.example to .env
+      run: cp .env.example .env
     - run: doppler run -- docker compose build
       env:
         DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
