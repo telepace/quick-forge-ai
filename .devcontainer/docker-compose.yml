@@ -1,0 +1,19 @@
+version: '3.8'  
+services:  
+  backend:  
+    volumes:  
+      - ..:/app:cached  
+      - backend-venv:/app/.venv  
+      - ~/.ssh:/root/.ssh:ro  
+      - ~/.gitconfig:/root/.gitconfig:ro  
+    command: sleep infinity  
+  
+  frontend:  
+    volumes:  
+      - ../frontend:/app:cached  
+      - frontend-node-modules:/app/node_modules  
+    command: sleep infinity  
+  
+volumes:  
+  backend-venv:  
+  frontend-node-modules:

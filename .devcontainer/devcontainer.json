@@ -1,34 +1,42 @@
-{
-  "name": "Quick Forge AI - Backend Development",
-  "dockerComposeFile": [
-    "../docker-compose.yml"
-  ],
-  "service": "backend",
-  "workspaceFolder": "/app",
-  "shutdownAction": "stopCompose",
-  "runServices": [
-    "db",
-    "backend"
-  ],
-  "extensions": [
-    "ms-python.python",
-    "ms-python.vscode-pylance",
-    "ms-azuretools.vscode-docker"
-  ],
-  "settings": {
-    "python.defaultInterpreterPath": "/app/.venv/bin/python",
-    "python.formatting.blackArgs": [
-      "--line-length",
-      "88"
-    ]
-  },
-  "containerEnv": {
-    "PYTHONPATH": "/app",
-    "ENVIRONMENT": "development"
-  },
-  "forwardPorts": [
-    5432,
-    8000
-  ],
-  "postStartCommand": "if [ ! -f .env ]; then cp .env.example .env; fi && uv sync"
-} 
+{  
+  "name": "FastAPI Full Stack",  
+  "dockerComposeFile": [  
+    "../docker-compose.yml",  
+    "../docker-compose.override.yml",  
+    "docker-compose.yml"  
+  ],  
+  "service": "backend",  
+  "workspaceFolder": "/app",  
+  "features": {  
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.10" },  
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" }  
+  },  
+  "customizations": {  
+    "vscode": {  
+      "settings": {  
+        "python.defaultInterpreterPath": "/app/.venv/bin/python",  
+        "python.linting.enabled": true,  
+        "python.formatting.provider": "ruff",  
+        "editor.formatOnSave": true,  
+        "editor.codeActionsOnSave": {  
+          "source.fixAll": true  
+        },  
+        "terminal.integrated.defaultProfile.linux": "bash"  
+      },  
+      "extensions": [  
+        "ms-python.python",  
+        "ms-python.vscode-pylance",  
+        "charliermarsh.ruff",  
+        "ms-azuretools.vscode-docker",  
+        "dbaeumer.vscode-eslint",  
+        "esbenp.prettier-vscode",  
+        "biomejs.biome",  
+        "bradlc.vscode-tailwindcss",  
+        "ms-vscode.vscode-typescript-next"  
+      ]  
+    }  
+  },  
+  "forwardPorts": [8000, 5173, 5432, 8080, 1080],  
+  "postCreateCommand": "[ ! -f .env ] && cp .env.example .env || echo '.env already exists'; pip install pre-commit && pre-commit install",  
+  "remoteUser": "root"  
+}
