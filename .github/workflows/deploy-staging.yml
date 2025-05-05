@@ -7,26 +7,24 @@ on:
 
 jobs:
   deploy:
-    # Do not deploy in the main repository, only in user projects
-    # if: github.repository_owner == 'telepace'
     runs-on:
       - self-hosted
       - staging
-    env:
-      ENVIRONMENT: staging
-      DOMAIN: ${{ secrets.DOMAIN_STAGING }}
-      STACK_NAME: ${{ secrets.STACK_NAME_STAGING }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      FIRST_SUPERUSER: ${{ secrets.FIRST_SUPERUSER }}
-      FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
-      SMTP_HOST: ${{ secrets.SMTP_HOST }}
-      SMTP_USER: ${{ secrets.SMTP_USER }}
-      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-      EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-      - run: docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} build
-      - run: docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up -d
+
+      - name: Setup Doppler environment
+        run: doppler setup --silent --project quick-forge-ai --config stg
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+      - name: Docker Compose Build (with Doppler env)
+        run: doppler run --mount=false -- docker compose -f docker-compose.yml build
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+      - name: Docker Compose Up (with Doppler env)
+        run: doppler run --mount=false -- docker compose -f docker-compose.yml up -d
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
