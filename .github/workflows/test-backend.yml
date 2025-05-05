@@ -8,50 +8,48 @@ on:
     types:
       - opened
       - synchronize
-
 jobs:
   test-backend:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: '3.10'
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
           version: "0.4.15"
           enable-cache: true
+
       - name: Copy example env file
         run: cp .env.example .env
+
       - name: Install Doppler CLI
         uses: dopplerhq/cli-action@v3
-      - name: Setup Doppler
-        run: doppler setup --silent --project quick-forge-ai --config stg
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 
-      - run: doppler run -- docker compose down -v --remove-orphans
+      - name: Setup Doppler
+        run: |
+          doppler setup --silent --project quick-forge-ai --config stg
+          doppler secrets download --no-file --format env > .env
+          STACK_NAME=$(doppler run -- printenv STACK_NAME)
+          echo "STACK_NAME=$STACK_NAME" >> $GITHUB_ENV
         env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
-      - run: doppler run -- docker compose up -d db mailcatcher
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_STAGING }}
+
+      - run: docker compose --project-name $STACK_NAME down -v --remove-orphans
+      - run: docker compose --project-name $STACK_NAME up -d db mailcatcher
       - name: Migrate DB
-        run: doppler run -- uv run bash scripts/prestart.sh
+        run: docker compose --project-name $STACK_NAME run --rm backend uv run bash scripts/prestart.sh
         working-directory: backend
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Run tests
-        run: doppler run -- uv run bash scripts/tests-start.sh "Coverage for ${{ github.sha }}"
+        run: docker compose --project-name $STACK_NAME run --rm backend uv run bash scripts/tests-start.sh "Coverage for ${{ github.sha }}"
         working-directory: backend
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
-      - run: doppler run -- docker compose down -v --remove-orphans
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - run: docker compose --project-name $STACK_NAME down -v --remove-orphans
       - name: Store coverage files
         uses: actions/upload-artifact@v4
         with:
