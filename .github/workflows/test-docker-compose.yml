@@ -31,16 +31,15 @@ jobs:
         run: |
           doppler setup --silent --project quick-forge-ai --config stg
           doppler secrets download --no-file --format env > .env
-          STACK_NAME=$(doppler run -- printenv STACK_NAME)
-          echo "STACK_NAME=$STACK_NAME" >> $GITHUB_ENV
+
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_STAGING }}
 
       - name: Build and test services
         run: |
-          docker compose --project-name $STACK_NAME down -v --remove-orphans
-          docker compose --project-name $STACK_NAME build
-          docker compose --project-name $STACK_NAME up -d backend frontend adminer
+          docker compose down -v --remove-orphans
+          docker compose build
+          docker compose up -d --wait backend frontend adminer
 
       - name: Test backend is up
         run: curl http://localhost:8000/api/v1/utils/health-check
@@ -49,4 +48,4 @@ jobs:
         run: curl http://localhost:5173
 
       - name: Clean up
-        run: docker compose --project-name $STACK_NAME down -v --remove-orphans
+        run: docker compose down -v --remove-orphans
