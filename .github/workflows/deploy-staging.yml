@@ -10,14 +10,28 @@ jobs:
     runs-on:
       - self-hosted
       - staging
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Doppler environment
+      - name: Show current user and docker access
+        run: |
+          echo "Running as user: $(whoami)"
+          echo "Docker access test:"
+          docker ps || echo "Docker access failed"
+
+      - name: Setup Doppler project & download secrets to .env
         run: |
           doppler setup --silent --project quick-forge-ai --config stg
           doppler secrets download --no-file --format env > .env
-          doppler run -- docker compose up -d
+          STACK_NAME=$(doppler run -- printenv STACK_NAME)
+          echo "STACK_NAME=$STACK_NAME" >> $GITHUB_ENV
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+      - name: Start services with Docker Compose
+        run: |
+          docker compose --project-name $STACK_NAME down --remove-orphans
+          docker compose --project-name $STACK_NAME build
+          docker compose --project-name $STACK_NAME up -d
