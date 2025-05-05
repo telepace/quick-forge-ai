@@ -17,6 +17,7 @@ jobs:
       - name: Setup Doppler environment
         run: |
           doppler setup --silent --project quick-forge-ai --config stg
+          doppler secrets download --no-file --format env > .env
           doppler run -- docker compose up -d
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
