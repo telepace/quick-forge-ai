@@ -88,6 +88,12 @@ playwright = "playwright"
 dorny = "dorny"
 mxschmitt = "mxschmitt"
 astral = "astral"
+# German words
+oder = "oder"
+ist = "ist"
+Oder = "Oder"
+als = "als"
+also = "also"
 
 # Use custom settings for Markdown files
 [type.markdown]
