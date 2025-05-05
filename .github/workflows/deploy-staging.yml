@@ -15,16 +15,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Doppler environment
-        run: doppler setup --silent --project quick-forge-ai --config stg
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
-
-      - name: Docker Compose Build (with Doppler env)
-        run: doppler run --mount=false -- docker compose -f docker-compose.yml build
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
-
-      - name: Docker Compose Up (with Doppler env)
-        run: doppler run --mount=false -- docker compose -f docker-compose.yml up -d
+        run: |
+          doppler setup --silent --project quick-forge-ai --config stg
+          doppler run -- docker compose up -d
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
