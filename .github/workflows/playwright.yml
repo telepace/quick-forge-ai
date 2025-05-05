@@ -82,7 +82,7 @@ jobs:
         DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_STAGING }}
     - run: docker compose --project-name $STACK_NAME down --remove-orphans
     - run: docker compose --project-name $STACK_NAME build
-    - run: docker compose --project-name $STACK_NAME up -d --wait
+    - run: docker compose --project-name $STACK_NAME up -d
     - name: Run Playwright tests
       run: docker compose --project-name $STACK_NAME run --rm playwright npx playwright test --fail-on-flaky-tests --trace=retain-on-failure --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
     - run: docker compose --project-name $STACK_NAME down --remove-orphans
