@@ -8,35 +8,45 @@ on:
     types:
       - opened
       - synchronize
-
 jobs:
-
   test-docker-compose:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Show current user and docker access
+        run: |
+          echo "Running as user: $(whoami)"
+          echo "Docker access test:"
+          docker ps || echo "Docker access failed"
+
       - name: Copy example env file
         run: cp .env.example .env
+
       - name: Install Doppler CLI
         uses: dopplerhq/cli-action@v3
-      - name: Setup Doppler
-        run: doppler setup --silent --project quick-forge-ai --config stg
+
+      - name: Setup Doppler project & download secrets to .env
+        run: |
+          doppler setup --silent --project quick-forge-ai --config stg
+          doppler secrets download --no-file --format env > .env
+          STACK_NAME=$(doppler run -- printenv STACK_NAME)
+          echo "STACK_NAME=$STACK_NAME" >> $GITHUB_ENV
         env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
-      - run: doppler run -- docker compose build
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
-      - run: doppler run -- docker compose down -v --remove-orphans
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
-      - run: doppler run -- docker compose up -d --wait backend frontend adminer
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_STAGING }}
+
+      - name: Build and test services
+        run: |
+          docker compose --project-name $STACK_NAME down -v --remove-orphans
+          docker compose --project-name $STACK_NAME build
+          docker compose --project-name $STACK_NAME up -d --wait backend frontend adminer
+
       - name: Test backend is up
         run: curl http://localhost:8000/api/v1/utils/health-check
+
       - name: Test frontend is up
         run: curl http://localhost:5173
-      - run: doppler run -- docker compose down -v --remove-orphans
-        env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+      - name: Clean up
+        run: docker compose --project-name $STACK_NAME down -v --remove-orphans

@@ -3,30 +3,71 @@ name: Deploy to Production
 on:
   release:
     types:
-      - published
+      - published # Wird ausgelöst, wenn ein Release veröffentlicht wird
 
 jobs:
   deploy:
-    # Do not deploy in the main repository, only in user projects
-    # if: github.repository_owner == 'telepace'
+    name: Deploy to Production Environment
+    # Optional: Bedingung, um sicherzustellen, dass dies nur in bestimmten Repositories läuft
+    # if: github.repository_owner == 'dein-org-oder-benutzername'
     runs-on:
       - self-hosted
-      - staging
-    env:
-      ENVIRONMENT: production
-      DOMAIN: ${{ secrets.DOMAIN_PRODUCTION }}
-      STACK_NAME: ${{ secrets.STACK_NAME_PRODUCTION }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      FIRST_SUPERUSER: ${{ secrets.FIRST_SUPERUSER }}
-      FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
-      SMTP_HOST: ${{ secrets.SMTP_HOST }}
-      SMTP_USER: ${{ secrets.SMTP_USER }}
-      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-      EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      - staging # Überlege, ob hier 'production' sinnvoller wäre
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-      - run: docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_PRODUCTION }} build
-      - run: docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_PRODUCTION }} up -d
+
+      - name: Show current user and docker access
+        run: |
+          echo "Running as user: $(whoami)"
+          echo "Docker access test:"
+          docker ps || echo "Docker access failed"
+
+      # Richte Doppler für die Produktionsumgebung ein
+      # Erfordert ein DOPPLER_TOKEN Secret für die Produktion
+      - name: Setup Doppler project & download secrets to .env
+        run: |
+          # Stelle sicher, dass Doppler CLI installiert ist oder füge einen Setup-Schritt hinzu
+          # z.B.: uses: dopplerhq/cli-action@v2
+          echo "Setting up Doppler for Production"
+          # Passe --project und --config an deine Produktionskonfiguration an
+          doppler setup --silent --project quick-forge-ai --config prd # Beispiel: prd für Produktion
+          echo "Downloading production secrets to .env"
+          doppler secrets download --no-file --format env > .env
+          # Hole den Stack-Namen aus Doppler (oder verwende ein Secret, falls bevorzugt)
+          STACK_NAME=$(doppler run -- printenv STACK_NAME) # Hole den Produktions-Stack-Namen
+          # Alternativ, wenn STACK_NAME direkt als Secret verfügbar ist:
+          echo "STACK_NAME=${STACK_NAME}" >> $GITHUB_ENV
+          # Hole den Release-Tag (z.B. v1.0.0) aus dem GitHub-Kontext
+          echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "Using Stack Name: ${STACK_NAME}"
+          echo "Using Release Tag: ${{ github.ref_name }}"
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_PRODUCTION }} # Stelle sicher, dass dieses Secret existiert
+
+      # Stoppe alte Container, baue neue Images (mit dem Release-Tag) und starte die Dienste
+      - name: Deploy Services with Docker Compose using Release Tag
+        # Diese Umgebungsvariablen sind jetzt für diesen Schritt verfügbar:
+        # $STACK_NAME (aus Doppler/Secret)
+        # $RELEASE_TAG (aus github.ref_name)
+        # Docker Compose liest automatisch die .env-Datei und die Umgebungsvariablen des Runners
+        # Stelle sicher, dass deine docker-compose.yml Datei den Tag verwendet, z.B.:
+        # services:
+        #   web:
+        #     image: dein-registry/dein-image:${RELEASE_TAG:-latest} # Verwendet RELEASE_TAG oder 'latest' als Fallback
+        run: |
+          echo "Stopping existing services..."
+          docker compose --project-name $STACK_NAME down --remove-orphans
+          echo "Building services with tag $RELEASE_TAG..."
+          # Der Build-Prozess sollte den RELEASE_TAG verwenden, wenn er in der docker-compose.yml referenziert wird
+          # Oder explizit übergeben, falls nötig: docker compose --project-name $STACK_NAME build --build-arg RELEASE_TAG=$RELEASE_TAG
+          docker compose --project-name $STACK_NAME build
+          echo "Starting services..."
+          docker compose --project-name $STACK_NAME up -d
+        env:
+           # Übergebe den Tag explizit an die Docker Compose Umgebung, falls die Substitution in der YML nicht ausreicht
+           # Normalerweise nicht nötig, wenn die YML ${RELEASE_TAG} verwendet.
+           TAG: ${{ env.RELEASE_TAG }}
+           # Du kannst hier immer noch spezifische Variablen überschreiben, wenn nötig,
+           # aber die meisten sollten aus der .env-Datei von Doppler kommen.
