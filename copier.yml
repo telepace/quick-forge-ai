@@ -73,6 +73,8 @@ _exclude:
   - .cache
   - .venv
   # Frontend
+  - website
+  - helm-charts
   # Logs
   - logs
   - "*.log"
