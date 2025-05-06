@@ -58,7 +58,7 @@ services:
 
   # 数据库
   db:
-    image: postgres:14
+    image: postgres:17
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
