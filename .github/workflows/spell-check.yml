@@ -41,7 +41,7 @@ jobs:
 
       - name: Commit Spell Check Changes
         if: ${{ success() && github.event_name == 'pull_request' }}
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "chore: fix typos [skip ci]"
           commit_user_name: "Typos Bot"
