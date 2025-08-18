@@ -19,7 +19,7 @@ jobs:
     steps:
       # 1. Checkout Code - Single step handles both fork and same-repo PRs/pushes
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         # Fetch depth 0 is needed for accurate diff/commit history if required elsewhere
         # For pushing back, fetch the specific ref for same-repo PRs
         with:
