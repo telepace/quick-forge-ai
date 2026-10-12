@@ -71,7 +71,7 @@ jobs:
       env:
         VIRTUAL_ENV: backend/.venv
     - name: Install Doppler CLI
-      uses: dopplerhq/cli-action@v3
+      uses: dopplerhq/cli-action@v4
     - name: Setup Doppler and env
       run: |
         doppler setup --silent --project quick-forge-ai --config stg
