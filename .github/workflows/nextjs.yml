@@ -81,7 +81,7 @@ jobs:
         run: npx pagefind --site out --output-path out/_pagefind # Target the 'out' dir relative to 'website/'
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           # Path is relative to the repository root, pointing to the build output folder
           path: ./website/out
